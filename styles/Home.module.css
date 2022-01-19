@@ -1,16 +1,13 @@
-.container {
-  padding: 0 2rem;
-}
-
 .main {
+  padding: 4rem 2rem;
   min-height: 100vh;
-  padding: 4rem 0;
-  flex: 1;
+  margin: 0 40px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
 }
+
+
 
 .footer {
   display: flex;
@@ -50,14 +47,29 @@
   text-align: center;
 }
 
+.recordHeading {
+  margin: 60px 0 20px;
+  width: 100%;
+  display: flex;
+  text-align: center;
+  justify-content: flex-start;
+}
+
+.descriptionWrapper {
+  display: flex;
+  margin-left: 10px;
+}
+
 .description {
-  margin: 4rem 0;
-  line-height: 1.5;
+  margin: auto 0;
   font-size: 1.5rem;
+  line-height: 1;
+  color: gray;
+
 }
 
 .code {
-  background: #fafafa;
+  background: var(--background-light);
   border-radius: 5px;
   padding: 0.75rem;
   font-size: 1.1rem;

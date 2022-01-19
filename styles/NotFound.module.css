@@ -1,0 +1,11 @@
+.container {
+    margin-top: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.container a {
+    color: rgb(122, 122, 202);
+    text-decoration: underline;
+}
