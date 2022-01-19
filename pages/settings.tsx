@@ -1,7 +1,11 @@
 import { NextPage } from "next";
 import Head from "next/head";
+import { useUser } from "../firebase/useUser";
+import { auth } from "../firebase/initFirebase";
 
+const user = auth.currentUser;
 const Settings: NextPage = () => {
+  const { user, logout } = useUser();
   return (
     <div>
       <Head>
