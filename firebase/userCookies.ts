@@ -10,9 +10,8 @@ export const getUserFromCookie = (): null | User => {
 };
 
 export const setUserCookie = (user: User) => {
-  console.log("about to set cookie: ", cookies, user);
   cookies.set("auth", JSON.stringify(user), {
-    // expires: Date.parse("01 Jan 2100 00:00:00 GMT"),
+    expires: Date.parse("01 Jan 2100 00:00:00 GMT"),
   });
 };
 

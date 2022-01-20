@@ -1,14 +1,13 @@
 import "../styles/globals.css";
 import type { AppProps } from "next/app";
 import Layout from "../comps/Layout";
-import { useUser } from "../firebase/useUser";
-import SignInScreen from "./auth";
+import { ToastContainer } from "react-toastify";
 
 function MyApp({ Component, pageProps }: AppProps) {
-  console.log("fka");
   return (
     <Layout>
       <Component {...pageProps} />
+      <ToastContainer theme='colored' autoClose={2} />
     </Layout>
   );
 }

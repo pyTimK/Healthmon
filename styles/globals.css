@@ -3,7 +3,9 @@
 :root {
   --background-dark: #17171B;
   --background-light: #28272C;
+  --green: #3BA55D;
   --pink: rgb(236, 111, 126);
+  --red: rgb(255, 42, 67);
 }
 
 html,
@@ -34,4 +36,8 @@ a {
 
 * {
   box-sizing: border-box;
+}
+
+.avatar {
+  border-radius: 50%;
 }

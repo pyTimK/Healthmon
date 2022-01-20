@@ -21,3 +21,5 @@
 //     throw error;
 //   }
 // };
+import "../comps/Avatar";
+const firebasetemp = 0;

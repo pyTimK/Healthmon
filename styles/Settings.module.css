@@ -1,0 +1,101 @@
+.container {
+    text-align: center;
+}
+
+.hint {
+    color: gray;
+    margin: 5px;
+}
+
+.block {
+    text-align: left;
+
+}
+
+.item {
+    padding: 16px;
+    background-color: var(--background-light);
+    width: 50vw;
+    max-width: 500px;
+    display: flex;
+    border-radius: 8px;
+}
+
+.itemtext {
+    margin: 0;
+    display: inline;
+    flex: 3;
+}
+
+.itemtext p {
+    font-size: 1rem;
+    color: gray;
+    margin: 0;
+    display: inline;
+}
+
+.option {
+    flex: 1;
+    text-align: right;
+}
+
+
+.modal {
+    background: var(--background-light);
+    padding: 16px;
+    border-radius: 10px;
+    display: flex;
+    width: 80vw;
+    max-width: 800px;
+    text-align: center;
+    --svg-color: whitesmoke;
+    color: var(--svg-color);
+}
+
+.modalLeft,
+.modalRight {
+    background: var(--background-dark);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    margin: 50px 40px;
+    flex: 1;
+    cursor: pointer;
+    aspect-ratio: 1;
+}
+
+.svg {
+    stroke: var(--svg-color);
+}
+
+.modalTxt {
+    color: var(--svg-color)
+}
+
+.sss {
+    size: 96px;
+    stroke-width: 1px;
+}
+
+.modalLeft:hover,
+.modalRight:hover {
+    opacity: 0.7;
+    --svg-color: #fcd8dc;
+}
+
+/* .modalRight {
+    background: blue;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+    aspect-ratio: 1;
+} */
+
+
+.qrfilereader {
+    display: none;
+}

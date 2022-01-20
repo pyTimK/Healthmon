@@ -15,8 +15,7 @@ const firebaseConfig = {
 };
 
 initializeApp(firebaseConfig);
-console.log("init");
-const firestore = getFirestore();
+const db = getFirestore();
 const auth = getAuth();
 
 onAuthStateChanged(auth, (user) => {
@@ -33,7 +32,7 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-export { firestore, auth };
+export { db, auth };
 
 // export default function initFirebase() {
 //   if (!firebase.getApps().length) {

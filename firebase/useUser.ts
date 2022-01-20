@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { User } from "firebase/auth";
 import { getUserFromCookie, removeUserCookie, setUserCookie } from "./userCookies";
 import { auth } from "./initFirebase";
+import Cookies from "js-cookie";
 
 const useUser = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -12,6 +13,7 @@ const useUser = () => {
     try {
       await auth.signOut();
       removeUserCookie();
+      Cookies.remove("isPatient");
       router.push("/auth");
     } catch (_e: any) {
       const e: Error = _e;
@@ -33,10 +35,8 @@ const useUser = () => {
         setUser(null);
       }
     });
-    console.log("fk");
 
     const userFromCookie = getUserFromCookie();
-    console.log("fku");
     if (!userFromCookie) {
       router.push("/auth");
       return;
