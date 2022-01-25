@@ -2,6 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { enableIndexedDbPersistence } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -51,12 +52,12 @@ export { db, auth };
 
 // ? OFFLINE DATA
 // TODO
-// db.enablePersistence().catch((error) => {
-//   if (error.code === "failed-precondition") {
-//     // multiple tabs open at once
-//     console.log("persistence failed");
-//   } else if (error.code === "unimplemented") {
-//     // lack of browser support
-//     console.log("persistence is not available");
-//   }
-// });
+enableIndexedDbPersistence(db).catch((error) => {
+  if (error.code === "failed-precondition") {
+    // multiple tabs open at once
+    console.log("persistence failed");
+  } else if (error.code === "unimplemented") {
+    // lack of browser support
+    console.log("persistence is not available");
+  }
+});

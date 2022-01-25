@@ -5,16 +5,23 @@ import { auth, db } from "../firebase/initFirebase";
 import styles from "../styles/Settings.module.css";
 import { Camera, CirclePlusFill, CircleXFill, File } from "akar-icons";
 import { useModal } from "react-hooks-use-modal";
-import { useRef, useState } from "react";
-import notify from "../functions/notify";
-import { doc, setDoc } from "firebase/firestore";
+import { FormEventHandler, useRef, useState } from "react";
+import { doc, FieldValue, getDoc, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
 import { CookiesHelper } from "../classes/CookiesHelper";
+import notify from "../myfunctions/notify";
+import { ToastContainer } from "react-toastify";
+import HealthWorker from "../types/healthWorker";
 if (typeof window != "undefined") {
   var QrReader = require("react-qr-reader");
 }
 
+const defaultHealthWorker: HealthWorker = {
+  name: "Dr. Belen",
+  number: "09683879596",
+};
+
 const Settings: NextPage = () => {
-  const [healthWorkers, setHealthWorkers] = useState(["Dr. Belen"]);
+  const [healthWorkers, setHealthWorkers] = useState([defaultHealthWorker]);
   const { user, logout } = useUser();
   const [PairDeviceModal, openPairDeviceModal, closePairDeviceModal, isPairDeviceModalOpen] = useModal("__next", {
     preventScroll: true,
@@ -22,22 +29,48 @@ const Settings: NextPage = () => {
   const [ScanQRModal, openScanQRModal, closeScanQRModal, isScanQRModalOpen] = useModal("__next", {
     preventScroll: true,
   });
+  const [CodeInputModal, openCodeInputModal, closeCodeInputModal, isCodeInputModalOpen] = useModal("__next", {
+    preventScroll: true,
+  });
   const [parsedQR, setParsedQR] = useState<string | null>(CookiesHelper.get("deviceid", ""));
   const qrRef = useRef<QrReader | null>(null);
+  const codeInputRef = useRef<HTMLInputElement>(null);
+  console.log(parsedQR);
 
-  const successScan = (qr: string) => {
+  const submitCode: FormEventHandler<HTMLFormElement> = async (e) => {
+    e.preventDefault();
+    if (!codeInputRef.current) return;
+
+    const authenticateDoc = await getDoc(doc(db, "authenticate", parsedQR!));
+    const deviceData = authenticateDoc.data() as AuthenticateData;
+    if (deviceData.code.toString() !== codeInputRef.current.value) {
+      notify("Code did not match");
+      setParsedQR(null);
+      closeCodeInputModal();
+      return;
+    }
+
+    const paired = await pairDevice();
+    if (!paired) return;
+
+    CookiesHelper.set("deviceid", parsedQR!);
     notify("Successfully linked device", { type: "success" });
+    closeCodeInputModal();
+  };
+
+  const successScan = async (qr: string) => {
+    const res = await askPairDevice(qr);
+    if (!res) return;
     setParsedQR(qr);
-    CookiesHelper.set("deviceid", qr);
-    pairDevice(qr);
+    openCodeInputModal();
   };
 
   const handleFileScan = (qrdata: string | null) => {
+    // console.log("umabot here");
     if (!qrdata) {
       notify("Cannot read qr code");
       return;
     }
-    console.log(qrdata, "qr");
 
     successScan(qrdata);
   };
@@ -57,6 +90,7 @@ const Settings: NextPage = () => {
   const onScanFile = () => {
     try {
       qrRef.current?.openImageDialog();
+      // console.log("umabot here 1");
     } catch (_e) {
       const e = _e as Error;
       console.log(e);
@@ -68,24 +102,67 @@ const Settings: NextPage = () => {
     if (!parsedQR) return;
 
     notify("Device disconnected", { type: "warning" });
-    setParsedQR("");
+    setParsedQR(null);
     CookiesHelper.set("deviceid", "");
     unPairDevice(parsedQR);
   };
 
   //? Firestore
-  const pairDevice = async (deviceCode: string) => {
-    await setDoc(doc(db, "devices", deviceCode), {
-      name: user ? user.displayName : "John Doe",
+  const askPairDevice = async (deviceCode: string) => {
+    try {
+      await updateDoc(doc(db, "devices", deviceCode), {
+        new_name: user ? user.displayName : "John Doe",
+        new_id: user ? user.uid : "1",
+        new_healthWorkers: healthWorkers,
+        confirmed: false,
+        code: 0,
+        request_timestamp: serverTimestamp(),
+      });
+      return true;
+    } catch (_e) {
+      console.log(_e);
+      notify("Invalid qr code");
+      return false;
+    }
+  };
+
+  const pairDevice = async () => {
+    const paired_doc: DeviceData = {
+      name: user && user.displayName ? user.displayName : "John Doe",
+      id: user ? user.uid : "1",
       healthWorkers: healthWorkers,
-    });
+      new_name: "",
+      new_id: "",
+      new_healthWorkers: [],
+      confirmed: true,
+      request_timestamp: serverTimestamp(),
+    };
+    try {
+      await updateDoc(doc(db, "devices", parsedQR!), {
+        ...paired_doc,
+      });
+      return true;
+    } catch (_e) {
+      notify("Pair failed");
+      return false;
+    }
   };
 
   const unPairDevice = async (deviceCode: string) => {
-    await setDoc(doc(db, "devices", deviceCode), {
+    const deviceDoc = await getDoc(doc(db, "devices", parsedQR!));
+    const deviceData = deviceDoc.data() as DeviceData;
+
+    if (user?.uid !== deviceData.id) return;
+    const clearedDeviceData = {
       name: "",
+      id: "",
       healthWorkers: [],
-    });
+      new_name: "",
+      new_id: "",
+      new_healthWorkers: [],
+      confirmed: false,
+    };
+    await updateDoc(doc(db, "devices", deviceCode), clearedDeviceData);
   };
 
   return (
@@ -107,7 +184,7 @@ const Settings: NextPage = () => {
             {parsedQR && <p> (Connected)</p>}
           </h3>
           <div className={styles.option}>
-            {parsedQR ? (
+            {CookiesHelper.get("deviceid", "") !== "" ? (
               <CircleXFill size={24} color='var(--red)' cursor='pointer' onClick={onUnpairDevie} />
             ) : (
               <CirclePlusFill size={24} color='var(--pink)' cursor='pointer' onClick={openPairDeviceModal} />
@@ -133,7 +210,7 @@ const Settings: NextPage = () => {
       {/* SCAN QR MODAL */}
       <ScanQRModal>
         <div className={styles.modal}>
-          <div className={styles.modalLeft} onClick={onScanFile}>
+          <div className={styles.modalLeft}>
             {isScanQRModalOpen && (
               <QrReader delay={3000} onError={handleScanError} onScan={handleCamScan} style={{ width: "100%" }} />
             )}
@@ -141,6 +218,19 @@ const Settings: NextPage = () => {
           </div>
         </div>
       </ScanQRModal>
+
+      {/* CODE INPUT MODAL */}
+      <CodeInputModal>
+        <div className={styles.modal}>
+          <div className={styles.modalLeft}>
+            <p className={styles.modalTxt}>Please enter the code sent to your device</p>
+            <form onSubmit={submitCode}>
+              <input ref={codeInputRef} required type='text' name='code' placeholder='Input code...' />
+              <input type='submit' value='Submit' />
+            </form>
+          </div>
+        </div>
+      </CodeInputModal>
 
       {/* QR READER */}
       <QrReader
@@ -153,8 +243,24 @@ const Settings: NextPage = () => {
         onScan={handleFileScan}
         style={{ width: "100%" }}
       />
+      <ToastContainer theme='colored' autoClose={2} />
     </div>
   );
 };
+
+export interface DeviceData {
+  name: string;
+  id: string;
+  healthWorkers: HealthWorker[];
+  new_name: string;
+  new_id: string;
+  new_healthWorkers: HealthWorker[];
+  confirmed: boolean;
+  request_timestamp: FieldValue;
+}
+
+export interface AuthenticateData {
+  code: number;
+}
 
 export default Settings;

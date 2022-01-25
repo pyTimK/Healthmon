@@ -20,26 +20,30 @@ const Layout: NextPage = ({ children }) => {
   const path = route.pathname;
 
   const [isPatient, setIsPatient] = useState(() => CookiesHelper.get("isPatient", "") as boolean | "");
-  console.log("isPatient ", isPatient);
   const chooseRole = isPatient === "";
 
   const showSidebar = showPages.includes(path) && !chooseRole;
   const showContent = user !== null || path === "/auth";
 
-  if (!showContent) return <></>;
+  if (!showContent) {
+    return <div></div>;
+  }
 
-  if (chooseRole) return <ChooseRole setIsPatient={setIsPatient} />;
+  if (chooseRole) {
+    return <ChooseRole setIsPatient={setIsPatient}>hello</ChooseRole>;
+  }
 
-  return showSidebar ? (
-    <div>
-      <Sidebar />
-      <div className='content-wrapper'>
-        <div className='content'>{children}</div>
+  if (showSidebar)
+    return (
+      <div>
+        <Sidebar />
+        <div className='content-wrapper'>
+          <div className='content'>{children}</div>
+        </div>
       </div>
-    </div>
-  ) : (
-    <>{children}</>
-  );
+    );
+
+  return <>{children}</>;
 };
 
 // Layout.getInitialProps = async (context) => {

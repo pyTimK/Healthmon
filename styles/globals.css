@@ -19,12 +19,14 @@ body {
 
 }
 
+
 .content-wrapper {
   display: flex;
   justify-content: center;
 }
 
 .content {
+  width: 50vw;
   max-width: 960px;
 }
 
@@ -40,4 +42,12 @@ a {
 
 .avatar {
   border-radius: 50%;
+}
+
+/** SMALL TABLET */
+@media screen and (max-width: 960px) {
+  .content {
+    width: 100vw;
+  }
+
 }

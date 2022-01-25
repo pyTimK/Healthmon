@@ -2,6 +2,7 @@ import { IncomingMessage } from "http";
 import cookies from "js-cookie";
 import cookie from "cookie";
 
+const allCookies = ["isPatient", "deviceid"];
 export abstract class CookiesHelper {
   static get<T>(key: string, fallBackValue: T): T {
     try {
@@ -27,5 +28,11 @@ export abstract class CookiesHelper {
       const e = _e as Error;
       console.log(e.message);
     }
+  }
+
+  static clear() {
+    allCookies.forEach((ck) => {
+      cookies.remove(ck);
+    });
   }
 }

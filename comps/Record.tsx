@@ -1,15 +1,32 @@
 import { ReactElement } from "react";
 import styles from "../styles/Record.module.css";
+import firebase from "firebase/compat/app";
+import { getHHMMSS } from "../myfunctions/dateConversions";
 
-const Record: React.FC = () => {
+export interface RecordData {
+  name: string;
+  temp: number;
+  pulse: number;
+  spo2: number;
+  timestamp: firebase.firestore.Timestamp;
+}
+
+export interface Props {
+  temp: number;
+  pulse: number;
+  spo2: number;
+  timestamp: firebase.firestore.Timestamp;
+}
+
+const Record: React.FC<Props> = ({ temp, pulse, spo2, timestamp }) => {
   return (
     <div className={styles.container}>
-      <div className={styles.time}>8:00</div>
+      <div className={styles.time}>{getHHMMSS(timestamp.toDate())}</div>
       <div className={styles.data}>
-        <Data measurement='36.7' units=' °C' name='Temp' />
-        <Data measurement='74' units='BPM' name='PR' />
+        <Data measurement={temp.toFixed(1)} units=' °C' name='Temp' />
+        <Data measurement={Math.floor(pulse).toString()} units='BPM' name='PR' />
         <Data
-          measurement='96'
+          measurement={Math.floor(spo2).toString()}
           units='%'
           name={
             <>

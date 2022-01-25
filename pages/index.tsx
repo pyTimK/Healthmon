@@ -1,17 +1,45 @@
+import { collection, doc, getDoc, getDocs, onSnapshot, query } from "firebase/firestore";
 import type { NextPage } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 import Avatar from "../comps/Avatar";
-import Record from "../comps/Record";
+import Record, { RecordData } from "../comps/Record";
+import { db } from "../firebase/initFirebase";
 import { useUser } from "../firebase/useUser";
+import { getYYYYMMDD } from "../myfunctions/dateConversions";
+import dayGreetings from "../myfunctions/dayGreetings";
 import styles from "../styles/Home.module.css";
-import { useState, useRef } from "react";
-// const QrReader = dynamic(() => import("react-qr-reader"), { ssr: false });
-// import QrReader from "react-qr-reader";
 
 const Home: NextPage = () => {
   const { user } = useUser();
   const router = useRouter();
+
+  const [records, setRecords] = useState<RecordData[]>([]);
+
+  function getRecords(date: Date, uid: string) {
+    const dateDoc = getYYYYMMDD(date);
+    const q = query(collection(db, "records", dateDoc, uid));
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      let gotRecords: RecordData[] = [];
+      querySnapshot.forEach((doc) => {
+        const data = doc.data() as RecordData;
+        gotRecords.push(data);
+      });
+      gotRecords.reverse();
+      setRecords(() => gotRecords);
+    });
+
+    return unsubscribe;
+  }
+
+  // TODO: move to serverside
+  useEffect(() => {
+    if (!user) return;
+    const unsub = getRecords(new Date(), user.uid);
+    return () => unsub();
+  }, [user]);
 
   return (
     user && (
@@ -25,7 +53,9 @@ const Home: NextPage = () => {
         </Head>
 
         <main className={styles.main}>
-          <h1 className={styles.title}>Good morning {user.displayName}</h1>
+          <h1 className={styles.title}>
+            {dayGreetings()} {user.displayName}
+          </h1>
           {/* {user.photoURL && <img className='avatar' src={user.photoURL} alt='avatar' />} */}
           <div className={styles.recordHeading}>
             <Avatar />
@@ -33,33 +63,9 @@ const Home: NextPage = () => {
               <p className={styles.description}>Krisha is feeling good today</p>
             </div>
           </div>
-          <Record />
-          <Record />
-          <Record />
-          <Record />
-          {/* <div className={styles.grid}>
-          <a href='https://nextjs.org/docs' className={styles.card}>
-            <h2>Documentation &rarr;</h2>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href='https://nextjs.org/learn' className={styles.card}>
-            <h2>Learn &rarr;</h2>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a href='https://github.com/vercel/next.js/tree/canary/examples' className={styles.card}>
-            <h2>Examples &rarr;</h2>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href='https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app'
-            className={styles.card}>
-            <h2>Deploy &rarr;</h2>
-            <p>Instantly deploy your Next.js site to a public URL with Vercel.</p>
-          </a>
-        </div> */}
+          {records.map((record, i) => (
+            <Record key={i} timestamp={record.timestamp} temp={record.temp} pulse={record.pulse} spo2={record.spo2} />
+          ))}
         </main>
 
         <footer className={styles.footer}>

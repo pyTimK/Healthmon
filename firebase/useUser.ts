@@ -4,6 +4,8 @@ import { User } from "firebase/auth";
 import { getUserFromCookie, removeUserCookie, setUserCookie } from "./userCookies";
 import { auth } from "./initFirebase";
 import Cookies from "js-cookie";
+import { clear } from "console";
+import { CookiesHelper } from "../classes/CookiesHelper";
 
 const useUser = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -13,7 +15,7 @@ const useUser = () => {
     try {
       await auth.signOut();
       removeUserCookie();
-      Cookies.remove("isPatient");
+      CookiesHelper.clear();
       router.push("/auth");
     } catch (_e: any) {
       const e: Error = _e;
