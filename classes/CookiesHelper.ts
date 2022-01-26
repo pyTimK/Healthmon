@@ -2,7 +2,7 @@ import { IncomingMessage } from "http";
 import cookies from "js-cookie";
 import cookie from "cookie";
 
-const allCookies = ["isPatient", "deviceid"];
+const allCookies = ["user", "isPatient", "deviceid"];
 export abstract class CookiesHelper {
   static get<T>(key: string, fallBackValue: T): T {
     try {
@@ -22,7 +22,7 @@ export abstract class CookiesHelper {
   static set<T>(key: string, value: T) {
     try {
       cookies.set(key, JSON.stringify(value), {
-        expires: Date.parse("01 Jan 2100 00:00:00 GMT"),
+        expires: 1000,
       });
     } catch (_e) {
       const e = _e as Error;

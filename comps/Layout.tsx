@@ -1,37 +1,17 @@
-import { CookiesHelper } from "../classes/CookiesHelper";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
-import { useUser } from "../firebase/useUser";
-import ChooseRole from "./ChooseRole";
 import Sidebar from "./Sidebar";
-import { useState } from "react";
 
-const showPages = ["/", "/settings", "/account"];
-
-// interface ILayoutComponentProps {
-//   isPatientString?: string;
-
-// }
-//const Layout: NextPage<ILayoutComponentProps> = ({ children, isPatientString }) => {
+const showSidebarPages = ["/", "/settings", "/account"];
 
 const Layout: NextPage = ({ children }) => {
-  const { user } = useUser();
   const route = useRouter();
   const path = route.pathname;
 
-  const [isPatient, setIsPatient] = useState(() => CookiesHelper.get("isPatient", "") as boolean | "");
-  const chooseRole = isPatient === "";
+  const showSidebar = showSidebarPages.includes(path);
+  // const showContent = user !== null || path === "/auth";
 
-  const showSidebar = showPages.includes(path) && !chooseRole;
-  const showContent = user !== null || path === "/auth";
-
-  if (!showContent) {
-    return <div></div>;
-  }
-
-  if (chooseRole) {
-    return <ChooseRole setIsPatient={setIsPatient}>hello</ChooseRole>;
-  }
+  // if (!showContent) return <div></div>;
 
   if (showSidebar)
     return (
@@ -45,13 +25,5 @@ const Layout: NextPage = ({ children }) => {
 
   return <>{children}</>;
 };
-
-// Layout.getInitialProps = async (context) => {
-//   const cookies = CookiesHelper.parseCookies(context.req);
-
-//   return {
-//     isPatientString: cookies.isPatient,
-//   };
-// };
 
 export default Layout;

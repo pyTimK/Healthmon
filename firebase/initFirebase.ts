@@ -32,6 +32,17 @@ onAuthStateChanged(auth, (user) => {
     // ...
   }
 });
+// ? OFFLINE DATA
+// TODO
+enableIndexedDbPersistence(db).catch((error) => {
+  if (error.code === "failed-precondition") {
+    // multiple tabs open at once
+    console.log("persistence failed");
+  } else if (error.code === "unimplemented") {
+    // lack of browser support
+    console.log("persistence is not available");
+  }
+});
 
 export { db, auth };
 
@@ -49,15 +60,3 @@ export { db, auth };
 //     console.log("Firebase was successfully init.");
 //   }
 // }
-
-// ? OFFLINE DATA
-// TODO
-enableIndexedDbPersistence(db).catch((error) => {
-  if (error.code === "failed-precondition") {
-    // multiple tabs open at once
-    console.log("persistence failed");
-  } else if (error.code === "unimplemented") {
-    // lack of browser support
-    console.log("persistence is not available");
-  }
-});

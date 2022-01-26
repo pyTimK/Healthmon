@@ -3,21 +3,39 @@ import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
 import styles from "../styles/SignIn.module.css";
 import "firebase/compat/auth";
 import Sizedbox from "../comps/Sizedbox";
-import { setUserCookie } from "../firebase/userCookies";
 import { User } from "firebase/auth";
 import firebase from "firebase/compat/app";
-import { auth } from "../firebase/initFirebase";
+import { auth, db } from "../firebase/initFirebase";
 import { FireStoreHelper } from "../classes/FireStoreHelper";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import { doc, getDoc } from "firebase/firestore";
+import { CookiesHelper } from "../classes/CookiesHelper";
+import MyUser from "../types/myUser";
 
 const SignInScreen: NextPage = () => {
-  const [user, setUser] = useState<firebase.User | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
+
+  const firestoreUserRecordChecker = async (user: User) => {
+    const docRef = doc(db, "users", user.uid);
+    const snapshot = await getDoc(docRef);
+
+    // Go to registration if first time logging in
+    if (snapshot.exists()) {
+      CookiesHelper.set("user", snapshot.data());
+      router.replace("/");
+    } else {
+      const myUser = MyUser.fromFirebaseUser(user);
+      FireStoreHelper.setUserFirestore(myUser);
+      CookiesHelper.set("user", myUser);
+      router.replace("/register");
+    }
+  };
 
   useEffect(() => {
     if (user) {
-      router.replace("/");
+      firestoreUserRecordChecker(user);
     }
   }, [user]);
 
@@ -37,10 +55,8 @@ const SignInScreen: NextPage = () => {
     callbacks: {
       signInSuccessWithAuthResult: (authResult: firebase.auth.UserCredential, redirectUrl: string) => {
         if (authResult.user) {
-          setUserCookie(authResult.user as User);
-          FireStoreHelper.setUserFirestore(authResult.user).then(() => {
-            setUser(authResult.user);
-          });
+          setUser(authResult.user as User);
+
           // return true;
         }
         return false;

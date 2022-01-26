@@ -1,9 +1,23 @@
 import { NextPage } from "next";
 import Head from "next/head";
-import { useUser } from "../firebase/useUser";
+import { useRouter } from "next/router";
+import { CookiesHelper } from "../classes/CookiesHelper";
+import { auth } from "../firebase/initFirebase";
 
 const Account: NextPage = () => {
-  const { user, logout } = useUser();
+  const router = useRouter();
+
+  const logout = async () => {
+    try {
+      await auth.signOut();
+      CookiesHelper.clear();
+      router.replace("/auth");
+    } catch (_e: any) {
+      const e: Error = _e;
+      console.log(e.message);
+    }
+  };
+
   return (
     <div>
       <Head>
