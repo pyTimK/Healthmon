@@ -16,6 +16,7 @@
     max-width: 500px;
     display: flex;
     border-radius: 8px;
+    margin: 24px 0;
 }
 
 .rowTitle {

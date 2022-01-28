@@ -2,7 +2,7 @@ import { Camera, CirclePlusFill, CircleXFill, File } from "akar-icons";
 import { doc, FieldValue, getDoc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { NextPage } from "next";
 import dynamic from "next/dynamic";
-import { FormEventHandler, ReactElement, useEffect, useRef, useState } from "react";
+import { FormEventHandler, HTMLInputTypeAttribute, ReactElement, RefObject, useEffect, useRef, useState } from "react";
 import { useModal } from "react-hooks-use-modal";
 import { ToastContainer } from "react-toastify";
 import { CookiesHelper } from "../../classes/CookiesHelper";
@@ -253,35 +253,24 @@ const ConfigScreen: NextPage = () => {
 	return (
 		<div>
 			<SettingsBlock hint='General'>
-				<SettingsRow
-					title='Pair Healthmon Device'
-					subtitle={parsedQR ? "(Connected)" : undefined}
-					option={
-						<AddOption
-							isAdd={CookiesHelper.get("deviceid", "") === ""}
-							addCallback={openPairDeviceModal}
-							removeCallback={onUnpairDevie}
-						/>
-					}
-				/>
+				<SettingsRow title='Pair Healthmon Device' subtitle={parsedQR ? "(Connected)" : undefined}>
+					<AddOption
+						isAdd={CookiesHelper.get("deviceid", "") === ""}
+						addCallback={openPairDeviceModal}
+						removeCallback={onUnpairDevie}
+					/>
+				</SettingsRow>
 			</SettingsBlock>
-			<Sizedbox height={40} />
-			<div className={styles.block}>
-				<h5 className={styles.hint}>Personal Details</h5>
-				<div className={styles.item}>
-					<h3 className={styles.itemtext}>Name</h3>
-					<div className={styles.option}>
-						<input ref={nameInputRef} type='text' defaultValue={user.name} />
-					</div>
-				</div>
-				<Sizedbox height={20} />
-				<div className={styles.item}>
-					<h3 className={styles.itemtext}>Number</h3>
-					<div className={styles.option}>
-						<input ref={numberInputRef} type='text' defaultValue={user.number} />
-					</div>
-				</div>
-			</div>
+
+			<SettingsBlock hint='Personal Details'>
+				<SettingsRow title='Name'>
+					<InputOption inputRef={nameInputRef} defaultValue={user.name} />
+				</SettingsRow>
+				<SettingsRow title='Phone'>
+					<InputOption inputRef={numberInputRef} defaultValue={user.number} />
+				</SettingsRow>
+			</SettingsBlock>
+
 			<Sizedbox height={40} />
 			<div className={styles.block}>
 				<h5 className={styles.hint}>Health Worker</h5>
@@ -301,7 +290,7 @@ const ConfigScreen: NextPage = () => {
 							</div>
 							<Sizedbox height={20} />
 							<div className={styles.item}>
-								<h3 className={styles.itemtext}>Number</h3>
+								<h3 className={styles.itemtext}>Phone</h3>
 								<div className={styles.option}>
 									<input
 										ref={healthWorkerNumberInputRef}
@@ -315,6 +304,16 @@ const ConfigScreen: NextPage = () => {
 					);
 				})}
 			</div>
+
+			<SettingsBlock hint='Personal Details'>
+				<SettingsRow title='Name'>
+					<InputOption inputRef={nameInputRef} defaultValue={user.name} />
+				</SettingsRow>
+				<SettingsRow title='Phone'>
+					<InputOption inputRef={numberInputRef} defaultValue={user.number} />
+				</SettingsRow>
+			</SettingsBlock>
+
 			<button onClick={goToDashboard}>Proceed</button>
 			{/* PAIR MODAL */}
 			<PairDeviceModal>
@@ -375,6 +374,20 @@ const ConfigScreen: NextPage = () => {
 	);
 };
 
+interface InputOptionProps {
+	inputRef: RefObject<HTMLInputElement>;
+	type?: HTMLInputTypeAttribute;
+	defaultValue?: string;
+}
+
+const InputOption: React.FC<InputOptionProps> = ({ inputRef, type = "text", defaultValue }) => {
+	return (
+		<div className={styles.option}>
+			<input ref={inputRef} type={type} defaultValue={defaultValue} />
+		</div>
+	);
+};
+
 interface AddOptionProps {
 	isAdd: boolean;
 	addCallback: () => void;
@@ -399,6 +412,7 @@ interface SettingsBlockProps {
 const SettingsBlock: React.FC<SettingsBlockProps> = ({ hint, children }) => {
 	return (
 		<div className={styles.block}>
+			<Sizedbox height={40} />
 			<h5 className={styles.blockHint}>{hint}</h5>
 			{children}
 		</div>
@@ -408,15 +422,14 @@ const SettingsBlock: React.FC<SettingsBlockProps> = ({ hint, children }) => {
 interface SettingsRowProps {
 	title: string;
 	subtitle?: string;
-	option: ReactElement;
 }
 
-const SettingsRow: React.FC<SettingsRowProps> = ({ title, subtitle, option }) => {
+const SettingsRow: React.FC<SettingsRowProps> = ({ title, subtitle, children }) => {
 	return (
 		<div className={styles.row}>
 			<h3 className={styles.rowTitle}>{title}</h3>
 			{subtitle && <p className={styles.rowSubTitle}> (Connected)</p>}
-			{option}
+			{children}
 		</div>
 	);
 };
