@@ -2,7 +2,7 @@
     text-align: center;
 }
 
-.hint {
+.blockHint {
     color: gray;
     margin: 5px;
 }
@@ -13,7 +13,7 @@
     margin: 0 auto;
 }
 
-.item {
+.settingsRow {
     padding: 16px;
     background-color: var(--background-light);
     width: 50vw;
@@ -22,13 +22,13 @@
     border-radius: 8px;
 }
 
-.itemtext {
+.rowTitle {
     margin: 0;
     display: inline;
     flex: 3;
 }
 
-.itemtext p {
+.rowSubTitle {
     font-size: 1rem;
     color: gray;
     margin: 0;

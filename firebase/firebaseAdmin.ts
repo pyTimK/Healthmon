@@ -21,5 +21,5 @@
 //     throw error;
 //   }
 // };
-import "../comps/Avatar";
+import "../components/Avatar";
 const firebasetemp = 0;
