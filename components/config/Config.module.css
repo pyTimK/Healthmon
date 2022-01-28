@@ -1,5 +1,7 @@
-.container {
-    text-align: center;
+.block {
+    text-align: left;
+    width: fit-content;
+    margin: 0 auto;
 }
 
 .blockHint {
@@ -7,13 +9,7 @@
     margin: 5px;
 }
 
-.block {
-    text-align: left;
-    width: fit-content;
-    margin: 0 auto;
-}
-
-.settingsRow {
+.row {
     padding: 16px;
     background-color: var(--background-light);
     width: 50vw;
@@ -40,7 +36,6 @@
     display: flex;
     align-items: center;
     justify-content: right;
-    /* text-align: right; */
 }
 
 

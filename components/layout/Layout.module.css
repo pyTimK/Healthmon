@@ -1,8 +1,21 @@
+.container {}
+
+.contentWrapper {
+    --footer-height: 50px;
+    text-align: center;
+}
+
+.content {
+    min-height: calc(100vh - var(--footer-height));
+    display: flex;
+    justify-content: center;
+}
+
 .footer {
     display: flex;
-    flex: 1;
-    padding: 2rem 0;
-    border-top: 1px solid #eaeaea;
+    height: var(--footer-height);
+    /* padding: 2rem 0; */
+    border-top: 1px solid #eaeaea35;
     justify-content: center;
     align-items: center;
 }

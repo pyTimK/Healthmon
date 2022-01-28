@@ -2,7 +2,7 @@ import { collection, onSnapshot, query } from "firebase/firestore";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { CookiesHelper } from "../../classes/CookiesHelper";
-import { RecordData } from "../../components/Record";
+import { RecordData } from "../../components/record/Record";
 import { db } from "../../firebase/initFirebase";
 import { getYYYYMMDD } from "../../functions/dateConversions";
 import MyUser from "../../types/myUser";

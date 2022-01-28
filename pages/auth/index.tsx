@@ -1,17 +1,17 @@
 import { NextPage } from "next";
 import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
-import styles from "../styles/SignIn.module.css";
+import styles from "./Auth.module.css";
 import "firebase/compat/auth";
-import Sizedbox from "../components/Sizedbox";
+import Sizedbox from "../../components/Sizedbox";
 import { User } from "firebase/auth";
 import firebase from "firebase/compat/app";
-import { auth, db } from "../firebase/initFirebase";
-import { FireStoreHelper } from "../classes/FireStoreHelper";
+import { auth, db } from "../../firebase/initFirebase";
+import { FireStoreHelper } from "../../classes/FireStoreHelper";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { doc, getDoc } from "firebase/firestore";
-import { CookiesHelper } from "../classes/CookiesHelper";
-import MyUser from "../types/myUser";
+import { CookiesHelper } from "../../classes/CookiesHelper";
+import MyUser from "../../types/myUser";
 
 const SignInScreen: NextPage = () => {
 	const [user, setUser] = useState<User | null>(null);

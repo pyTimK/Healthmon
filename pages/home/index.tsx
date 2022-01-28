@@ -2,7 +2,7 @@ import type { NextPage } from "next";
 import { PageDescriptions } from "../../classes/Constants";
 import Avatar from "../../components/Avatar";
 import Layout from "../../components/layout/Layout";
-import Record from "../../components/Record";
+import Record from "../../components/record/Record";
 import dayGreetings from "../../functions/dayGreetings";
 import styles from "./Home.module.css";
 import useHome from "./useHome";
@@ -16,6 +16,7 @@ const Home: NextPage = () => {
 				<h1 className={styles.title}>
 					{dayGreetings()} {user.name}
 				</h1>
+
 				{/* {user.photoURL && <img className='avatar' src={user.photoURL} alt='avatar' />} */}
 
 				<div className={styles.recordHeading}>

@@ -5,20 +5,20 @@ import dynamic from "next/dynamic";
 import { FormEventHandler, ReactElement, useEffect, useRef, useState } from "react";
 import { useModal } from "react-hooks-use-modal";
 import { ToastContainer } from "react-toastify";
-import { CookiesHelper } from "../classes/CookiesHelper";
-import { db } from "../firebase/initFirebase";
-import notify from "../functions/notify";
-import styles from "../styles/Settings.module.css";
-import HealthWorker from "../types/healthWorker";
-import MyUser from "../types/myUser";
-import Sizedbox from "./Sizedbox";
+import { CookiesHelper } from "../../classes/CookiesHelper";
+import { db } from "../../firebase/initFirebase";
+import notify from "../../functions/notify";
+import styles from "./Config.module.css";
+import HealthWorker from "../../types/healthWorker";
+import MyUser from "../../types/myUser";
+import Sizedbox from "../Sizedbox";
 
 const QrReader = dynamic(() => import("react-qr-reader"), { ssr: false });
 if (typeof window != "undefined") {
 	var QrReaderFile = require("react-qr-reader");
 }
 
-const ConfigurationScreen: NextPage = () => {
+const ConfigScreen: NextPage = () => {
 	const [user, setUser] = useState(CookiesHelper.get<MyUser>("user", new MyUser()));
 
 	useEffect(() => {
@@ -251,7 +251,7 @@ const ConfigurationScreen: NextPage = () => {
 	};
 
 	return (
-		<div className={styles.container}>
+		<div>
 			<SettingsBlock hint='General'>
 				<SettingsRow
 					title='Pair Healthmon Device'
@@ -413,7 +413,7 @@ interface SettingsRowProps {
 
 const SettingsRow: React.FC<SettingsRowProps> = ({ title, subtitle, option }) => {
 	return (
-		<div className={styles.settingsRow}>
+		<div className={styles.row}>
 			<h3 className={styles.rowTitle}>{title}</h3>
 			{subtitle && <p className={styles.rowSubTitle}> (Connected)</p>}
 			{option}
@@ -421,7 +421,7 @@ const SettingsRow: React.FC<SettingsRowProps> = ({ title, subtitle, option }) =>
 	);
 };
 
-export default ConfigurationScreen;
+export default ConfigScreen;
 export interface DeviceData {
 	name: string;
 	id: string;

@@ -1,7 +1,7 @@
 import { ReactElement } from "react";
-import styles from "../styles/Record.module.css";
+import styles from "./Record.module.css";
 import firebase from "firebase/compat/app";
-import { getHHMMSS } from "../functions/dateConversions";
+import { getHHMMSS } from "../../functions/dateConversions";
 
 export interface RecordData {
 	name: string;
