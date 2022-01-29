@@ -1,7 +1,7 @@
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { CookiesHelper } from "../../classes/CookiesHelper";
-import MyUser from "../../types/myUser";
+import MyUser from "../../classes/MyUser";
 import Sidebar from "../sidebar/Sidebar";
 import Head from "next/head";
 import styles from "./Layout.module.css";

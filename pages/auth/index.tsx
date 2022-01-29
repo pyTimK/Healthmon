@@ -11,7 +11,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { doc, getDoc } from "firebase/firestore";
 import { CookiesHelper } from "../../classes/CookiesHelper";
-import MyUser from "../../types/myUser";
+import MyUser from "../../classes/MyUser";
 
 const SignInScreen: NextPage = () => {
 	const [user, setUser] = useState<User | null>(null);

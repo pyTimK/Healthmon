@@ -5,7 +5,7 @@ import { CookiesHelper } from "../../classes/CookiesHelper";
 import { RecordData } from "../../components/record/Record";
 import { db } from "../../firebase/initFirebase";
 import { getYYYYMMDD } from "../../functions/dateConversions";
-import MyUser from "../../types/myUser";
+import MyUser from "../../classes/MyUser";
 
 const useHome = () => {
 	const user = CookiesHelper.get("user", new MyUser());

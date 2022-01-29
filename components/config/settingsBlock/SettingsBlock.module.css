@@ -1,0 +1,10 @@
+.block {
+    text-align: left;
+    width: fit-content;
+    margin: 0 auto;
+}
+
+.blockHint {
+    color: gray;
+    margin: 5px;
+}

@@ -1,101 +1,32 @@
-.block {
-    text-align: left;
-    width: fit-content;
-    margin: 0 auto;
-}
-
-.blockHint {
-    color: gray;
-    margin: 5px;
-}
-
-.row {
-    padding: 16px;
-    background-color: var(--background-light);
-    width: 50vw;
-    max-width: 500px;
-    display: flex;
-    border-radius: 8px;
-    margin: 24px 0;
-}
-
-.rowTitle {
-    margin: 0;
-    display: inline;
-    flex: 3;
-}
-
-.rowSubTitle {
-    font-size: 1rem;
-    color: gray;
-    margin: 0;
-    display: inline;
-}
-
-.option {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: right;
-}
-
-
-.modal {
-    background: var(--background-light);
-    padding: 16px;
-    border-radius: 10px;
-    display: flex;
-    width: 80vw;
-    max-width: 800px;
+.dropdown {
+    box-shadow: 0 0 1px rgb(81, 81, 81);
+    border: 1px solid rgba(245, 245, 245, 0.174);
+    background-color: var(--background-dark);
     text-align: center;
-    --svg-color: whitesmoke;
-    color: var(--svg-color);
-}
-
-.modalLeft,
-.modalRight {
-    background: var(--background-dark);
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    justify-content: center;
-    align-items: center;
-    border-radius: 10px;
-    margin: 50px 40px;
-    flex: 1;
+    flex: 2;
+    color: whitesmoke;
+    border-radius: 5px;
+    padding: 20;
     cursor: pointer;
-    aspect-ratio: 1;
 }
 
-.svg {
-    stroke: var(--svg-color);
+.dropdownMenu {
+    background-color: none;
 }
 
-.modalTxt {
-    color: var(--svg-color)
+.dropdownMenu {
+    border-top: 1px solid rgba(245, 245, 245, 0.174);
 }
 
-.sss {
-    size: 96px;
-    stroke-width: 1px;
+.dropdownMenu div.is-selected {
+    color: red;
 }
 
-.modalLeft:hover,
-.modalRight:hover {
-    opacity: 0.7;
-    --svg-color: #fcd8dc;
+.dropdownMenu div:hover {
+    /* background-color: green; */
+    opacity: 0.6;
 }
 
-/* .modalRight {
-    background: blue;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex: 1;
-    aspect-ratio: 1;
-} */
-
-
-.qrfilereader {
-    display: none;
+.dropdownPlaceHolder {
+    color: whitesmoke;
 }

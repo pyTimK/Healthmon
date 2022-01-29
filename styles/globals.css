@@ -6,6 +6,8 @@
   --green: #3BA55D;
   --pink: rgb(236, 111, 126);
   --red: rgb(255, 42, 67);
+  --calm-red: #BD2148;
+  --blue: lightskyblue;
 
   --tablet-max-width: 960px
 }
@@ -34,6 +36,40 @@ a {
 .avatar {
   border-radius: 50%;
 }
+
+/** Hide up down arrow in input */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  /* display: none; <- Crashes Chrome on hover */
+  -webkit-appearance: none;
+  margin: 0;
+  /* <-- Apparently some margin are still there even though it's hidden */
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+  /* Firefox */
+}
+
+/** Hide focus border in input */
+input:active {
+  border: none;
+  outline: none;
+}
+
+
+/** BUTTON */
+.pink-button {
+  padding: 4px 24px;
+  border-radius: 4px;
+  border: none;
+  background-color: var(--calm-red);
+  color: whitesmoke;
+  cursor: pointer;
+  margin: 20px 0;
+}
+
+
 
 /** SMALL TABLET */
 @media screen and (max-width: var(--tablet-max-width)) {

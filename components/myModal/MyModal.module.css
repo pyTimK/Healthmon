@@ -1,0 +1,15 @@
+.container {
+    background: var(--background-light);
+    padding: 16px;
+    border-radius: 10px;
+    display: flex;
+    width: 80vw;
+    max-width: 800px;
+    text-align: center;
+    --svg-color: whitesmoke;
+    color: var(--svg-color);
+}
+
+.flexColumn {
+    flex-direction: column;
+}
