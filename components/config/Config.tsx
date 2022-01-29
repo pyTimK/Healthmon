@@ -6,7 +6,7 @@ import { ToastContainer } from "react-toastify";
 import { CookiesHelper } from "../../classes/CookiesHelper";
 import MyUser, { Role } from "../../classes/MyUser";
 import { db } from "../../firebase/initFirebase";
-import notify from "../../functions/notify";
+import notify from "../../function/notify";
 import DeviceData from "../../types/DeviceData";
 import GeneralSettingsBlock from "./blocks/general/GeneralSettingsBlock";
 import styles from "./Config.module.css";

@@ -3,9 +3,9 @@ import { PageDescriptions } from "../../classes/Constants";
 import Avatar from "../../components/Avatar";
 import Layout from "../../components/layout/Layout";
 import Record from "../../components/record/Record";
-import dayGreetings from "../../functions/dayGreetings";
+import dayGreetings from "../../function/dayGreetings";
 import styles from "./Home.module.css";
-import useHome from "./useHome";
+import useHome from "../../hooks/useHome";
 
 const Home: NextPage = () => {
 	const { user, records } = useHome();

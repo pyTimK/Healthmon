@@ -1,7 +1,7 @@
 import { NextPage } from "next";
 import { PageDescriptions } from "../../classes/Constants";
 import Layout from "../../components/layout/Layout";
-import useAccount from "./useAccount";
+import useAccount from "../../hooks/useAccount";
 
 const Account: NextPage = () => {
 	const { logout } = useAccount();

@@ -3,7 +3,7 @@ import { Dispatch, FormEventHandler, SetStateAction, useRef } from "react";
 import { CookiesHelper } from "../../../../../classes/CookiesHelper";
 import MyUser from "../../../../../classes/MyUser";
 import { db } from "../../../../../firebase/initFirebase";
-import notify from "../../../../../functions/notify";
+import notify from "../../../../../function/notify";
 import AuthenticateData from "../../../../../types/AuthenticateData";
 import DeviceData from "../../../../../types/DeviceData";
 import useMyModal from "../../../../myModal/useMyModal";
@@ -12,7 +12,7 @@ import dynamic from "next/dynamic";
 import { ReactCodeInputProps } from "react-code-input";
 import Sizedbox from "../../../../Sizedbox";
 import { FireStoreHelper } from "../../../../../classes/FireStoreHelper";
-import logError from "../../../../../functions/logError";
+import logError from "../../../../../function/logError";
 const ReactCodeInput = dynamic(import("react-code-input"));
 
 interface CodeInputModalProps {}

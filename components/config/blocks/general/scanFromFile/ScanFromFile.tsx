@@ -1,6 +1,6 @@
 import { MutableRefObject, useRef } from "react";
-import logError from "../../../../../functions/logError";
-import notify from "../../../../../functions/notify";
+import logError from "../../../../../function/logError";
+import notify from "../../../../../function/notify";
 import styles from "./ScanFromFile.module.css";
 
 if (typeof window != "undefined") {

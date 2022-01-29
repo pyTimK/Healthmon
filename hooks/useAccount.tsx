@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
-import { CookiesHelper } from "../../classes/CookiesHelper";
-import { auth } from "../../firebase/initFirebase";
+import { CookiesHelper } from "../classes/CookiesHelper";
+import { auth } from "../firebase/initFirebase";
 
 const useAccount = () => {
 	const router = useRouter();

@@ -1,5 +1,5 @@
 import dynamic from "next/dynamic";
-import logError from "../../../../../functions/logError";
+import logError from "../../../../../function/logError";
 import MyModalSection from "../../../../myModal/myModalSection/MyModalSection";
 import useMyModal from "../../../../myModal/useMyModal";
 const QrReader = dynamic(() => import("react-qr-reader"), { ssr: false });
