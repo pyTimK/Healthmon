@@ -51,7 +51,7 @@ const useGeneralSettingsBlock = (user: MyUser) => {
 		if (!parsedQR) return;
 
 		try {
-			await FireStoreHelper.unPairDevice(parsedQR, user.id);
+			await FireStoreHelper.unPairDevice(user, parsedQR);
 			CookiesHelper.set("deviceid", "");
 			setParsedQR(null);
 			notify("Device disconnected", { type: "warning" });
