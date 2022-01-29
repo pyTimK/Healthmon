@@ -1,7 +1,11 @@
 import { User } from "firebase/auth";
+import { doc, serverTimestamp, updateDoc } from "firebase/firestore";
+import { db } from "../firebase/initFirebase";
+import DeviceData from "../types/DeviceData";
 import HealthWorker from "../types/HealthWorker";
 import Patient from "../types/Patient";
 import { CookiesHelper } from "./CookiesHelper";
+import { FireStoreHelper } from "./FireStoreHelper";
 
 export const enum Role {
 	Patient = "Patient",
@@ -45,25 +49,18 @@ class MyUser {
 		});
 	}
 
-	updatePersonalDetails(newName: string, newNumber: string, newRole: Role) {
+	static fromCookie() {
+		return new MyUser(CookiesHelper.get<MyUser | undefined>("user", undefined));
+	}
+
+	updatePersonalDetails = async (newName: string, newNumber: string, newRole: Role) => {
 		this.name = newName;
 		this.number = newNumber;
 		this.role = newRole;
-		saveToCookies();
-		saveToFirestore();
-
-		function saveToCookies() {
-			CookiesHelper.update<MyUser>("user", {
-				name: newName,
-				role: newRole,
-				number: newNumber,
-			});
-		}
-
-		function saveToFirestore() {
-			// TODO
-		}
-	}
+		CookiesHelper.savePersonalDetails(this);
+		FireStoreHelper.updateDevice(this);
+		FireStoreHelper.updateUser(this);
+	};
 }
 
 export default MyUser;

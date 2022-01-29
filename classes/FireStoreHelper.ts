@@ -8,24 +8,6 @@ export abstract class FireStoreHelper {
 		await setDoc(doc(db, "users", user.id), { ...user });
 	};
 
-	static unPairDevice = async (deviceCode: string, uid: string) => {
-		const deviceDoc = await getDoc(doc(db, "devices", deviceCode));
-		const deviceData = deviceDoc.data() as DeviceData;
-
-		if (uid !== deviceData.id) return;
-
-		const clearedDeviceData = {
-			name: "",
-			id: "",
-			healthWorkers: [],
-			new_name: "",
-			new_id: "",
-			new_healthWorkers: [],
-			confirmed: false,
-		};
-		await updateDoc(doc(db, "devices", deviceCode), clearedDeviceData);
-	};
-
 	static askPairDevice = async (deviceCode: string, user: MyUser) => {
 		await updateDoc(doc(db, "devices", deviceCode), {
 			new_name: user.name,
@@ -37,7 +19,7 @@ export abstract class FireStoreHelper {
 		} as Partial<DeviceData>);
 	};
 
-	static pairDevice = async (user: MyUser, parsedQR: string) => {
+	static pairDevice = async (user: MyUser, deviceCode: string) => {
 		const paired_doc: DeviceData = {
 			name: user.name,
 			id: user.id,
@@ -49,6 +31,65 @@ export abstract class FireStoreHelper {
 			request_timestamp: serverTimestamp(),
 		};
 
-		await updateDoc(doc(db, "devices", parsedQR), { ...paired_doc });
+		await updateDoc(doc(db, "devices", deviceCode), { ...paired_doc });
+	};
+
+	private static _isDevicePaired = async (user: MyUser, deviceCode: string = "") => {
+		if (deviceCode === "" && user.device === "") return false;
+
+		const deviceDocRef = doc(db, "devices", deviceCode !== "" ? deviceCode : user.device);
+		const deviceDoc = await getDoc(deviceDocRef);
+
+		if (!deviceDoc.exists()) return false;
+
+		const deviceData = deviceDoc.data() as DeviceData;
+
+		if (user.id !== deviceData.id) return false;
+
+		return true;
+	};
+
+	static unPairDevice = async (user: MyUser, deviceCode: string) => {
+		const isPaired = await this._isDevicePaired(user, deviceCode);
+		if (!isPaired) return;
+
+		const clearedDeviceData: Partial<DeviceData> = {
+			name: "",
+			id: "",
+			healthWorkers: [],
+			new_name: "",
+			new_id: "",
+			new_healthWorkers: [],
+			confirmed: false,
+		};
+		await updateDoc(doc(db, "devices", deviceCode), clearedDeviceData);
+	};
+
+	static updateDevice = async (user: MyUser) => {
+		const isPaired = await this._isDevicePaired(user);
+		if (!isPaired) return;
+
+		const newDeviceDocFields: DeviceData = {
+			name: user.name,
+			id: user.id,
+			healthWorkers: user.healthWorkers,
+			new_name: "",
+			new_id: "",
+			new_healthWorkers: [],
+			confirmed: false,
+			request_timestamp: serverTimestamp(),
+		};
+		await updateDoc(doc(db, "devices", user.device), { ...newDeviceDocFields });
+	};
+
+	static updateUser = async (user: MyUser) => {
+		const updatedUserDocFields: Partial<MyUser> = {
+			name: user.name,
+			number: user.number,
+			device: user.device,
+			healthWorkers: user.healthWorkers,
+			role: user.role,
+		};
+		await updateDoc(doc(db, "users", user.id), { ...updatedUserDocFields });
 	};
 }
