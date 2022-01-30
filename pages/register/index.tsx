@@ -3,10 +3,11 @@ import { ToastContainer } from "react-toastify";
 import { PageDescriptions } from "../../classes/Constants";
 import GeneralSettingsBlock from "../../components/config/blocks/general/GeneralSettingsBlock";
 import Layout from "../../components/layout/Layout";
+import ButtonStatus from "../../enums/ButtonStatus";
 import useRegister from "../../hooks/useRegister";
 
 const RegisterScreen: NextPage = () => {
-	const { user, PersonalDetailsSettingsBlock, updateUser } = useRegister();
+	const { user, PersonalDetailsSettingsBlock, updateUser, proceedButtonStatus } = useRegister();
 
 	return (
 		<Layout title='Register - Healthmon' description={PageDescriptions.HOME} showSidebar={false}>
@@ -15,7 +16,10 @@ const RegisterScreen: NextPage = () => {
 
 			<PersonalDetailsSettingsBlock />
 
-			<button className={"pink-button"} onClick={updateUser}>
+			<button
+				className={"pink-button"}
+				onClick={updateUser}
+				disabled={proceedButtonStatus === ButtonStatus.Disabled}>
 				Proceed
 			</button>
 

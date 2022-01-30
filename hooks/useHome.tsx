@@ -1,14 +1,13 @@
 import { collection, onSnapshot, query } from "firebase/firestore";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { CookiesHelper } from "../classes/CookiesHelper";
 import { RecordData } from "../components/record/Record";
 import { db } from "../firebase/initFirebase";
 import { getYYYYMMDD } from "../function/dateConversions";
 import MyUser from "../classes/MyUser";
 
 const useHome = () => {
-	const user = CookiesHelper.get("user", new MyUser());
+	const user = MyUser.fromCookie();
 	const [records, setRecords] = useState<RecordData[]>([]);
 	const router = useRouter();
 

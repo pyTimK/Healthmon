@@ -7,6 +7,7 @@
   --pink: rgb(236, 111, 126);
   --red: rgb(255, 42, 67);
   --calm-red: #BD2148;
+  --gray-red: rgb(148, 81, 81);
   --blue: lightskyblue;
 
   --tablet-max-width: 960px
@@ -67,16 +68,33 @@ input:active {
   color: whitesmoke;
   cursor: pointer;
   margin: 20px 0;
+  display: flex;
+  align-items: center;
+}
+
+.green-button {
+  padding: 4px 22px;
+  border-radius: 4px;
+  border: none;
+  background-color: var(--green);
+  color: whitesmoke;
+  cursor: pointer;
+  margin: 20px 0;
+  display: flex;
+  align-items: center;
 }
 
 
 .black-button {
-  padding: 8px 18px;
-  border-radius: 6px;
+  padding: 4px 22px;
+  border-radius: 4px;
   border: none;
   background-color: black;
   color: whitesmoke;
   cursor: pointer;
+  margin: 20px 0;
+  display: flex;
+  align-items: center;
   /* margin: 20px 0; */
 }
 

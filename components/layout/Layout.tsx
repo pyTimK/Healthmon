@@ -32,7 +32,7 @@ const Layout: NextPage<LayoutProps> = ({ title, description, showSidebar = true,
 			{showSidebar && <Sidebar />}
 			<div className={styles.contentWrapper}>
 				<div className={styles.content}>
-					<div className='content'>{children}</div>
+					<div>{children}</div>
 				</div>
 				<footer className={styles.footer}>
 					<a href='https://healthmonmikee.web.app/' target='_blank' rel='noopener noreferrer'>

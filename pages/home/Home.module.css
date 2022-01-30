@@ -1,18 +1,51 @@
 .main {
   padding: 4rem 2rem;
   min-height: 100vh;
+  width: 70vw;
+  max-width: 800px;
   margin: 0 40px;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
+.header {
+
+  --header-margin-top: 20px;
+  --header-height: 30px;
+  --header-gap: 12px;
+  --avatar-width: 30px;
+
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: var(--header-gap);
+  width: 100%;
+  margin-top: var(--header-margin-top);
+  height: var(--header-height);
+  overflow: hidden;
+}
+
+.avatar {
+  width: var(--avatar-width) !important;
+}
+
+.notifDropdown {
+  position: absolute;
+  top: calc(var(--header-margin-top) + var(--header-height) + 4px);
+  transform: translateX(calc(-1 * (var(--avatar-width) + var(--header-gap))));
+  width: 300px;
+  /* height: 100px; */
+  background-color: var(--background-light);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
 
 
 .title {
   margin: 0;
   line-height: 1.15;
-  font-size: 4rem;
+  font-size: 2.5rem;
 }
 
 .title,

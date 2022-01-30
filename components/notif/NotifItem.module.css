@@ -1,0 +1,62 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+
+/** MAIN ROW */
+
+.main {
+    display: flex;
+    width: 100%;
+
+}
+
+.avatarWrapper {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+    /* justify-content: center; */
+}
+
+.description {
+    flex: 5;
+    padding-left: 10px;
+    text-align: start;
+    font-size: 0.75rem;
+    font-weight: 300;
+}
+
+
+/** OPTIONS ROW */
+
+.options {
+    display: flex;
+    width: 100%;
+    justify-content: flex-end;
+    margin: 10px 0 20px 0;
+}
+
+
+.notifButton {
+    /* margin: 4px 22px; */
+    font-size: 0.75rem;
+    border-radius: 4px;
+    border: none;
+    background-color: transparent;
+    color: whitesmoke;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.declineButton {
+    color: var(--gray-red);
+}
+
+.acceptButton {
+    color: var(--green);
+}
