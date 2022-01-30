@@ -20,7 +20,7 @@ const usePersonalDetailsSettingsBlock = (user: MyUser, hasEditOption = false) =>
 
 	const PersonalDetailsSettingsBlock: React.FC<PersonalDetailsSettingsBlockProps> = useMemo(
 		() =>
-			({}) => {
+			function PersonalDetailsSettingsBlockInner({}) {
 				return (
 					<SettingsBlock
 						hint='Personal Details'
@@ -65,8 +65,8 @@ const usePersonalDetailsSettingsBlock = (user: MyUser, hasEditOption = false) =>
 			},
 		[editing]
 	);
+	// PersonalDetailsSettingsBlock.displayName = "PersonalDetailsSettingsBlock";
 
 	return { PersonalDetailsSettingsBlock, nameInputRef, numberInputRef, role, editing, setEditing };
 };
-
 export default usePersonalDetailsSettingsBlock;

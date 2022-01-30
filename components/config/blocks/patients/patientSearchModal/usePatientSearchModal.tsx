@@ -27,7 +27,7 @@ const usePatientSearchModal: usePatientSearchModal = () => {
 							<Search size={16} strokeWidth={4} color='var(--background-light)' />
 						</div>
 					</div>
-					<p>Please Enter patient's phone number</p>
+					<p>Please Enter patient&quot;s phone number</p>
 				</div>
 				{/* <MyModalSection description="Please Enter patient's phone number"></MyModalSection> */}
 			</MyModal>
