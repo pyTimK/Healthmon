@@ -21,7 +21,7 @@ const SignInScreen: NextPage = () => {
 		const docRef = doc(db, "users", user.uid);
 		const snapshot = await getDoc(docRef);
 
-		// Go to registration if first time logging in
+		//* Go to registration if first time logging in
 		if (snapshot.exists()) {
 			CookiesHelper.set("user", snapshot.data());
 			router.replace("/");

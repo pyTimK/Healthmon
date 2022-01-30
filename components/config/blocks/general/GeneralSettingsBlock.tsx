@@ -37,7 +37,7 @@ const GeneralSettingsBlock: React.FC<GeneralSettingsBlockProps> = ({ user }) => 
 	return (
 		<>
 			<SettingsBlock hint='General'>
-				<SettingsRow title='Pair Healthmon Device' subtitle={isConnectedToDevice() ? "(Connected)" : undefined}>
+				<SettingsRow title='Pair Healthmon Device' subtitle={isConnectedToDevice() ? "Connected" : undefined}>
 					<AddOption
 						isAdd={!isConnectedToDevice()}
 						addCallback={openPickTypeOfScanModal}

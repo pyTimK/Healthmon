@@ -1,7 +1,4 @@
 import { User } from "firebase/auth";
-import { doc, serverTimestamp, updateDoc } from "firebase/firestore";
-import { db } from "../firebase/initFirebase";
-import DeviceData from "../types/DeviceData";
 import HealthWorker from "../types/HealthWorker";
 import Patient from "../types/Patient";
 import { CookiesHelper } from "./CookiesHelper";
@@ -20,6 +17,7 @@ interface IMyUser {
 	healthWorkers: HealthWorker[];
 	monitoring: Patient[];
 	device: string;
+	photoURL: string;
 }
 
 class MyUser {
@@ -30,6 +28,7 @@ class MyUser {
 	public healthWorkers: HealthWorker[];
 	public monitoring: Patient[];
 	public device: string;
+	public photoURL: string;
 
 	constructor(user?: Partial<IMyUser>) {
 		this.name = user?.name ?? "";
@@ -39,13 +38,16 @@ class MyUser {
 		this.healthWorkers = user?.healthWorkers ?? [];
 		this.monitoring = user?.monitoring ?? [];
 		this.device = user?.device ?? "";
+		this.photoURL = user?.photoURL ?? "";
 	}
 
 	static fromFirebaseUser(user: User) {
+		console.log(user);
 		return new this({
 			name: user.displayName?.substring(0, Math.min(15, user.displayName.length)) ?? "",
 			id: user.uid,
 			number: user.phoneNumber ?? "",
+			photoURL: user.photoURL ?? "",
 		});
 	}
 
@@ -53,14 +55,15 @@ class MyUser {
 		return new MyUser(CookiesHelper.get<MyUser | undefined>("user", undefined));
 	}
 
-	updatePersonalDetails = async (newName: string, newNumber: string, newRole: Role) => {
+	async updatePersonalDetails(newName: string, newNumber: string, newRole: Role) {
 		this.name = newName;
 		this.number = newNumber;
 		this.role = newRole;
+
 		CookiesHelper.savePersonalDetails(this);
-		FireStoreHelper.updateDevice(this);
-		FireStoreHelper.updateUser(this);
-	};
+		await FireStoreHelper.updateDevice(this);
+		await FireStoreHelper.updateUser(this);
+	}
 }
 
 export default MyUser;

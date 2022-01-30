@@ -10,7 +10,7 @@ const SettingsRow: React.FC<SettingsRowProps> = ({ title, subtitle, children }) 
 		<div className={styles.row}>
 			<div className={styles.rowLeft}>
 				<h3 className={styles.rowTitle}>{title}</h3>
-				{subtitle && <p className={styles.rowSubTitle}>{subtitle}</p>}
+				{subtitle && <p className={styles.rowSubTitle}>({subtitle})</p>}
 			</div>
 			{children}
 		</div>

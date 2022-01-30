@@ -50,7 +50,7 @@ export abstract class FireStoreHelper {
 	};
 
 	static unPairDevice = async (user: MyUser, deviceCode: string) => {
-		const isPaired = await this._isDevicePaired(user, deviceCode);
+		const isPaired = await FireStoreHelper._isDevicePaired(user, deviceCode);
 		if (!isPaired) return;
 
 		const clearedDeviceData: Partial<DeviceData> = {
@@ -66,7 +66,7 @@ export abstract class FireStoreHelper {
 	};
 
 	static updateDevice = async (user: MyUser) => {
-		const isPaired = await this._isDevicePaired(user);
+		const isPaired = await FireStoreHelper._isDevicePaired(user);
 		if (!isPaired) return;
 
 		const newDeviceDocFields: DeviceData = {
@@ -89,6 +89,7 @@ export abstract class FireStoreHelper {
 			device: user.device,
 			healthWorkers: user.healthWorkers,
 			role: user.role,
+			photoURL: user.photoURL,
 		};
 		await updateDoc(doc(db, "users", user.id), { ...updatedUserDocFields });
 	};
