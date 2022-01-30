@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -6,44 +7,66 @@ import { PageDescriptions } from "../../classes/Constants";
 import MyUser from "../../classes/MyUser";
 import usePersonalDetailsSettingsBlock from "../../components/config/blocks/personalDetails/usePersonalDetailsSettingsBlock";
 import Layout from "../../components/layout/Layout";
+import Sizedbox from "../../components/Sizedbox";
 import ButtonStatus from "../../enums/ButtonStatus";
 import logError from "../../function/logError";
 import notify from "../../function/notify";
 import useAccount from "../../hooks/useAccount";
+import styles from "./Account.module.css";
 
 const Account: NextPage = () => {
 	const user = MyUser.fromCookie();
 	const { logout } = useAccount();
-	const { PersonalDetailsSettingsBlock, nameInputRef, numberInputRef, role } = usePersonalDetailsSettingsBlock(user);
-	const [saveButtonEnabled, setSaveButtonEnabled] = useState(ButtonStatus.Hidden);
+	const { PersonalDetailsSettingsBlock, nameInputRef, numberInputRef, role, editing, setEditing } =
+		usePersonalDetailsSettingsBlock(user, true);
+	const [saveButtonStatus, setSaveButtonStatus] = useState(ButtonStatus.Hidden);
 	const route = useRouter();
 
 	const updateUser = async () => {
-		// setSaveButtonEnabled(false);
+		setSaveButtonStatus(ButtonStatus.Disabled);
 		try {
 			await user.updatePersonalDetails(nameInputRef.current!.value, numberInputRef.current!.value, role);
 			notify("Successfully updated details", { type: "success" });
+			setEditing(false);
 		} catch (_e) {
 			notify("Updating user details failed");
 			logError(_e);
-			return;
 		}
+		setSaveButtonStatus(ButtonStatus.Enabled);
+	};
 
-		setTimeout(() => route.replace("/"), 2000);
-		// setSaveButtonEnabled(false);
+	const discardChanges = () => {
+		if (!nameInputRef.current || !numberInputRef.current) return;
+
+		nameInputRef.current.value = user.name;
+		numberInputRef.current.value = user.number;
+		setEditing(false);
 	};
 
 	return (
 		<Layout title='Account - Healthmon' description={PageDescriptions.HOME}>
 			<h1>Account</h1>
 			<PersonalDetailsSettingsBlock />
-
-			<button className={"pink-button"} onClick={updateUser} disabled={!saveButtonEnabled}>
-				Save
-			</button>
-			<button className='black-button' onClick={logout}>
-				Sign out
-			</button>
+			<div className={clsx(styles.onChangeButtonWrapper, !editing && "hidden")}>
+				<button
+					className={"transparent-button"}
+					onClick={discardChanges}
+					disabled={saveButtonStatus === ButtonStatus.Disabled}>
+					Discard
+				</button>
+				<button
+					className={"pink-button"}
+					onClick={updateUser}
+					disabled={saveButtonStatus === ButtonStatus.Disabled}>
+					Save
+				</button>
+			</div>
+			<Sizedbox height={50} />
+			<div className={styles.signOutButton}>
+				<button className='black-button' onClick={logout}>
+					Sign out
+				</button>
+			</div>
 			<ToastContainer theme='colored' autoClose={2} />
 		</Layout>
 	);

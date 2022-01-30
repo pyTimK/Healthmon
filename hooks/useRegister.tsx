@@ -25,7 +25,7 @@ const useRegister = () => {
 		route.replace("/");
 	};
 
-	return { user, PersonalDetailsSettingsBlock, updateUser, proceedButtonStatus };
+	return { user, PersonalDetailsSettingsBlock, updateUser, proceedButtonStatus, role };
 };
 
 export default useRegister;

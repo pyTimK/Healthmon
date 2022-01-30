@@ -1,0 +1,15 @@
+.onChangeButtonWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+
+
+}
+
+.signOutButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+}

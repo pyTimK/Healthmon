@@ -1,15 +1,26 @@
 .inputOption {
-    flex: 2;
     min-width: 0;
-    background-color: var(--background-dark);
+    /* background-color: var(--background-dark); */
+    background-color: transparent;
     color: whitesmoke;
     display: flex;
     border: none;
+    /* border-radius: 5px; */
+    border-bottom: 2px solid var(--background-dark);
     padding: 0;
-    font-size: medium;
+    font-size: 0.8rem;
     text-align: center;
     /* padding: 0 0 0 12px; */
     font-family: "Nunito";
-    border-radius: 5px;
+
+
+}
+
+.inputOption:focus {
+    outline: none;
+}
+
+.inputOption:active {
+    border-bottom: 2px solid var(--background-dark);
 
 }

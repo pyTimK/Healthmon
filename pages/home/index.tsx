@@ -5,22 +5,19 @@ import Layout from "../../components/layout/Layout";
 import Record from "../../components/record/Record";
 import dayGreetings from "../../function/dayGreetings";
 import styles from "./Home.module.css";
+import { useState } from "react";
 import useHome from "../../hooks/useHome";
 import { Bell } from "akar-icons";
 import NotifBlock from "../../components/notif/NotifBlock";
+import MyUser from "../../classes/MyUser";
+import { useRouter } from "next/router";
 
 const Home: NextPage = () => {
 	const { user, records } = useHome();
 
 	return (
 		<Layout title='HealthMon' description={PageDescriptions.HOME}>
-			<div className={styles.header}>
-				<Bell size={24} color='whitesmoke' strokeWidth={1} cursor='pointer' onClick={() => {}} />
-				<Avatar className={styles.avatar} size={30} photoURL={user.photoURL} letter={user.name} />
-				<div className={styles.notifDropdown}>
-					<NotifBlock />
-				</div>
-			</div>
+			<Header user={user} />
 			<main className={styles.main}>
 				<h1 className={styles.title}>
 					{dayGreetings()} {user.name}
@@ -44,6 +41,34 @@ const Home: NextPage = () => {
 				))}
 			</main>
 		</Layout>
+	);
+};
+
+interface HeaderProps {
+	user: MyUser;
+}
+
+const Header: React.FC<HeaderProps> = ({ user }) => {
+	const [isNotifOpen, setIsNotifOpen] = useState(false);
+	const router = useRouter();
+	const toggleNotif = () => setIsNotifOpen((isNotifOpen) => !isNotifOpen);
+	const goToAccounts = () => router.push("/account");
+	return (
+		<div className={styles.header}>
+			<Bell size={24} color='whitesmoke' strokeWidth={1} cursor='pointer' onClick={toggleNotif} />
+			<Avatar
+				className={styles.avatar}
+				size={30}
+				photoURL={user.photoURL}
+				letter={user.name}
+				onClick={goToAccounts}
+			/>
+			{isNotifOpen && (
+				<div className={styles.notifDropdown}>
+					<NotifBlock />
+				</div>
+			)}
+		</div>
 	);
 };
 

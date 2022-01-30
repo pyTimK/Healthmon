@@ -1,10 +1,22 @@
-.block {
+.container {
     text-align: left;
     width: fit-content;
-    margin: 0 auto;
+    width: 100%;
 }
 
-.blockHint {
+.header {
+    display: flex;
+    align-items: center;
+    width: 100%;
+
+}
+
+.title {
+    flex: 5;
     color: gray;
     margin: 5px;
+}
+
+.option {
+    flex: 1
 }

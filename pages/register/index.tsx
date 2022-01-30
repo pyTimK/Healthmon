@@ -1,13 +1,18 @@
+import clsx from "clsx";
 import { NextPage } from "next";
 import { ToastContainer } from "react-toastify";
 import { PageDescriptions } from "../../classes/Constants";
+import { Role } from "../../classes/MyUser";
 import GeneralSettingsBlock from "../../components/config/blocks/general/GeneralSettingsBlock";
+import PatientsSettingsBlock from "../../components/config/blocks/patients/PatientsSettingsBlock";
 import Layout from "../../components/layout/Layout";
+import Sizedbox from "../../components/Sizedbox";
 import ButtonStatus from "../../enums/ButtonStatus";
 import useRegister from "../../hooks/useRegister";
+import styles from "./Register.module.css";
 
 const RegisterScreen: NextPage = () => {
-	const { user, PersonalDetailsSettingsBlock, updateUser, proceedButtonStatus } = useRegister();
+	const { user, PersonalDetailsSettingsBlock, updateUser, proceedButtonStatus, role } = useRegister();
 
 	return (
 		<Layout title='Register - Healthmon' description={PageDescriptions.HOME} showSidebar={false}>
@@ -16,8 +21,11 @@ const RegisterScreen: NextPage = () => {
 
 			<PersonalDetailsSettingsBlock />
 
+			{role === Role.HealthWorker && <PatientsSettingsBlock user={user} />}
+
+			<Sizedbox height={20} />
 			<button
-				className={"pink-button"}
+				className={clsx("pink-button", styles.proceedButton)}
 				onClick={updateUser}
 				disabled={proceedButtonStatus === ButtonStatus.Disabled}>
 				Proceed

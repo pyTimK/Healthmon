@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import { MouseEventHandler } from "react";
 
 interface Props {
 	photoURL?: string;
@@ -6,9 +7,10 @@ interface Props {
 	letter?: string;
 	className?: string;
 	nonclickable?: boolean;
+	onClick?: MouseEventHandler<HTMLDivElement>;
 }
 
-const Avatar: React.FC<Props> = ({ photoURL, size = 30, letter = "K", className, nonclickable = false }) => {
+const Avatar: React.FC<Props> = ({ photoURL, size = 30, letter = "K", className, nonclickable = false, onClick }) => {
 	const circleStyle = {
 		height: size,
 		width: size,
@@ -26,7 +28,7 @@ const Avatar: React.FC<Props> = ({ photoURL, size = 30, letter = "K", className,
 	const letterStyle = { fontSize: "1.2rem", margin: 0 } as React.CSSProperties;
 
 	return (
-		<div style={circleStyle} className={className}>
+		<div style={circleStyle} className={className} onClick={onClick}>
 			{photoURL ? (
 				<img className={clsx("avatar", className)} src={photoURL} alt='avatar' width={size} height={size} />
 			) : (

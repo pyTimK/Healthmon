@@ -14,13 +14,8 @@ interface LayoutProps {
 }
 
 const Layout: NextPage<LayoutProps> = ({ title, description, showSidebar = true, children }) => {
-	const route = useRouter();
 	const user = CookiesHelper.get("user", new MyUser());
-	const path = route.pathname;
 
-	// const showContent = user !== null || path === "/auth";
-
-	// if (!showContent) return <div></div>;
 	if (user.id === "") return <></>;
 
 	return (

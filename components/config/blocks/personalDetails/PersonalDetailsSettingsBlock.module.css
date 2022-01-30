@@ -1,3 +1,9 @@
+.settingsRowValue {
+    font-size: 0.8rem;
+    margin: 0;
+    /* overflow: hidden; */
+}
+
 .dropdown {
     box-shadow: 0 0 1px rgb(81, 81, 81);
     border: 1px solid rgba(245, 245, 245, 0.174);
@@ -16,6 +22,7 @@
 
 .dropdownMenu {
     border-top: 1px solid rgba(245, 245, 245, 0.174);
+    font-size: 0.8rem;
 }
 
 .dropdownMenu div.is-selected {
@@ -29,4 +36,5 @@
 
 .dropdownPlaceHolder {
     color: whitesmoke;
+    font-size: 0.8rem;
 }
