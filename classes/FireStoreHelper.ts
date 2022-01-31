@@ -2,6 +2,7 @@ import { MonitorRequestNotif } from "./../types/Notification";
 import {
 	addDoc,
 	collection,
+	deleteDoc,
 	doc,
 	getDoc,
 	onSnapshot,
@@ -16,7 +17,11 @@ import { db } from "../firebase/initFirebase";
 import { getYYYYMMDD } from "../function/dateConversions";
 import DeviceData from "../types/DeviceData";
 import { NotifSubject } from "../types/Notification";
-import MyUser from "./MyUser";
+import MyUser, { IMyUser } from "./MyUser";
+import Patient from "../types/Patient";
+import HealthWorker from "../types/HealthWorker";
+import RequestedUsers from "../types/RequestedUsers";
+import RequestedUser from "../types/RequestedUsers";
 
 export abstract class FireStoreHelper {
 	//! DEVICE------------------------
@@ -118,24 +123,34 @@ export abstract class FireStoreHelper {
 
 	//! USER------------------------
 	static updateUser = async (user: MyUser) => {
-		const updatedUserDocFields: Partial<MyUser> = {
+		const updatedUserDocFields: IMyUser = {
+			id: user.id,
 			name: user.name,
 			number: user.number,
 			device: user.device,
 			healthWorkers: user.healthWorkers,
+			requestedUsers: user.requestedUsers,
+			monitoring: user.monitoring,
 			role: user.role,
 			photoURL: user.photoURL,
 		};
 		await updateDoc(doc(db, "users", user.id), { ...updatedUserDocFields });
 	};
+
+	static updateRequestedUsers = async (user: MyUser) => {
+		await updateDoc(doc(db, "users", user.id), { requestedUsers: user.requestedUsers });
+	};
+
 	//! NOTIF------------------------
-	static sendMonitorRequest = async (patientID: string, healthWorkerID: string) => {
-		const monitorRequestNotif: MonitorRequestNotif = {
+	static sendMonitorRequestNotif = async (patient: Patient, healthWorker: HealthWorker) => {
+		//* Send notification to patient user
+		await setDoc(doc(db, "notifications", patient.id, NotifSubject.MonitorRequest, healthWorker.id), {
 			timestamp: serverTimestamp(),
-			senderID: healthWorkerID,
-		};
-		await addDoc(collection(db, "notifications", patientID, NotifSubject.MonitorRequest), {
-			...monitorRequestNotif,
-		});
+			sender: healthWorker,
+		} as MonitorRequestNotif);
+	};
+
+	static removeMonitorRequestNotif = async (patient: Patient, healthWorker: HealthWorker) => {
+		await deleteDoc(doc(db, "notifications", patient.id, NotifSubject.MonitorRequest, healthWorker.id));
 	};
 }

@@ -50,4 +50,8 @@ export abstract class CookiesHelper {
 			role: user.role,
 		});
 	}
+
+	static saveRequestedUsers(user: MyUser) {
+		CookiesHelper.update<MyUser>("user", { requestedUsers: user.requestedUsers });
+	}
 }

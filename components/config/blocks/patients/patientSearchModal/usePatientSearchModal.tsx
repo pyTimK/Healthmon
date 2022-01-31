@@ -1,11 +1,13 @@
 import { Search } from "akar-icons";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import dynamic from "next/dynamic";
-import { FormEventHandler, useRef, useState } from "react";
+import { FormEventHandler, MouseEventHandler, useRef, useState } from "react";
 import { FireStoreHelper } from "../../../../../classes/FireStoreHelper";
 import MyUser from "../../../../../classes/MyUser";
 import ButtonStatus from "../../../../../enums/ButtonStatus";
 import { db } from "../../../../../firebase/initFirebase";
+import alreadyPatient from "../../../../../function/alreadyPatient";
+import alreadyRequested from "../../../../../function/alreadyRequested";
 import logError from "../../../../../function/logError";
 import notify from "../../../../../function/notify";
 import Patient from "../../../../../types/Patient";
@@ -21,7 +23,7 @@ const usePatientSearchModal = (user: MyUser) => {
 	const [MyModal, openPatientSearchModal, closePatientSearchModal, isPatientSearchModalOpen] = useMyModal();
 	const [searchResult, setSearchResult] = useState<Patient[]>([]);
 	const patientNumInputRef = useRef<HTMLInputElement>(null);
-	const [sendRequestButtonStatus, setSendRequestButtonStatus] = useState(ButtonStatus.Enabled);
+	const [buttonStatus, setButtonStatus] = useState(ButtonStatus.Enabled);
 
 	const searchPatient: FormEventHandler<HTMLFormElement> = async (e) => {
 		e.preventDefault();
@@ -31,9 +33,10 @@ const usePatientSearchModal = (user: MyUser) => {
 			notify("Please enter a phone number", { type: "info" });
 			return;
 		}
+		const newSearchResult: Patient[] = [];
+
 		const q = query(collection(db, "users"), where("number", "==", patientNumInputRef.current.value));
 		const snapshot = await getDocs(q);
-		const newSearchResult: Patient[] = [];
 		snapshot.forEach((doc) => {
 			const user = doc.data() as MyUser;
 			newSearchResult.push({ id: user.id, name: user.name, number: user.number, photoURL: user.photoURL });
@@ -44,16 +47,35 @@ const usePatientSearchModal = (user: MyUser) => {
 		setSearchResult(newSearchResult);
 	};
 
-	const send_request = async (patientID: string) => {
-		setSendRequestButtonStatus(ButtonStatus.Disabled);
+	const send_request = async (patient: Patient) => {
+		if (alreadyRequested(patient, user)) return;
+		if (alreadyPatient(patient, user)) return;
+
+		setButtonStatus(ButtonStatus.Disabled);
 		try {
-			await FireStoreHelper.sendMonitorRequest(patientID, user.id);
+			await user.addRequestedUser(patient);
+			await FireStoreHelper.sendMonitorRequestNotif(patient, user.toHealthWorker());
 			notify("Request Sent", { type: "success" });
 		} catch (_e) {
 			logError(_e);
 			notify("Can't send request right now");
 		}
-		setSendRequestButtonStatus(ButtonStatus.Enabled);
+		setButtonStatus(ButtonStatus.Enabled);
+	};
+
+	const cancel_request = async (patient: Patient) => {
+		if (!alreadyRequested(patient, user)) return;
+
+		setButtonStatus(ButtonStatus.Disabled);
+		try {
+			await user.removeRequestedUser(patient);
+			await FireStoreHelper.removeMonitorRequestNotif(patient, user.toHealthWorker());
+			notify("Request Cancelled", { type: "info" });
+		} catch (_e) {
+			logError(_e);
+			notify("Can't cancel request right now");
+		}
+		setButtonStatus(ButtonStatus.Enabled);
 	};
 
 	const PatientSearchModal: React.FC<PatientSearchModalProps> = ({}) => {
@@ -73,12 +95,17 @@ const usePatientSearchModal = (user: MyUser) => {
 						return (
 							<div key={_i} className={styles.resultRow}>
 								<UserOverview name={patient.name} number={patient.number} photoURL={patient.photoURL} />
-								<button
-									className='pink-button'
-									onClick={(_) => send_request(patient.id)}
-									disabled={sendRequestButtonStatus === ButtonStatus.Disabled}>
-									Send Request
-								</button>
+								{alreadyRequested(patient, user) ? (
+									<CancelRequestButton
+										onClick={(_) => cancel_request(patient)}
+										buttonStatus={buttonStatus}
+									/>
+								) : (
+									<SendRequestButton
+										onClick={(_) => send_request(patient)}
+										buttonStatus={buttonStatus}
+									/>
+								)}
 							</div>
 						);
 					})}
@@ -94,6 +121,32 @@ const usePatientSearchModal = (user: MyUser) => {
 		isPatientSearchModalOpen,
 		setSearchResult,
 	};
+};
+
+interface SendRequestButtonProps {
+	buttonStatus: ButtonStatus;
+	onClick?: MouseEventHandler<HTMLButtonElement>;
+}
+
+const SendRequestButton: React.FC<SendRequestButtonProps> = ({ buttonStatus, onClick }) => {
+	return (
+		<button className='pink-button' onClick={onClick} disabled={buttonStatus === ButtonStatus.Disabled}>
+			Send Request
+		</button>
+	);
+};
+
+interface CancelRequestButtonProps {
+	buttonStatus: ButtonStatus;
+	onClick?: MouseEventHandler<HTMLButtonElement>;
+}
+
+const CancelRequestButton: React.FC<CancelRequestButtonProps> = ({ buttonStatus, onClick }) => {
+	return (
+		<button className='gray-button' onClick={onClick} disabled={buttonStatus === ButtonStatus.Disabled}>
+			Cancel Request
+		</button>
+	);
 };
 
 export default usePatientSearchModal;

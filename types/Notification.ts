@@ -1,4 +1,5 @@
 import { FieldValue } from "firebase/firestore";
+import HealthWorker from "./HealthWorker";
 export const enum NotifSubject {
 	MonitorRequest = "monitor_request",
 	RecordComment = "record_comment",
@@ -6,7 +7,7 @@ export const enum NotifSubject {
 
 interface Notification {
 	timestamp: FieldValue;
-	senderID: string;
+	sender: HealthWorker;
 }
 
 export interface MonitorRequestNotif extends Notification {}
