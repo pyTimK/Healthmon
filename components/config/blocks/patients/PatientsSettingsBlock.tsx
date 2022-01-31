@@ -11,6 +11,7 @@ import styles from "./PatientsSettingsBlock.module.css";
 interface PatientsSettingsBlockProps {
 	user: MyUser;
 }
+//TODO nothing
 
 const PatientsSettingsBlock: React.FC<PatientsSettingsBlockProps> = ({ user }) => {
 	const { PatientSearchModal, openPatientSearchModal, setSearchResult } = usePatientSearchModal();
