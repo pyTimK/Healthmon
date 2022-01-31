@@ -7,7 +7,7 @@ import notify from "../function/notify";
 import ButtonStatus from "../enums/ButtonStatus";
 
 const useRegister = () => {
-	const user = MyUser.fromCookie();
+	const [user, setUser] = useState(MyUser.fromCookie());
 	const [proceedButtonStatus, setProceedButtonStatus] = useState(ButtonStatus.Enabled);
 	const { PersonalDetailsSettingsBlock, nameInputRef, numberInputRef, role } = usePersonalDetailsSettingsBlock(user);
 	const route = useRouter();

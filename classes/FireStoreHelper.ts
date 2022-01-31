@@ -109,6 +109,7 @@ export abstract class FireStoreHelper {
 		const q = query(collection(db, "records", dateDoc, id));
 
 		const unsubscribe = onSnapshot(q, (querySnapshot) => {
+			console.log("snap");
 			let gotRecords: RecordData[] = [];
 			querySnapshot.forEach((doc) => {
 				const data = doc.data() as RecordData;

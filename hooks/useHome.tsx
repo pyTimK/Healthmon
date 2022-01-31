@@ -5,7 +5,7 @@ import MyUser from "../classes/MyUser";
 import { RecordData } from "../components/record/Record";
 
 const useHome = () => {
-	const user = MyUser.fromCookie();
+	const [user, setUser] = useState(MyUser.fromCookie());
 	const [records, setRecords] = useState<RecordData[]>([]);
 	const router = useRouter();
 

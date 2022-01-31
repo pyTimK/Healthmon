@@ -15,7 +15,7 @@ import useAccount from "../../hooks/useAccount";
 import styles from "./Account.module.css";
 
 const Account: NextPage = () => {
-	const user = MyUser.fromCookie();
+	const [user, setUser] = useState(MyUser.fromCookie());
 	const { logout } = useAccount();
 	const { PersonalDetailsSettingsBlock, nameInputRef, numberInputRef, role, editing, setEditing } =
 		usePersonalDetailsSettingsBlock(user, true);

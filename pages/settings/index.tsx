@@ -1,4 +1,5 @@
 import { NextPage } from "next";
+import { useState } from "react";
 import { ToastContainer } from "react-toastify";
 import { PageDescriptions } from "../../classes/Constants";
 import MyUser, { Role } from "../../classes/MyUser";
@@ -8,7 +9,7 @@ import PatientsSettingsBlock from "../../components/config/blocks/patients/Patie
 import Layout from "../../components/layout/Layout";
 
 const Settings: NextPage = () => {
-	const user = MyUser.fromCookie();
+	const [user, setUser] = useState(MyUser.fromCookie());
 
 	return (
 		<Layout title='Settings - Healthmon' description={PageDescriptions.HOME}>
