@@ -1,10 +1,39 @@
 import { Bell } from "akar-icons";
-import { useState } from "react";
+import { useRouter } from "next/router";
+import { useEffect, useMemo, useState } from "react";
+import { FireStoreHelper } from "../../classes/FireStoreHelper";
+import MyUser from "../../classes/MyUser";
+import sortNotifs from "../../function/sortNotifs";
+import { MonitorRequestNotif, RecordCommentNotif } from "../../types/Notification";
 import NotifBlock from "./NotifBlock";
 import styles from "./useNotif.module.css";
 
-const useNotif = () => {
+const useNotif = (user: MyUser) => {
 	const [isNotifOpen, setIsNotifOpen] = useState(false);
+	const [monitorRequestNotifs, setMonitorRequestNotifs] = useState<MonitorRequestNotif[]>([]);
+	const [recordCommentNotifs, setRecordCommentNotifs] = useState<RecordCommentNotif[]>([]);
+	const notifsList: (MonitorRequestNotif | RecordCommentNotif)[] = useMemo(
+		() => sortNotifs(monitorRequestNotifs, recordCommentNotifs),
+		[monitorRequestNotifs, recordCommentNotifs]
+	);
+	const router = useRouter();
+
+	console.log("joined notifs: ", notifsList);
+
+	useEffect(() => {
+		if (user.id.length == 0) {
+			router.replace("/auth");
+			return;
+		}
+		const unsubMonitorRequestNotif = FireStoreHelper.monitorRequestNotifListener(user.id, setMonitorRequestNotifs);
+		const unsubRecordCommentNotif = FireStoreHelper.recordCommentNotifListener(user.id, setRecordCommentNotifs);
+
+		return () => {
+			unsubMonitorRequestNotif();
+			unsubRecordCommentNotif();
+		};
+	}, [user]);
+
 	const toggleNotif = () => {
 		setIsNotifOpen((isNotifOpen) => !isNotifOpen);
 	};
@@ -15,7 +44,7 @@ const useNotif = () => {
 
 	const Notif: React.FC = () => (
 		<div className={styles.notifDropdown}>
-			<NotifBlock />
+			<NotifBlock notifs={notifsList} />
 		</div>
 	);
 

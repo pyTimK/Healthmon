@@ -60,6 +60,20 @@ class MyUser {
 		return { id: this.id, name: this.name, number: this.number, photoURL: this.photoURL };
 	};
 
+	getPropsOnly = (): IMyUser => {
+		return {
+			id: this.id,
+			name: this.name,
+			number: this.number,
+			photoURL: this.photoURL,
+			device: this.device,
+			healthWorkers: this.healthWorkers,
+			monitoring: this.monitoring,
+			requestedUsers: this.requestedUsers,
+			role: this.role,
+		};
+	};
+
 	static fromCookie() {
 		return new MyUser(CookiesHelper.get<MyUser | undefined>("user", undefined));
 	}

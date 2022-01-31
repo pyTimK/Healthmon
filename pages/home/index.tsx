@@ -48,7 +48,7 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ user }) => {
-	const { Notif, NotifBell, Overlay, isNotifOpen } = useNotif();
+	const { Notif, NotifBell, Overlay, isNotifOpen } = useNotif(user);
 
 	const router = useRouter();
 	const goToAccounts = () => router.push("/account");

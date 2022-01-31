@@ -2,8 +2,13 @@ import NotifItem from "./NotifItem";
 import styles from "./NotifBlock.module.css";
 import { SettingsHorizontal } from "akar-icons";
 import { useRouter } from "next/router";
+import { isRecordCommentNotif, MonitorRequestNotif, RecordCommentNotif } from "../../types/Notification";
 
-const NotifBlock: React.FC = () => {
+interface NotifBlockProps {
+	notifs: (MonitorRequestNotif | RecordCommentNotif)[];
+}
+
+const NotifBlock: React.FC<NotifBlockProps> = ({ notifs }) => {
 	const router = useRouter();
 	const goToSettings = () => router.push("/settings");
 
@@ -15,9 +20,9 @@ const NotifBlock: React.FC = () => {
 					<SettingsHorizontal size={18} cursor='pointer' onClick={goToSettings} />
 				</div>
 			</div>
-			<NotifItem />
-			<NotifItem />
-			<NotifItem />
+			{notifs.map((notif, _i) => (
+				<NotifItem key={_i} notif={notif} />
+			))}
 		</div>
 	);
 };

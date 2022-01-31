@@ -1,4 +1,4 @@
-import { MonitorRequestNotif } from "./../types/Notification";
+import { MonitorRequestNotif, RecordCommentNotif } from "./../types/Notification";
 import {
 	addDoc,
 	collection,
@@ -11,7 +11,7 @@ import {
 	setDoc,
 	updateDoc,
 } from "firebase/firestore";
-import { SetStateAction } from "react";
+import { Dispatch, SetStateAction } from "react";
 import { RecordData } from "../components/record/Record";
 import { db } from "../firebase/initFirebase";
 import { getYYYYMMDD } from "../function/dateConversions";
@@ -26,7 +26,7 @@ import RequestedUser from "../types/RequestedUsers";
 export abstract class FireStoreHelper {
 	//! DEVICE------------------------
 	static setUserFirestore = async (user: MyUser) => {
-		await setDoc(doc(db, "users", user.id), { ...user });
+		await setDoc(doc(db, "users", user.id), user.getPropsOnly());
 	};
 
 	static askPairDevice = async (deviceCode: string, user: MyUser) => {
@@ -104,7 +104,7 @@ export abstract class FireStoreHelper {
 	};
 
 	//! RECORD----------------------
-	static recordDataListener = (id: string, setRecords: (value: SetStateAction<RecordData[]>) => void) => {
+	static recordDataListener = (id: string, setRecords: Dispatch<SetStateAction<RecordData[]>>) => {
 		const dateDoc = getYYYYMMDD(new Date());
 		const q = query(collection(db, "records", dateDoc, id));
 
@@ -153,5 +153,49 @@ export abstract class FireStoreHelper {
 
 	static removeMonitorRequestNotif = async (patient: Patient, healthWorker: HealthWorker) => {
 		await deleteDoc(doc(db, "notifications", patient.id, NotifSubject.MonitorRequest, healthWorker.id));
+	};
+
+	static monitorRequestNotifListener = (
+		id: string,
+		setMonitorRequestNotifs: Dispatch<SetStateAction<MonitorRequestNotif[]>>
+	) => {
+		const q = query(collection(db, "notifications", id, NotifSubject.MonitorRequest));
+
+		const unsubscribe = onSnapshot(q, (querySnapshot) => {
+			console.log("monitorRequestNotif snap");
+
+			let gotRecords: MonitorRequestNotif[] = [];
+
+			querySnapshot.forEach((doc) => {
+				const data = doc.data() as MonitorRequestNotif;
+				gotRecords.push(data);
+			});
+
+			setMonitorRequestNotifs(() => gotRecords);
+		});
+
+		return unsubscribe;
+	};
+
+	static recordCommentNotifListener = (
+		id: string,
+		setRecordCommentNotifs: Dispatch<SetStateAction<RecordCommentNotif[]>>
+	) => {
+		const q = query(collection(db, "notifications", id, NotifSubject.RecordComment));
+
+		const unsubscribe = onSnapshot(q, (querySnapshot) => {
+			console.log("recordCommentNotif snap");
+
+			let gotRecords: RecordCommentNotif[] = [];
+
+			querySnapshot.forEach((doc) => {
+				const data = doc.data() as RecordCommentNotif;
+				gotRecords.push(data);
+			});
+
+			setRecordCommentNotifs(() => gotRecords);
+		});
+
+		return unsubscribe;
 	};
 }
