@@ -1,0 +1,16 @@
+.section {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.title {
+    margin: 0;
+}
+
+.buttonsWrapper {
+    display: flex;
+    gap: 40px;
+}

@@ -11,6 +11,7 @@ import alreadyRequested from "../../../../../function/alreadyRequested";
 import logError from "../../../../../function/logError";
 import notify from "../../../../../function/notify";
 import Patient from "../../../../../types/Patient";
+import useConfirmModal from "../../../../myModal/useConfirmModal/useConfirmModal";
 import useMyModal from "../../../../myModal/useMyModal";
 import Sizedbox from "../../../../Sizedbox";
 import UserOverview from "../../../../userOverview/UserOverview";
@@ -21,9 +22,11 @@ interface PatientSearchModalProps {}
 
 const usePatientSearchModal = (user: MyUser) => {
 	const [MyModal, openPatientSearchModal, closePatientSearchModal, isPatientSearchModalOpen] = useMyModal();
+	const { ConfirmModal, openConfirmModal, closeConfirmModal } = useConfirmModal();
 	const [searchResult, setSearchResult] = useState<Patient[]>([]);
 	const patientNumInputRef = useRef<HTMLInputElement>(null);
 	const [buttonStatus, setButtonStatus] = useState(ButtonStatus.Enabled);
+	const selectedPatient = useRef<Patient | null>(null);
 
 	const searchPatient: FormEventHandler<HTMLFormElement> = async (e) => {
 		e.preventDefault();
@@ -47,7 +50,7 @@ const usePatientSearchModal = (user: MyUser) => {
 		setSearchResult(newSearchResult);
 	};
 
-	const send_request = async (patient: Patient) => {
+	const sendRequest = async (patient: Patient) => {
 		if (alreadyRequested(patient, user)) return;
 		if (alreadyPatient(patient, user)) return;
 
@@ -63,7 +66,8 @@ const usePatientSearchModal = (user: MyUser) => {
 		setButtonStatus(ButtonStatus.Enabled);
 	};
 
-	const cancel_request = async (patient: Patient) => {
+	const cancelRequest = async (patient: Patient | null) => {
+		if (!patient) return;
 		if (!alreadyRequested(patient, user)) return;
 
 		setButtonStatus(ButtonStatus.Disabled);
@@ -76,41 +80,72 @@ const usePatientSearchModal = (user: MyUser) => {
 			notify("Can't cancel request right now");
 		}
 		setButtonStatus(ButtonStatus.Enabled);
+		closeConfirmModal();
+	};
+
+	const confirmCancelRequest = async (patient: Patient) => {
+		selectedPatient.current = patient;
+		openConfirmModal();
 	};
 
 	const PatientSearchModal: React.FC<PatientSearchModalProps> = ({}) => {
 		return (
-			<MyModal>
-				<div className={styles.section}>
-					<h1 className={styles.title}>Add Patient</h1>
-					<Sizedbox height={30} />
-					<form className={styles.inputRow} onSubmit={searchPatient}>
-						<input ref={patientNumInputRef} className={styles.input} type='text' placeholder='Search...' />
-						<button type='submit' className={styles.SearchIconButton}>
-							<Search size={16} strokeWidth={4} color='var(--background-light)' />
-						</button>
-					</form>
-					<p>Please Enter patient&#39;s phone number</p>
-					{searchResult.map((patient, _i) => {
-						return (
-							<div key={_i} className={styles.resultRow}>
-								<UserOverview name={patient.name} number={patient.number} photoURL={patient.photoURL} />
-								{alreadyRequested(patient, user) ? (
-									<CancelRequestButton
-										onClick={(_) => cancel_request(patient)}
-										buttonStatus={buttonStatus}
+			<>
+				<MyModal>
+					<div className={styles.section}>
+						<h1 className={styles.title}>Add Patient</h1>
+						<Sizedbox height={30} />
+						<form className={styles.inputRow} onSubmit={searchPatient}>
+							<input
+								ref={patientNumInputRef}
+								className={styles.input}
+								type='text'
+								placeholder='Search...'
+							/>
+							<button type='submit' className={styles.SearchIconButton}>
+								<Search size={16} strokeWidth={4} color='var(--background-light)' />
+							</button>
+						</form>
+						<p>Please Enter patient&#39;s phone number</p>
+						{searchResult.map((patient, _i) => {
+							return (
+								<div key={_i} className={styles.resultRow}>
+									<UserOverview
+										name={patient.name}
+										number={patient.number}
+										photoURL={patient.photoURL}
 									/>
-								) : (
-									<SendRequestButton
-										onClick={(_) => send_request(patient)}
-										buttonStatus={buttonStatus}
-									/>
-								)}
-							</div>
-						);
-					})}
-				</div>
-			</MyModal>
+									{alreadyRequested(patient, user) ? (
+										<CancelRequestButton
+											onClick={(_) => confirmCancelRequest(patient)}
+											buttonStatus={buttonStatus}
+										/>
+									) : (
+										<SendRequestButton
+											onClick={(_) => sendRequest(patient)}
+											buttonStatus={buttonStatus}
+										/>
+									)}
+									{/* <ConfirmModal
+									title='Confirm Cancel Request'
+									description={`Are you sure you want to cancel request to ${patient.name}?`}
+									onConfirm={(_) => cancelRequest(patient)}
+								/> */}
+								</div>
+							);
+						})}
+					</div>
+				</MyModal>
+				<ConfirmModal
+					title='Confirm Cancel Request'
+					description={`Are you sure you want to cancel request to ${
+						selectedPatient.current?.name ?? "this user"
+					}?`}
+					onConfirm={(_) => {
+						cancelRequest(selectedPatient.current);
+					}}
+				/>
+			</>
 		);
 	};
 

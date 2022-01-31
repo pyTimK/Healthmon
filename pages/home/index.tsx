@@ -69,6 +69,7 @@ const Header: React.FC<HeaderProps> = ({ user }) => {
 					<NotifBlock />
 				</div>
 			)}
+			{isNotifOpen && <div className={styles.overlay} onClick={toggleNotif} />}
 			<ToastContainer theme='colored' autoClose={2} />
 		</div>
 	);
