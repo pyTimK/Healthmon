@@ -30,13 +30,14 @@
     border: 1px solid rgba(255, 255, 255, 0.186);
 }
 
-.SearchIconWrapper {
+.SearchIconButton {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 40px;
     height: 40px;
     background-color: var(--green);
+    border: none;
     border-radius: 10px;
     cursor: pointer;
 }

@@ -1,4 +1,5 @@
 interface Patient {
+	id: string;
 	name: string;
 	number: string;
 	photoURL?: string;

@@ -1,20 +1,14 @@
-import { useRef } from "react";
 import MyUser from "../../../../classes/MyUser";
-import MyModalSection from "../../../myModal/myModalSection/MyModalSection";
-import useMyModal from "../../../myModal/useMyModal";
-import InputOption from "../../options/inputOption/InputOption";
 import SettingsBlock from "../../settingsBlock/SettingsBlock";
 import SettingsRow from "../../settingsRow/SettingsRow";
 import usePatientSearchModal from "./patientSearchModal/usePatientSearchModal";
-import styles from "./PatientsSettingsBlock.module.css";
 
 interface PatientsSettingsBlockProps {
 	user: MyUser;
 }
-//TODO nothing
 
 const PatientsSettingsBlock: React.FC<PatientsSettingsBlockProps> = ({ user }) => {
-	const { PatientSearchModal, openPatientSearchModal, setSearchResult } = usePatientSearchModal();
+	const { PatientSearchModal, openPatientSearchModal, setSearchResult } = usePatientSearchModal(user);
 
 	const addPatient = () => {
 		// TODO

@@ -1,9 +1,25 @@
-import { doc, getDoc, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
+import { MonitorRequestNotif } from "./../types/Notification";
+import {
+	addDoc,
+	collection,
+	doc,
+	getDoc,
+	onSnapshot,
+	query,
+	serverTimestamp,
+	setDoc,
+	updateDoc,
+} from "firebase/firestore";
+import { SetStateAction } from "react";
+import { RecordData } from "../components/record/Record";
 import { db } from "../firebase/initFirebase";
+import { getYYYYMMDD } from "../function/dateConversions";
 import DeviceData from "../types/DeviceData";
+import { NotifSubject } from "../types/Notification";
 import MyUser from "./MyUser";
 
 export abstract class FireStoreHelper {
+	//! DEVICE------------------------
 	static setUserFirestore = async (user: MyUser) => {
 		await setDoc(doc(db, "users", user.id), { ...user });
 	};
@@ -82,6 +98,25 @@ export abstract class FireStoreHelper {
 		await updateDoc(doc(db, "devices", user.device), { ...newDeviceDocFields });
 	};
 
+	//! RECORD----------------------
+	static recordDataListener = (id: string, setRecords: (value: SetStateAction<RecordData[]>) => void) => {
+		const dateDoc = getYYYYMMDD(new Date());
+		const q = query(collection(db, "records", dateDoc, id));
+
+		const unsubscribe = onSnapshot(q, (querySnapshot) => {
+			let gotRecords: RecordData[] = [];
+			querySnapshot.forEach((doc) => {
+				const data = doc.data() as RecordData;
+				gotRecords.push(data);
+			});
+			gotRecords.reverse();
+			setRecords(() => gotRecords);
+		});
+
+		return unsubscribe;
+	};
+
+	//! USER------------------------
 	static updateUser = async (user: MyUser) => {
 		const updatedUserDocFields: Partial<MyUser> = {
 			name: user.name,
@@ -92,5 +127,15 @@ export abstract class FireStoreHelper {
 			photoURL: user.photoURL,
 		};
 		await updateDoc(doc(db, "users", user.id), { ...updatedUserDocFields });
+	};
+	//! NOTIF------------------------
+	static sendMonitorRequest = async (patientID: string, healthWorkerID: string) => {
+		const monitorRequestNotif: MonitorRequestNotif = {
+			timestamp: serverTimestamp(),
+			senderID: healthWorkerID,
+		};
+		await addDoc(collection(db, "notifications", patientID, NotifSubject.MonitorRequest), {
+			...monitorRequestNotif,
+		});
 	};
 }

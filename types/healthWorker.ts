@@ -1,4 +1,5 @@
 interface HealthWorker {
+	id: string;
 	name: string;
 	number: string;
 	photoURL?: string;
