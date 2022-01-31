@@ -1,4 +1,5 @@
 import { NextPage } from "next";
+import { ToastContainer } from "react-toastify";
 import { PageDescriptions } from "../../classes/Constants";
 import MyUser, { Role } from "../../classes/MyUser";
 import GeneralSettingsBlock from "../../components/config/blocks/general/GeneralSettingsBlock";
@@ -18,6 +19,7 @@ const Settings: NextPage = () => {
 			) : (
 				<PatientsSettingsBlock user={user} />
 			)}
+			<ToastContainer theme='colored' autoClose={2} />
 		</Layout>
 	);
 };

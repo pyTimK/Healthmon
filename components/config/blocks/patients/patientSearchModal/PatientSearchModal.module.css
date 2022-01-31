@@ -40,3 +40,11 @@
     border-radius: 10px;
     cursor: pointer;
 }
+
+.resultRow {
+    background-color: var(--background-dark);
+    padding: 0 12px;
+    border-radius: 5px;
+    display: flex;
+    gap: 30px;
+}

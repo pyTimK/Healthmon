@@ -11,6 +11,7 @@ import { Bell } from "akar-icons";
 import NotifBlock from "../../components/notif/NotifBlock";
 import MyUser from "../../classes/MyUser";
 import { useRouter } from "next/router";
+import { ToastContainer } from "react-toastify";
 
 const Home: NextPage = () => {
 	const { user, records } = useHome();
@@ -68,6 +69,7 @@ const Header: React.FC<HeaderProps> = ({ user }) => {
 					<NotifBlock />
 				</div>
 			)}
+			<ToastContainer theme='colored' autoClose={2} />
 		</div>
 	);
 };

@@ -13,11 +13,11 @@ interface PatientsSettingsBlockProps {
 }
 
 const PatientsSettingsBlock: React.FC<PatientsSettingsBlockProps> = ({ user }) => {
-	const [PatientSearchModal, openPatientSearchModal, closePatientSearchModal, isPatientSearchModalOpen] =
-		usePatientSearchModal();
+	const { PatientSearchModal, openPatientSearchModal, setSearchResult } = usePatientSearchModal();
 
 	const addPatient = () => {
 		// TODO
+		setSearchResult([]);
 		openPatientSearchModal();
 	};
 	return (
@@ -30,7 +30,7 @@ const PatientsSettingsBlock: React.FC<PatientsSettingsBlockProps> = ({ user }) =
 				<SettingsRow key={_i} title={patient.name} subtitle={patient.number} />
 			))}
 			{/* <SettingsRow title={user.name} subtitle={user.number} /> */}
-			<PatientSearchModal></PatientSearchModal>
+			<PatientSearchModal />
 		</SettingsBlock>
 	);
 };

@@ -29,14 +29,14 @@ const usePersonalDetailsSettingsBlock = (user: MyUser, hasEditOption = false) =>
 						editing={editing}>
 						<SettingsRow title='Name'>
 							{editing ? (
-								<InputOption inputRef={nameInputRef} value={user.name} />
+								<InputOption inputRef={nameInputRef} value={user.name} maxLength={15} />
 							) : (
 								<p className={styles.settingsRowValue}>{user.name}</p>
 							)}
 						</SettingsRow>
 						<SettingsRow title='Phone'>
 							{editing ? (
-								<InputOption inputRef={numberInputRef} value={user.number} />
+								<InputOption inputRef={numberInputRef} value={user.number} maxLength={15} />
 							) : (
 								<p className={styles.settingsRowValue}>{user.number}</p>
 							)}

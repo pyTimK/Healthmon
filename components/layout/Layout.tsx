@@ -1,11 +1,9 @@
 import { NextPage } from "next";
-import { useRouter } from "next/router";
+import Head from "next/head";
 import { CookiesHelper } from "../../classes/CookiesHelper";
 import MyUser from "../../classes/MyUser";
 import Sidebar from "../sidebar/Sidebar";
-import Head from "next/head";
 import styles from "./Layout.module.css";
-import { ToastContainer } from "react-toastify";
 
 interface LayoutProps {
 	title: string;

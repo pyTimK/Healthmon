@@ -5,9 +5,10 @@ interface InputOptionProps {
 	inputRef: RefObject<HTMLInputElement>;
 	type?: HTMLInputTypeAttribute;
 	value?: string;
+	maxLength?: number;
 }
 
-const InputOption: React.FC<InputOptionProps> = ({ inputRef, type = "text", value }) => {
+const InputOption: React.FC<InputOptionProps> = ({ inputRef, type = "text", value, maxLength }) => {
 	console.log("InputOption Rerendered");
 
 	return (
@@ -17,6 +18,7 @@ const InputOption: React.FC<InputOptionProps> = ({ inputRef, type = "text", valu
 			type={type}
 			defaultValue={value}
 			required
+			maxLength={maxLength}
 			// onChange={onChange}
 		/>
 	);

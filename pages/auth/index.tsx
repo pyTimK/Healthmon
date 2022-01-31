@@ -12,6 +12,7 @@ import { useRouter } from "next/router";
 import { doc, getDoc } from "firebase/firestore";
 import { CookiesHelper } from "../../classes/CookiesHelper";
 import MyUser from "../../classes/MyUser";
+import { ToastContainer } from "react-toastify";
 
 const SignInScreen: NextPage = () => {
 	const [user, setUser] = useState<User | null>(null);
@@ -73,6 +74,7 @@ const SignInScreen: NextPage = () => {
 			<p className={styles.p1}>Please sign-in using one of the following methods</p>
 			<Sizedbox height={50} />
 			<StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={auth} />
+			<ToastContainer theme='colored' autoClose={2} />
 		</div>
 	);
 };
