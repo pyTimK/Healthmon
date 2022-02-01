@@ -2,7 +2,7 @@ interface RequestedUser {
 	id: string;
 	name: string;
 	number: string;
-	photoURL?: string;
+	photoURL: string;
 }
 
 export default RequestedUser;

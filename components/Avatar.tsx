@@ -32,7 +32,7 @@ const Avatar: React.FC<Props> = ({ photoURL, size = 30, letter = "K", className,
 			{photoURL ? (
 				<img className={clsx("avatar", className)} src={photoURL} alt='avatar' width={size} height={size} />
 			) : (
-				<p style={letterStyle}>{letter.charAt(0)}</p>
+				<p style={letterStyle}>{letter.charAt(0).toUpperCase()}</p>
 			)}
 		</div>
 	);

@@ -2,6 +2,7 @@ import { User } from "firebase/auth";
 import removeRequestedPatient from "../function/removeRequestedPatient";
 import HealthWorker from "../types/HealthWorker";
 import Patient from "../types/Patient";
+import RecordComment from "../types/RecordComment";
 import RequestedUsers from "../types/RequestedUsers";
 import { CookiesHelper } from "./CookiesHelper";
 import { FireStoreHelper } from "./FireStoreHelper";
@@ -19,6 +20,7 @@ export interface IMyUser {
 	healthWorkers: HealthWorker[];
 	requestedUsers: RequestedUsers[];
 	monitoring: Patient[];
+	comments: RecordComment[];
 	device: string;
 	photoURL: string;
 }
@@ -31,6 +33,7 @@ class MyUser {
 	public healthWorkers: HealthWorker[];
 	public requestedUsers: RequestedUsers[];
 	public monitoring: Patient[];
+	public comments: RecordComment[];
 	public device: string;
 	public photoURL: string;
 
@@ -42,6 +45,7 @@ class MyUser {
 		this.healthWorkers = user?.healthWorkers ?? [];
 		this.requestedUsers = user?.requestedUsers ?? [];
 		this.monitoring = user?.monitoring ?? [];
+		this.comments = user?.comments ?? [];
 		this.device = user?.device ?? "";
 		this.photoURL = user?.photoURL ?? "";
 	}
@@ -60,17 +64,27 @@ class MyUser {
 		return { id: this.id, name: this.name, number: this.number, photoURL: this.photoURL };
 	};
 
-	getPropsOnly = (): IMyUser => {
+	toPatient = (): Patient => {
+		return { id: this.id, name: this.name, number: this.number, photoURL: this.photoURL };
+	};
+
+	getDocProps = () => {
 		return {
 			id: this.id,
 			name: this.name,
 			number: this.number,
+			role: this.role,
 			photoURL: this.photoURL,
 			device: this.device,
-			healthWorkers: this.healthWorkers,
-			monitoring: this.monitoring,
-			requestedUsers: this.requestedUsers,
+		};
+	};
+
+	getPersonalDetails = () => {
+		return {
+			name: this.name,
+			number: this.number,
 			role: this.role,
+			photoURL: this.photoURL,
 		};
 	};
 
@@ -84,11 +98,11 @@ class MyUser {
 		this.role = newRole;
 
 		CookiesHelper.savePersonalDetails(this);
-		await FireStoreHelper.updateDevice(this);
-		await FireStoreHelper.updateUser(this);
+		await FireStoreHelper.updatePersonalDetails(this);
 	}
 
 	async addRequestedUser(patient: Patient) {
+		//TODO FIX IT FILIX
 		this.requestedUsers.push(patient);
 
 		CookiesHelper.saveRequestedUsers(this);
@@ -96,6 +110,7 @@ class MyUser {
 	}
 
 	async removeRequestedUser(patient: Patient) {
+		//TODO FIX IT FILIX
 		this.requestedUsers = removeRequestedPatient(patient, this);
 
 		CookiesHelper.saveRequestedUsers(this);

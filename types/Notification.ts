@@ -12,9 +12,10 @@ interface PatientNotif {
 
 export interface MonitorRequestNotif extends PatientNotif {}
 export interface RecordCommentNotif extends PatientNotif {
-	recordDocRef: string;
+	recordDate: string;
+	recordTime: string;
 }
 
 export function isRecordCommentNotif(notif: MonitorRequestNotif | RecordCommentNotif): notif is RecordCommentNotif {
-	return (<RecordCommentNotif>notif).recordDocRef !== undefined;
+	return (<RecordCommentNotif>notif).recordDate !== undefined;
 }

@@ -44,7 +44,7 @@ const useNotif = (user: MyUser) => {
 
 	const Notif: React.FC = () => (
 		<div className={styles.notifDropdown}>
-			<NotifBlock notifs={notifsList} />
+			<NotifBlock notifs={notifsList} user={user} />
 		</div>
 	);
 

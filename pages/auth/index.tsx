@@ -28,7 +28,7 @@ const SignInScreen: NextPage = () => {
 			router.replace("/");
 		} else {
 			const myUser = MyUser.fromFirebaseUser(user);
-			FireStoreHelper.setUserFirestore(myUser);
+			FireStoreHelper.setUser(myUser);
 			CookiesHelper.set("user", myUser);
 			router.replace("/register");
 		}

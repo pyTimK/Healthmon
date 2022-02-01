@@ -44,11 +44,7 @@ export abstract class CookiesHelper {
 
 	//! USER
 	static savePersonalDetails(user: MyUser) {
-		CookiesHelper.update<MyUser>("user", {
-			name: user.name,
-			number: user.number,
-			role: user.role,
-		});
+		CookiesHelper.update<MyUser>("user", user.getPersonalDetails());
 	}
 
 	static saveRequestedUsers(user: MyUser) {

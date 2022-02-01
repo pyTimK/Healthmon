@@ -73,7 +73,7 @@ const usePatientSearchModal = (user: MyUser) => {
 		setButtonStatus(ButtonStatus.Disabled);
 		try {
 			await user.removeRequestedUser(patient);
-			await FireStoreHelper.removeMonitorRequestNotif(patient, user.toHealthWorker());
+			await FireStoreHelper.removeMonitorRequest(patient, user.toHealthWorker());
 			notify("Request Cancelled", { type: "info" });
 		} catch (_e) {
 			logError(_e);
@@ -115,17 +115,18 @@ const usePatientSearchModal = (user: MyUser) => {
 										number={patient.number}
 										photoURL={patient.photoURL}
 									/>
-									{alreadyRequested(patient, user) ? (
-										<CancelRequestButton
-											onClick={(_) => confirmCancelRequest(patient)}
-											buttonStatus={buttonStatus}
-										/>
-									) : (
-										<SendRequestButton
-											onClick={(_) => sendRequest(patient)}
-											buttonStatus={buttonStatus}
-										/>
-									)}
+									{patient.number !== user.number &&
+										(alreadyRequested(patient, user) ? (
+											<CancelRequestButton
+												onClick={(_) => confirmCancelRequest(patient)}
+												buttonStatus={buttonStatus}
+											/>
+										) : (
+											<SendRequestButton
+												onClick={(_) => sendRequest(patient)}
+												buttonStatus={buttonStatus}
+											/>
+										))}
 									{/* <ConfirmModal
 									title='Confirm Cancel Request'
 									description={`Are you sure you want to cancel request to ${patient.name}?`}
