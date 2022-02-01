@@ -1,18 +1,15 @@
-import { doc, getDoc, serverTimestamp, updateDoc } from "firebase/firestore";
-import { Dispatch, FormEventHandler, SetStateAction, useRef } from "react";
-import { CookiesHelper } from "../../../../../classes/CookiesHelper";
+import { doc, getDoc } from "firebase/firestore";
+import dynamic from "next/dynamic";
+import { Dispatch, SetStateAction } from "react";
+import { FireStoreHelper } from "../../../../../classes/FireStoreHelper";
 import MyUser from "../../../../../classes/MyUser";
 import { db } from "../../../../../firebase/initFirebase";
+import logError from "../../../../../function/logError";
 import notify from "../../../../../function/notify";
 import AuthenticateData from "../../../../../types/AuthenticateData";
-import DeviceData from "../../../../../types/DeviceData";
 import useMyModal from "../../../../myModal/useMyModal";
-import styles from "./CodeInputModal.module.css";
-import dynamic from "next/dynamic";
-import { ReactCodeInputProps } from "react-code-input";
 import Sizedbox from "../../../../Sizedbox";
-import { FireStoreHelper } from "../../../../../classes/FireStoreHelper";
-import logError from "../../../../../function/logError";
+import styles from "./CodeInputModal.module.css";
 const ReactCodeInput = dynamic(import("react-code-input"));
 
 interface CodeInputModalProps {}
@@ -23,7 +20,7 @@ type UseCodeInputModal = (
 	setParsedQR: Dispatch<SetStateAction<string | null>>
 ) => [React.FC<CodeInputModalProps>, () => void, () => void, boolean];
 
-// Responsible for pairing up user to device
+//* Responsible for pairing up user to device
 const useCodeInputModal: UseCodeInputModal = (user, parsedQR, setParsedQR) => {
 	const [MyModal, openCodeInputModal, closeCodeInputModal, isCodeInputModalOpen] = useMyModal();
 
@@ -41,10 +38,10 @@ const useCodeInputModal: UseCodeInputModal = (user, parsedQR, setParsedQR) => {
 			return;
 		}
 
-		//* Pair in Firestore and save to cookies device
+		//* Pair in Firestore
 		try {
 			await FireStoreHelper.pairDevice(user, parsedQR);
-			CookiesHelper.set("deviceid", parsedQR);
+			user.device = parsedQR;
 			notify("Successfully linked device", { type: "success" });
 		} catch (_e) {
 			logError(_e);

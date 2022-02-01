@@ -15,13 +15,10 @@ import { RecordData } from "../components/record/Record";
 import { db } from "../firebase/initFirebase";
 import { getYYYYMMDD } from "../function/dateConversions";
 import DeviceData from "../types/DeviceData";
-import HealthWorker from "../types/HealthWorker";
 import { NotifSubject } from "../types/Notification";
-import Patient from "../types/Patient";
-import { formatHealthWorkers } from "./../function/converter";
 import { MonitorRequestNotif, RecordCommentNotif } from "./../types/Notification";
-import { date_time_healthWorkerId } from "./../types/RecordComment";
-import MyUser from "./MyUser";
+import RecordComment, { date_time_healthWorkerId } from "./../types/RecordComment";
+import MyUser, { Formatted, toUnformatted } from "./MyUser";
 
 export abstract class FireStoreHelper {
 	//! DEVICE------------------------
@@ -31,13 +28,7 @@ export abstract class FireStoreHelper {
 			new_name: user.name,
 			confirmed: false,
 			request_timestamp: serverTimestamp(),
-			new_healthWorkers: user.healthWorkers,
 		} as Partial<DeviceData>);
-
-		await setDoc(
-			doc(db, "devices", deviceId, "associates", "newHealthWorkers"),
-			formatHealthWorkers(user.healthWorkers)
-		);
 	};
 
 	static pairDevice = async (user: MyUser, deviceId: string) => {
@@ -51,12 +42,6 @@ export abstract class FireStoreHelper {
 		};
 
 		await updateDoc(doc(db, "devices", deviceId), { ...paired_doc });
-		await setDoc(
-			doc(db, "devices", deviceId, "associates", "healthWorkers"),
-			formatHealthWorkers(user.healthWorkers)
-		);
-		//* No need to delete right
-		// await deleteDoc(doc(db, "devices", deviceId, "associates", "newHealthWorkers"));
 	};
 
 	private static _isDevicePaired = async (user: MyUser, deviceId: string = "") => {
@@ -86,7 +71,7 @@ export abstract class FireStoreHelper {
 			confirmed: false,
 			request_timestamp: serverTimestamp(),
 		};
-		await updateDoc(doc(db, "devices", deviceId), { ...clearedDeviceData });
+		await setDoc(doc(db, "devices", deviceId), { ...clearedDeviceData });
 	};
 
 	private static _updatePersonalDetailsOnDevice = async (user: MyUser) => {
@@ -101,7 +86,7 @@ export abstract class FireStoreHelper {
 			confirmed: false,
 			request_timestamp: serverTimestamp(),
 		};
-		await updateDoc(doc(db, "devices", user.device), { ...newDeviceDocFields });
+		await setDoc(doc(db, "devices", user.device), { ...newDeviceDocFields });
 	};
 
 	//! RECORD----------------------
@@ -110,11 +95,11 @@ export abstract class FireStoreHelper {
 		const q = query(collection(db, "records", dateDoc, id));
 
 		const unsubscribe = onSnapshot(q, (querySnapshot) => {
-			console.log("snap");
+			console.log("record snap");
 			let gotRecords: RecordData[] = [];
 			querySnapshot.forEach((doc) => {
-				const data = doc.data() as RecordData;
-				gotRecords.push(data);
+				const recordData = doc.data() as RecordData;
+				gotRecords.push(recordData);
 			});
 			gotRecords.reverse();
 			setRecords(() => gotRecords);
@@ -124,8 +109,16 @@ export abstract class FireStoreHelper {
 	};
 
 	//! COMMENT------------------------
+	static getComments = async (user: MyUser) => {
+		const commentsDoc = await getDoc(doc(db, "users", user.id, "comments", "comments"));
+		const formattedComments = commentsDoc.data() as Formatted<RecordComment>;
+		const comments = toUnformatted(formattedComments);
+		return comments;
+	};
+
 	private static _updatePersonalDetailsOnComments = async (user: MyUser) => {
-		for (const comment of user.comments) {
+		const comments = await FireStoreHelper.getComments(user);
+		for (const comment of comments) {
 			await updateDoc(
 				doc(db, "records", comment.recordDate, comment.patientID, comment.recordTime, "comments", user.id),
 				user.toHealthWorker()
@@ -133,13 +126,34 @@ export abstract class FireStoreHelper {
 		}
 	};
 
-	//! USER------------------------
+	//! USER------------------------ RESUME!!!!!!!!!!!!!!!!!
+	static getUser = async (id: string) => {
+		const userDoc = await getDoc(doc(db, "users", id));
+		return userDoc.data() as MyUser;
+	};
+	static getHealthWorkers = async (user: MyUser) => {
+		const healthWorkersDoc = await getDoc(doc(db, "users", user.id, "associates", "healthWorkers"));
+		const formattedHealthWorkers = healthWorkersDoc.data() as FormattedHealthWorkers;
+		return toHealthWorkers(formattedHealthWorkers);
+	};
+
+	static getPatients = async (user: MyUser) => {
+		const patientsDoc = await getDoc(doc(db, "users", user.id, "associates", "monitoring"));
+		const formattedPatients = patientsDoc.data() as FormattedPatients;
+		return toPatients(formattedPatients);
+	};
+
+	static getRequestedUsers = async (user: MyUser) => {
+		const requestedUsersDoc = await getDoc(doc(db, "users", user.id, "associates", "requestedUsers"));
+		const formattedHealthWorkers = requestedUsersDoc.data() as FormattedHealthWorkers;
+		return toHealthWorkers(formattedHealthWorkers);
+	};
 	static setUser = async (user: MyUser) => {
-		await setDoc(doc(db, "users", user.id), user.getDocProps());
+		await setDoc(doc(db, "users", user.id), user.getUserProps());
 
 		//* healthWorkers, monitoring, requestedUsers, and comments are all empty at the start
 		await setDoc(doc(db, "users", user.id, "associates", "healthWorkers"), { exists: true });
-		await setDoc(doc(db, "users", user.id, "associates", "requuestedUsers"), { exists: true });
+		await setDoc(doc(db, "users", user.id, "associates", "requestedUsers"), { exists: true });
 		await setDoc(doc(db, "users", user.id, "associates", "monitoring"), { exists: true });
 		await setDoc(doc(db, "users", user.id, "associates", "comments"), { exists: true });
 	};

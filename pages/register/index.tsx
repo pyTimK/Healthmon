@@ -13,6 +13,7 @@ import styles from "./Register.module.css";
 
 const RegisterScreen: NextPage = () => {
 	const { user, PersonalDetailsSettingsBlock, updateUser, proceedButtonStatus, role } = useRegister();
+	if (!user) return <></>;
 
 	return (
 		<Layout title='Register - Healthmon' description={PageDescriptions.HOME} showSidebar={false}>

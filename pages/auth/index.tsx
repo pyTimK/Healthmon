@@ -10,35 +10,31 @@ import { FireStoreHelper } from "../../classes/FireStoreHelper";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { doc, getDoc } from "firebase/firestore";
-import { CookiesHelper } from "../../classes/CookiesHelper";
 import MyUser from "../../classes/MyUser";
 import { ToastContainer } from "react-toastify";
+import { CookiesHelper } from "../../classes/CookiesHelper";
 
 const SignInScreen: NextPage = () => {
-	const [user, setUser] = useState<User | null>(null);
+	const [authUser, setAuthUser] = useState<User | null>(null);
 	const router = useRouter();
 
-	const firestoreUserRecordChecker = async (user: User) => {
-		const docRef = doc(db, "users", user.uid);
-		const snapshot = await getDoc(docRef);
+	const firestoreUserRecordChecker = async (authUser: User) => {
+		const snapshot = await getDoc(doc(db, "users", authUser.uid));
+		CookiesHelper.set("id", authUser.uid);
 
-		//* Go to registration if first time logging in
 		if (snapshot.exists()) {
-			CookiesHelper.set("user", snapshot.data());
 			router.replace("/");
 		} else {
-			const myUser = MyUser.fromFirebaseUser(user);
+			//* Go to registration if first time logging in
+			const myUser = MyUser.fromFirebaseUser(authUser);
 			FireStoreHelper.setUser(myUser);
-			CookiesHelper.set("user", myUser);
 			router.replace("/register");
 		}
 	};
 
 	useEffect(() => {
-		if (user) {
-			firestoreUserRecordChecker(user);
-		}
-	}, [user]);
+		if (authUser) firestoreUserRecordChecker(authUser);
+	}, [authUser]);
 
 	const uiConfig = {
 		// Popup signin flow rather than redirect flow.
@@ -56,7 +52,7 @@ const SignInScreen: NextPage = () => {
 		callbacks: {
 			signInSuccessWithAuthResult: (authResult: firebase.auth.UserCredential, redirectUrl: string) => {
 				if (authResult.user) {
-					setUser(authResult.user as User);
+					setAuthUser(authResult.user as User);
 
 					// return true;
 				}

@@ -8,10 +8,10 @@ import styles from "./PersonalDetailsSettingsBlock.module.css";
 
 interface PersonalDetailsSettingsBlockProps {}
 
-const usePersonalDetailsSettingsBlock = (user: MyUser, hasEditOption = false) => {
+const usePersonalDetailsSettingsBlock = (user?: MyUser, hasEditOption = false) => {
 	const nameInputRef = useRef<HTMLInputElement>(null);
 	const numberInputRef = useRef<HTMLInputElement>(null);
-	const [role, setRole] = useState<Role>(user.role);
+	const [role, setRole] = useState<Role>(user?.role ?? Role.Patient);
 	const [editing, setEditing] = useState(!hasEditOption);
 
 	const startEditing = () => {
@@ -22,45 +22,49 @@ const usePersonalDetailsSettingsBlock = (user: MyUser, hasEditOption = false) =>
 		() =>
 			function PersonalDetailsSettingsBlockInner({}) {
 				return (
-					<SettingsBlock
-						hint='Personal Details'
-						hasOptionButton={hasEditOption}
-						onOptionButtonClick={startEditing}
-						editing={editing}>
-						<SettingsRow title='Name'>
-							{editing ? (
-								<InputOption inputRef={nameInputRef} value={user.name} maxLength={15} />
-							) : (
-								<p className={styles.settingsRowValue}>{user.name}</p>
-							)}
-						</SettingsRow>
-						<SettingsRow title='Phone'>
-							{editing ? (
-								<InputOption inputRef={numberInputRef} value={user.number} maxLength={15} />
-							) : (
-								<p className={styles.settingsRowValue}>{user.number}</p>
-							)}
-						</SettingsRow>
-						<SettingsRow title='Role'>
-							{editing ? (
-								<ReactDropdown
-									className={styles.dropdown}
-									menuClassName={styles.dropdownMenu}
-									placeholderClassName={styles.dropdownPlaceHolder}
-									arrowClassName={styles.dropdownArrow}
-									options={[Role.Patient, Role.HealthWorker]}
-									onChange={(arg) => {
-										// console.log("CHANGED! ", arg);
-										setRole(arg.value as Role);
-									}}
-									// placeholder='Select Year Level'
-									value={role}
-								/>
-							) : (
-								<p className={styles.settingsRowValue}>{user.role}</p>
-							)}
-						</SettingsRow>
-					</SettingsBlock>
+					<>
+						{user && (
+							<SettingsBlock
+								hint='Personal Details'
+								hasOptionButton={hasEditOption}
+								onOptionButtonClick={startEditing}
+								editing={editing}>
+								<SettingsRow title='Name'>
+									{editing ? (
+										<InputOption inputRef={nameInputRef} value={user.name} maxLength={15} />
+									) : (
+										<p className={styles.settingsRowValue}>{user.name}</p>
+									)}
+								</SettingsRow>
+								<SettingsRow title='Phone'>
+									{editing ? (
+										<InputOption inputRef={numberInputRef} value={user.number} maxLength={15} />
+									) : (
+										<p className={styles.settingsRowValue}>{user.number}</p>
+									)}
+								</SettingsRow>
+								<SettingsRow title='Role'>
+									{editing ? (
+										<ReactDropdown
+											className={styles.dropdown}
+											menuClassName={styles.dropdownMenu}
+											placeholderClassName={styles.dropdownPlaceHolder}
+											arrowClassName={styles.dropdownArrow}
+											options={[Role.Patient, Role.HealthWorker]}
+											onChange={(arg) => {
+												// console.log("CHANGED! ", arg);
+												setRole(arg.value as Role);
+											}}
+											// placeholder='Select Year Level'
+											value={role}
+										/>
+									) : (
+										<p className={styles.settingsRowValue}>{user.role}</p>
+									)}
+								</SettingsRow>
+							</SettingsBlock>
+						)}
+					</>
 				);
 			},
 		[editing]

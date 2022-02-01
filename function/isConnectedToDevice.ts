@@ -1,5 +1,5 @@
-import { CookiesHelper } from "../classes/CookiesHelper";
+import MyUser from "../classes/MyUser";
 
-const isConnectedToDevice = () => CookiesHelper.get("deviceid", "") !== "";
+const isConnectedToDevice = (user: MyUser) => user.device !== "";
 
 export default isConnectedToDevice;

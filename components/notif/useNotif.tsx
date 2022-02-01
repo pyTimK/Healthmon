@@ -21,10 +21,6 @@ const useNotif = (user: MyUser) => {
 	console.log("joined notifs: ", notifsList);
 
 	useEffect(() => {
-		if (user.id.length == 0) {
-			router.replace("/auth");
-			return;
-		}
 		const unsubMonitorRequestNotif = FireStoreHelper.monitorRequestNotifListener(user.id, setMonitorRequestNotifs);
 		const unsubRecordCommentNotif = FireStoreHelper.recordCommentNotifListener(user.id, setRecordCommentNotifs);
 

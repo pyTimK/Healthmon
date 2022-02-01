@@ -1,9 +1,8 @@
 import { IncomingMessage } from "http";
 import cookies from "js-cookie";
 import cookie from "cookie";
-import MyUser from "./MyUser";
 
-const allCookies = ["user", "isPatient", "deviceid"];
+const allCookies: string[] = [];
 export abstract class CookiesHelper {
 	static get<T>(key: string, fallBackValue: T): T {
 		try {
@@ -40,14 +39,5 @@ export abstract class CookiesHelper {
 		allCookies.forEach((ck) => {
 			cookies.remove(ck);
 		});
-	}
-
-	//! USER
-	static savePersonalDetails(user: MyUser) {
-		CookiesHelper.update<MyUser>("user", user.getPersonalDetails());
-	}
-
-	static saveRequestedUsers(user: MyUser) {
-		CookiesHelper.update<MyUser>("user", { requestedUsers: user.requestedUsers });
 	}
 }

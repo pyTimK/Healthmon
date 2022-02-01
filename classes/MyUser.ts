@@ -1,10 +1,4 @@
 import { User } from "firebase/auth";
-import removeRequestedPatient from "../function/removeRequestedPatient";
-import HealthWorker from "../types/HealthWorker";
-import Patient from "../types/Patient";
-import RecordComment from "../types/RecordComment";
-import RequestedUsers from "../types/RequestedUsers";
-import { CookiesHelper } from "./CookiesHelper";
 import { FireStoreHelper } from "./FireStoreHelper";
 
 export const enum Role {
@@ -12,17 +6,33 @@ export const enum Role {
 	HealthWorker = "Health Worker",
 }
 
-export interface IMyUser {
+export interface BaseUser {
+	[key: string]: string;
 	name: string;
 	id: string;
 	number: string;
-	role: Role;
-	healthWorkers: HealthWorker[];
-	requestedUsers: RequestedUsers[];
-	monitoring: Patient[];
-	comments: RecordComment[];
-	device: string;
 	photoURL: string;
+}
+
+export interface RequestedUser extends BaseUser {}
+export interface Patient extends BaseUser {}
+export interface HealthWorker extends BaseUser {}
+
+export interface Formatted<T> {
+	[key: string]: T;
+}
+
+export const toFormatted = <T extends BaseUser>(list: T[]) => {
+	const formattedList = <Formatted<T>>{};
+	for (const el of list) formattedList[el.id] = el;
+	return formattedList;
+};
+
+export const toUnformatted = <T>(formattedList: Formatted<T>) => Object.values(formattedList);
+
+export interface IMyUser extends BaseUser {
+	role: Role;
+	device: string;
 }
 
 class MyUser {
@@ -30,10 +40,6 @@ class MyUser {
 	public id: string;
 	public number: string;
 	public role: Role;
-	public healthWorkers: HealthWorker[];
-	public requestedUsers: RequestedUsers[];
-	public monitoring: Patient[];
-	public comments: RecordComment[];
 	public device: string;
 	public photoURL: string;
 
@@ -42,10 +48,6 @@ class MyUser {
 		this.id = user?.id ?? "";
 		this.number = user?.number ?? "";
 		this.role = user?.role ?? Role.Patient;
-		this.healthWorkers = user?.healthWorkers ?? [];
-		this.requestedUsers = user?.requestedUsers ?? [];
-		this.monitoring = user?.monitoring ?? [];
-		this.comments = user?.comments ?? [];
 		this.device = user?.device ?? "";
 		this.photoURL = user?.photoURL ?? "";
 	}
@@ -68,7 +70,7 @@ class MyUser {
 		return { id: this.id, name: this.name, number: this.number, photoURL: this.photoURL };
 	};
 
-	getDocProps = () => {
+	getUserProps = () => {
 		return {
 			id: this.id,
 			name: this.name,
@@ -88,32 +90,23 @@ class MyUser {
 		};
 	};
 
-	static fromCookie() {
-		return new MyUser(CookiesHelper.get<MyUser | undefined>("user", undefined));
-	}
-
 	async updatePersonalDetails(newName: string, newNumber: string, newRole: Role) {
 		this.name = newName;
 		this.number = newNumber;
 		this.role = newRole;
 
-		CookiesHelper.savePersonalDetails(this);
 		await FireStoreHelper.updatePersonalDetails(this);
 	}
 
 	async addRequestedUser(patient: Patient) {
 		//TODO FIX IT FILIX
-		this.requestedUsers.push(patient);
-
-		CookiesHelper.saveRequestedUsers(this);
+		// this.requestedUsers.push(patient);
 		await FireStoreHelper.updateRequestedUsers(this);
 	}
 
 	async removeRequestedUser(patient: Patient) {
 		//TODO FIX IT FILIX
-		this.requestedUsers = removeRequestedPatient(patient, this);
-
-		CookiesHelper.saveRequestedUsers(this);
+		// this.requestedUsers = removeRequestedPatient(patient, this);
 		await FireStoreHelper.updateRequestedUsers(this);
 	}
 }

@@ -1,5 +1,4 @@
 import { useRouter } from "next/router";
-import { CookiesHelper } from "../classes/CookiesHelper";
 import { auth } from "../firebase/initFirebase";
 
 const useAccount = () => {
@@ -8,7 +7,6 @@ const useAccount = () => {
 	const logout = async () => {
 		try {
 			await auth.signOut();
-			CookiesHelper.clear();
 			router.replace("/auth");
 		} catch (_e: any) {
 			const e: Error = _e;

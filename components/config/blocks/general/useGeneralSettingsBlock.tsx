@@ -1,5 +1,4 @@
 import { useRef, useState } from "react";
-import { CookiesHelper } from "../../../../classes/CookiesHelper";
 import { FireStoreHelper } from "../../../../classes/FireStoreHelper";
 import MyUser from "../../../../classes/MyUser";
 import logError from "../../../../function/logError";
@@ -9,7 +8,7 @@ import usePickTypeOfScanModal from "./pickTypeOfScanModal/usePickTypeOfScanModal
 import useScanFromCamModal from "./scanFromCamModal/useScanFromCamModal";
 
 const useGeneralSettingsBlock = (user: MyUser) => {
-	const [parsedQR, setParsedQR] = useState<string | null>(CookiesHelper.get("deviceid", ""));
+	const [parsedQR, setParsedQR] = useState<string | null>("");
 
 	const [PickTypeOfScanModal, openPickTypeOfScanModal, closePickTypeOfScanModal, isPickTypeOfScanModalOpen] =
 		usePickTypeOfScanModal();
@@ -52,7 +51,7 @@ const useGeneralSettingsBlock = (user: MyUser) => {
 
 		try {
 			await FireStoreHelper.unPairDevice(user, parsedQR);
-			CookiesHelper.set("deviceid", "");
+			user.device = "";
 			setParsedQR(null);
 			notify("Device disconnected", { type: "warning" });
 		} catch (_e) {

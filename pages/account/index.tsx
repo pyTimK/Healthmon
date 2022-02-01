@@ -12,10 +12,13 @@ import ButtonStatus from "../../enums/ButtonStatus";
 import logError from "../../function/logError";
 import notify from "../../function/notify";
 import useAccount from "../../hooks/useAccount";
+import useUser from "../../hooks/useUser";
 import styles from "./Account.module.css";
 
 const Account: NextPage = () => {
-	const [user, setUser] = useState(MyUser.fromCookie());
+	const { user } = useUser();
+	if (!user) return <></>;
+
 	const { logout } = useAccount();
 	const { PersonalDetailsSettingsBlock, nameInputRef, numberInputRef, role, editing, setEditing } =
 		usePersonalDetailsSettingsBlock(user, true);

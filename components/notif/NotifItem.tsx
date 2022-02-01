@@ -27,7 +27,7 @@ const NotifItem: React.FC<NotifItemProp> = ({ notif, user }) => {
 
 	const onAcceptMonitorRequest = async () => {
 		try {
-			await FireStoreHelper.add_patient_healthWorker_relationship(user.toPatient(), sender, user.device);
+			await FireStoreHelper.add_patient_healthWorker_relationship(user.toPatient(), sender);
 			await FireStoreHelper.removeMonitorRequest(user.toPatient(), sender);
 		} catch (_e) {
 			logError(_e);
@@ -39,7 +39,7 @@ const NotifItem: React.FC<NotifItemProp> = ({ notif, user }) => {
 		<div className={styles.container}>
 			<div className={styles.main}>
 				<div className={styles.avatarWrapper}>
-					<Avatar letter={sender.name} nonclickable />
+					<Avatar letter={sender.name} nonclickable photoURL={sender.photoURL} />
 				</div>
 				<p className={styles.description}>
 					<b className={styles.name}>{sender.name}</b>

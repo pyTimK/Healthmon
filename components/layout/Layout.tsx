@@ -1,7 +1,5 @@
 import { NextPage } from "next";
 import Head from "next/head";
-import { CookiesHelper } from "../../classes/CookiesHelper";
-import MyUser from "../../classes/MyUser";
 import Sidebar from "../sidebar/Sidebar";
 import styles from "./Layout.module.css";
 
@@ -12,9 +10,9 @@ interface LayoutProps {
 }
 
 const Layout: NextPage<LayoutProps> = ({ title, description, showSidebar = true, children }) => {
-	const user = CookiesHelper.get("user", new MyUser());
+	// const user = CookiesHelper.get("user", new MyUser());
 
-	if (user.id === "") return <></>;
+	// if (user.id === "") return <></>;
 
 	return (
 		<div className={styles.container}>

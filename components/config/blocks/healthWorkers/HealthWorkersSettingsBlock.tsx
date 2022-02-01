@@ -7,6 +7,7 @@ interface HealthWorkersSettingsBlockProps {
 }
 
 const HealthWorkersSettingsBlock: React.FC<HealthWorkersSettingsBlockProps> = ({ user }) => {
+	const [healthWorkers];
 	if (user.healthWorkers.length === 0) return <></>;
 
 	return (

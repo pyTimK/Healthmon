@@ -4,7 +4,6 @@ import firebase from "firebase/compat/app";
 import { getHHMMSS } from "../../function/dateConversions";
 
 export interface RecordData {
-	name: string;
 	temp: number;
 	pulse: number;
 	spo2: number;

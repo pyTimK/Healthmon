@@ -5,9 +5,11 @@ import logError from "../function/logError";
 import { useState } from "react";
 import notify from "../function/notify";
 import ButtonStatus from "../enums/ButtonStatus";
+import useUser from "./useUser";
 
 const useRegister = () => {
-	const [user, setUser] = useState(MyUser.fromCookie());
+	const { user } = useUser();
+
 	const [proceedButtonStatus, setProceedButtonStatus] = useState(ButtonStatus.Enabled);
 	const { PersonalDetailsSettingsBlock, nameInputRef, numberInputRef, role } = usePersonalDetailsSettingsBlock(user);
 	const route = useRouter();
@@ -15,7 +17,7 @@ const useRegister = () => {
 	const updateUser = async () => {
 		setProceedButtonStatus(ButtonStatus.Disabled);
 		try {
-			await user.updatePersonalDetails(nameInputRef.current!.value, numberInputRef.current!.value, role);
+			await user?.updatePersonalDetails(nameInputRef.current!.value, numberInputRef.current!.value, role);
 		} catch (_e) {
 			notify("Updating user details failed");
 			logError(_e);

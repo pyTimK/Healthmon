@@ -13,6 +13,7 @@ import styles from "./Home.module.css";
 
 const Home: NextPage = () => {
 	const { user, records } = useHome();
+	if (!user) return <></>;
 
 	return (
 		<Layout title='HealthMon' description={PageDescriptions.HOME}>
@@ -59,7 +60,7 @@ const Header: React.FC<HeaderProps> = ({ user }) => {
 				className={styles.avatar}
 				size={30}
 				photoURL={user.photoURL}
-				letter={user.name}
+				letter={user.name ?? "U"}
 				onClick={goToAccounts}
 			/>
 			{isNotifOpen && <Notif />}
