@@ -2,44 +2,49 @@ import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import { ToastContainer } from "react-toastify";
 import { PageDescriptions } from "../../classes/Constants";
-import MyUser from "../../classes/MyUser";
+import MyUser, { Role } from "../../classes/MyUser";
 import Avatar from "../../components/Avatar";
 import Layout from "../../components/layout/Layout";
 import useNotif from "../../components/notif/useNotif";
-import Record from "../../components/record/Record";
+import RecordsBlock from "../../components/record/RecordsBlock";
+import Sizedbox from "../../components/Sizedbox";
 import dayGreetings from "../../function/dayGreetings";
-import useHome from "../../hooks/useHome";
+import useUser from "../../hooks/useUser";
 import styles from "./Home.module.css";
 
 const Home: NextPage = () => {
-	const { user, records } = useHome();
+	const { user } = useUser();
 
 	return (
 		<div>
 			<Layout title='HealthMon' description={PageDescriptions.HOME} header={<Header user={user} />}>
 				<main className={styles.main}>
-					<h1 className={styles.title}>
-						{dayGreetings()} {user?.name}
-					</h1>
-
-					<div className={styles.recordHeading}>
-						<Avatar />
-						<div className={styles.descriptionWrapper}>
-							<p className={styles.description}>Krisha is feeling good today</p>
-						</div>
+					<div className={styles.title}>
+						<h1>
+							{dayGreetings()} {user?.name}
+						</h1>
 					</div>
+					<Sizedbox height={100} />
 
-					{records.map((record, i) => (
-						<Record
-							key={i}
-							timestamp={record.timestamp}
-							temp={record.temp}
-							pulse={record.pulse}
-							spo2={record.spo2}
-						/>
-					))}
+					{user && user.role === Role.HealthWorker && <RecordHeading user={user} />}
+					{user && <RecordsBlock user={user} />}
 				</main>
 			</Layout>
+		</div>
+	);
+};
+
+interface RecordHeadingProps {
+	user: MyUser;
+}
+
+const RecordHeading: React.FC<RecordHeadingProps> = ({ user }) => {
+	return (
+		<div className={styles.recordHeading}>
+			<Avatar />
+			<div className={styles.descriptionWrapper}>
+				<p className={styles.description}>Krisha is feeling good today</p>
+			</div>
 		</div>
 	);
 };
