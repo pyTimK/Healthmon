@@ -1,8 +1,12 @@
-.container {}
+.container {
+    overflow: hidden;
+
+}
 
 .contentWrapper {
     --footer-height: 50px;
     text-align: center;
+    overflow: hidden;
 }
 
 .content {
