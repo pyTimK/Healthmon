@@ -40,6 +40,7 @@ const Account: NextPage = () => {
 								photoURL={user?.photoURL}
 								size={avatarSize}
 								letter={authUser.displayName ?? user.name}
+								nonclickable
 							/>
 							{typeof window !== "undefined" && (
 								<BackgroundBlob size={smallBlobAvatarSize} opacity={0.5} />

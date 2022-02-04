@@ -192,24 +192,18 @@ export abstract class FireStoreHelper {
 		FireStoreHelper._associateListener(user, setRecords, "requestedUsers");
 
 	static updatePersonalDetails = async (user: MyUser) => {
+		// TODO Make this a transaction
 		//* Updates the original doc containing user info and also all other docs dependent on it
 		await updateDoc(doc(db, "users", user.id), user.getPersonalDetails());
 
 		await FireStoreHelper._updatePersonalDetailsOnDevice(user);
-		console.log("UMABOT D2");
 		await FireStoreHelper._updatePersonalDetailsOnAssociatedHealthWorkers(user);
-		console.log("UMABOT D2 1.5");
 		await FireStoreHelper._updatePersonalDetailsOnAssociatedMonitoring(user);
-		console.log("UMABOT D2 2");
 		await FireStoreHelper._updatePersonalDetailsOnMonitorRequestNotif(user);
-		console.log("UMABOT D2 2.5");
 
 		const comments = await FireStoreHelper.getComments(user);
-		console.log("UMABOT D2 3");
 		await FireStoreHelper._updatePersonalDetailsOnRecordCommentNotif(user, comments);
-		console.log("UMABOT D2 4");
 		await FireStoreHelper._updatePersonalDetailsOnComments(user, comments);
-		console.log("UMABOT D2 5");
 	};
 
 	private static _updatePersonalDetailsOnAssociatedHealthWorkers = async (user: MyUser) => {
@@ -289,23 +283,6 @@ export abstract class FireStoreHelper {
 		return unsubscribe;
 	};
 
-	private static _addHealthWorker = async (patient: Patient, healthWorker: HealthWorker) => {
-		const newHealthWorkerField = <{ [key: string]: any }>{};
-		newHealthWorkerField[healthWorker.id] = healthWorker;
-		await updateDoc(doc(db, "users", patient.id, "associates", "healthWorkers"), newHealthWorkerField);
-	};
-
-	private static _addPatient = async (patient: Patient, healthWorker: HealthWorker) => {
-		const newPatientField = <{ [key: string]: any }>{};
-		newPatientField[patient.id] = patient;
-		await updateDoc(doc(db, "users", healthWorker.id, "associates", "monitoring"), newPatientField);
-	};
-
-	static add_patient_healthWorker_relationship = async (patient: Patient, healthWorker: HealthWorker) => {
-		await FireStoreHelper._addHealthWorker(patient, healthWorker);
-		await FireStoreHelper._addPatient(patient, healthWorker);
-	};
-
 	static recordCommentNotifListener = (
 		id: string,
 		setRecordCommentNotifs: Dispatch<SetStateAction<RecordCommentNotif[]>>
@@ -357,5 +334,41 @@ export abstract class FireStoreHelper {
 				notifUpdate
 			);
 		}
+	};
+
+	//! HW - PATIENT PAIRING------------------------
+
+	private static _addHealthWorker = async (patient: Patient, healthWorker: HealthWorker) => {
+		const newHealthWorkerField = <{ [key: string]: any }>{};
+		newHealthWorkerField[healthWorker.id] = healthWorker;
+		await updateDoc(doc(db, "users", patient.id, "associates", "healthWorkers"), newHealthWorkerField);
+	};
+
+	private static _addPatient = async (patient: Patient, healthWorker: HealthWorker) => {
+		const newPatientField = <{ [key: string]: any }>{};
+		newPatientField[patient.id] = patient;
+		await updateDoc(doc(db, "users", healthWorker.id, "associates", "monitoring"), newPatientField);
+	};
+
+	static add_patient_healthWorker_relationship = async (patient: Patient, healthWorker: HealthWorker) => {
+		await FireStoreHelper._addHealthWorker(patient, healthWorker);
+		await FireStoreHelper._addPatient(patient, healthWorker);
+	};
+
+	private static _removeHealthWorker = async (patient: Patient, healthWorker: HealthWorker) => {
+		const newHealthWorkerField = <{ [key: string]: FieldValue }>{};
+		newHealthWorkerField[healthWorker.id] = deleteField();
+		await updateDoc(doc(db, "users", patient.id, "associates", "healthWorkers"), newHealthWorkerField);
+	};
+
+	private static _removePatient = async (patient: Patient, healthWorker: HealthWorker) => {
+		const newPatientField = <{ [key: string]: FieldValue }>{};
+		newPatientField[patient.id] = deleteField();
+		await updateDoc(doc(db, "users", healthWorker.id, "associates", "monitoring"), newPatientField);
+	};
+
+	static remove_patient_healthWorker_relationship = async (patient: Patient, healthWorker: HealthWorker) => {
+		await FireStoreHelper._removeHealthWorker(patient, healthWorker);
+		await FireStoreHelper._removePatient(patient, healthWorker);
 	};
 }

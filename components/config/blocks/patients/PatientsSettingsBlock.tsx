@@ -1,6 +1,11 @@
+import { useRef } from "react";
+import { FireStoreHelper } from "../../../../classes/FireStoreHelper";
 import MyUser, { Patient } from "../../../../classes/MyUser";
+import logError from "../../../../function/logError";
+import notify from "../../../../function/notify";
 import usePatients from "../../../../hooks/usePatients";
 import useRequestedUsers from "../../../../hooks/useRequestedUsers";
+import useConfirmModal from "../../../myModal/useConfirmModal/useConfirmModal";
 import SettingsBlock from "../../settingsBlock/SettingsBlock";
 import SettingsRow from "../../settingsRow/SettingsRow";
 import usePatientSearchModal from "./patientSearchModal/usePatientSearchModal";
@@ -11,28 +16,52 @@ interface PatientsSettingsBlockProps {
 const PatientsSettingsBlock: React.FC<PatientsSettingsBlockProps> = ({ user }) => {
 	const { patients } = usePatients(user);
 	const { requestedUsers } = useRequestedUsers(user);
+	const selectedPatient = useRef<Patient | null>(null);
 	const { PatientSearchModal, openPatientSearchModal, setSearchResult } = usePatientSearchModal(
 		user,
 		patients,
 		requestedUsers
 	);
+	const { ConfirmModal, openConfirmModal, closeConfirmModal } = useConfirmModal();
 
 	const addPatient = () => {
-		// TODO
 		setSearchResult([]);
 		openPatientSearchModal();
 	};
+
+	const unpairPatient = async () => {
+		if (!selectedPatient.current) return;
+		try {
+			FireStoreHelper.remove_patient_healthWorker_relationship(selectedPatient.current, user.toHealthWorker());
+			notify("Patient unpaired", { type: "success" });
+		} catch (_e) {
+			logError(_e);
+			notify("Error unpairing patient", { type: "error" });
+		}
+		closeConfirmModal();
+	};
+
+	const confirmUnPairPatient = (patient: Patient) => {
+		selectedPatient.current = patient;
+		openConfirmModal();
+	};
+
 	return (
-		<SettingsBlock
-			hint='Monitoring Patients'
-			hasOptionButton
-			onOptionButtonClick={addPatient}
-			optionButtonName='Add'>
+		<SettingsBlock hint='Patients' hasOptionButton onOptionButtonClick={addPatient} optionButtonName='Add'>
 			{patients.map((patient, _i) => (
-				<SettingsRow key={_i} title={patient.name} subtitle={patient.number} />
+				<SettingsRow key={_i} title={patient.name} subtitle={patient.number}>
+					<button className='transparent-button' onClick={() => confirmUnPairPatient(patient)}>
+						Unpair
+					</button>
+				</SettingsRow>
 			))}
 			{/* <SettingsRow title={user.name} subtitle={user.number} /> */}
 			<PatientSearchModal />
+			<ConfirmModal
+				title='Confirm Unpair'
+				description='Are you sure you want to remove this patient from your monitoring list?'
+				onConfirm={unpairPatient}
+			/>
 		</SettingsBlock>
 	);
 };

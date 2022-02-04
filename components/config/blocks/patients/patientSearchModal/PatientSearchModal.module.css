@@ -56,5 +56,10 @@
 .resultRowButton {
     flex: 1;
     display: flex;
+    align-items: center;
     justify-content: flex-end;
+}
+
+.resultRowButton button {
+    height: 30px;
 }

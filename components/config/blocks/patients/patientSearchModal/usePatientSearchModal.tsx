@@ -167,7 +167,7 @@ interface SendRequestButtonProps {
 const SendRequestButton: React.FC<SendRequestButtonProps> = ({ buttonStatus, onClick }) => {
 	return (
 		<button className='pink-button' onClick={onClick} disabled={buttonStatus === ButtonStatus.Disabled}>
-			Send Request
+			<p>Send Request</p>
 		</button>
 	);
 };
