@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { FormEventHandler, useState } from "react";
 import usePersonalDetailsSettingsBlock from "../components/config/blocks/personalDetails/usePersonalDetailsSettingsBlock";
 import ButtonStatus from "../enums/ButtonStatus";
 import logError from "../function/logError";
@@ -15,7 +15,8 @@ const useRegister = () => {
 	const { PersonalDetailsSettingsBlock, nameInputRef, numberInputRef, role } = usePersonalDetailsSettingsBlock(user);
 	const route = useRouter();
 
-	const updateUser = async () => {
+	const updateUser: FormEventHandler<HTMLFormElement> = async (e) => {
+		e.preventDefault();
 		setProceedButtonStatus(ButtonStatus.Disabled);
 		try {
 			await user?.updatePersonalDetails(nameInputRef.current!.value, numberInputRef.current!.value, role);

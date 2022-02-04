@@ -46,7 +46,7 @@ class MyUser {
 	constructor(user?: Partial<IMyUser>) {
 		this.name = user?.name ?? "";
 		this.id = user?.id ?? "";
-		this.number = user?.number ?? "";
+		this.number = user?.number ?? "09";
 		this.role = user?.role ?? Role.Patient;
 		this.device = user?.device ?? "";
 		this.photoURL = user?.photoURL ?? "";
@@ -57,7 +57,7 @@ class MyUser {
 		return new this({
 			name: user.displayName?.substring(0, Math.min(15, user.displayName.length)) ?? "",
 			id: user.uid,
-			number: user.phoneNumber ?? "",
+			number: user.phoneNumber ?? "09",
 			photoURL: user.photoURL ?? "",
 		});
 	}

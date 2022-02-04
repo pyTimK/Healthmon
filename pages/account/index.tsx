@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { FormEventHandler, MouseEventHandler, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import { PageDescriptions } from "../../classes/Constants";
 import usePersonalDetailsSettingsBlock from "../../components/config/blocks/personalDetails/usePersonalDetailsSettingsBlock";
@@ -23,7 +23,8 @@ const Account: NextPage = () => {
 	const [saveButtonStatus, setSaveButtonStatus] = useState(ButtonStatus.Hidden);
 	const route = useRouter();
 
-	const updateUser = async () => {
+	const updateUser: FormEventHandler<HTMLFormElement> = async (e) => {
+		e.preventDefault();
 		setSaveButtonStatus(ButtonStatus.Disabled);
 		try {
 			await user?.updatePersonalDetails(nameInputRef.current!.value, numberInputRef.current!.value, role);
@@ -47,21 +48,24 @@ const Account: NextPage = () => {
 	return (
 		<Layout title='Account - Healthmon' description={PageDescriptions.HOME}>
 			<h1>Account</h1>
-			<PersonalDetailsSettingsBlock />
-			<div className={clsx(styles.onChangeButtonWrapper, !editing && "hidden")}>
-				<button
-					className={"transparent-button"}
-					onClick={discardChanges}
-					disabled={saveButtonStatus === ButtonStatus.Disabled}>
-					Discard
-				</button>
-				<button
-					className={"pink-button"}
-					onClick={updateUser}
-					disabled={saveButtonStatus === ButtonStatus.Disabled}>
-					Save
-				</button>
-			</div>
+			<form onSubmit={updateUser}>
+				<PersonalDetailsSettingsBlock />
+				<div className={clsx(styles.onChangeButtonWrapper, !editing && "hidden")}>
+					<button
+						type='reset'
+						className={"transparent-button"}
+						onClick={discardChanges}
+						disabled={saveButtonStatus === ButtonStatus.Disabled}>
+						Discard
+					</button>
+					<button
+						type='submit'
+						className={"pink-button"}
+						disabled={saveButtonStatus === ButtonStatus.Disabled}>
+						Save
+					</button>
+				</div>
+			</form>
 			<Sizedbox height={50} />
 			<div className={styles.signOutButton}>
 				<button className='black-button' onClick={logout}>

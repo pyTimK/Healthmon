@@ -20,17 +20,19 @@ const RegisterScreen: NextPage = () => {
 			<h1>Register</h1>
 			<GeneralSettingsBlock user={user} />
 
-			<PersonalDetailsSettingsBlock />
+			<form onSubmit={updateUser}>
+				<PersonalDetailsSettingsBlock />
 
-			{role === Role.HealthWorker && <PatientsSettingsBlock user={user} />}
+				{role === Role.HealthWorker && <PatientsSettingsBlock user={user} />}
 
-			<Sizedbox height={20} />
-			<button
-				className={clsx("pink-button", styles.proceedButton)}
-				onClick={updateUser}
-				disabled={proceedButtonStatus === ButtonStatus.Disabled}>
-				Proceed
-			</button>
+				<Sizedbox height={20} />
+				<button
+					type='submit'
+					className={clsx("pink-button", styles.proceedButton)}
+					disabled={proceedButtonStatus === ButtonStatus.Disabled}>
+					Proceed
+				</button>
+			</form>
 
 			{/* TOAST */}
 			<ToastContainer theme='colored' autoClose={2} />
