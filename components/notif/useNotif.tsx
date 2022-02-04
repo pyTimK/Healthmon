@@ -38,7 +38,8 @@ const useNotif = (user?: MyUser) => {
 	};
 
 	const NotifBell: React.FC = () => (
-		<div>
+		<div className={styles.bellWrapper}>
+			{notifsList.length > 0 && <div className={styles.redDot} />}
 			<Bell size={32} color='whitesmoke' strokeWidth={1} cursor='pointer' onClick={toggleNotif} />
 		</div>
 	);

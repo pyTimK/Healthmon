@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import { isRecordCommentNotif, MonitorRequestNotif, RecordCommentNotif } from "../../types/Notification";
 import MyUser from "../../classes/MyUser";
 import clsx from "clsx";
+import Divider from "../Divider";
 
 interface NotifBlockProps {
 	notifs: (MonitorRequestNotif | RecordCommentNotif)[];
@@ -23,6 +24,13 @@ const NotifBlock: React.FC<NotifBlockProps> = ({ notifs, user }) => {
 					<SettingsHorizontal size={18} cursor='pointer' onClick={goToSettings} />
 				</div>
 			</div>
+			<Divider />
+			{notifs.length === 0 && (
+				<div className={clsx(styles.emptyContainer, "unselectable")}>
+					<img className={styles.emptySvg} src='/img/void.svg' />
+					<p className={styles.emptyText}>It's quiet out here...</p>
+				</div>
+			)}
 			{user && notifs.map((notif, _i) => <NotifItem key={_i} notif={notif} user={user} />)}
 		</div>
 	);
