@@ -30,7 +30,13 @@ const Avatar: React.FC<Props> = ({ photoURL, size = 30, letter = "K", className,
 	return (
 		<div style={circleStyle} className={className} onClick={onClick}>
 			{photoURL ? (
-				<img className={clsx("avatar", className)} src={photoURL} alt='avatar' width={size} height={size} />
+				<img
+					className={clsx("avatar", className, "unselectable")}
+					src={photoURL}
+					alt='avatar'
+					width={size}
+					height={size}
+				/>
 			) : (
 				<p style={letterStyle}>{letter.charAt(0).toUpperCase()}</p>
 			)}

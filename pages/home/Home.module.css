@@ -10,11 +10,11 @@
 }
 
 .header {
-
+  /* position: absolute; */
   --header-margin-top: 20px;
-  --header-height: 30px;
-  --header-gap: 12px;
-  --avatar-width: 30px;
+  --header-height: 50px;
+  --header-gap: 24px;
+  --avatar-width: 50px;
 
   display: flex;
   justify-content: flex-end;
@@ -22,6 +22,7 @@
   gap: var(--header-gap);
   width: 100%;
   margin-top: var(--header-margin-top);
+  padding-right: 12px;
   height: var(--header-height);
   overflow: hidden;
 }

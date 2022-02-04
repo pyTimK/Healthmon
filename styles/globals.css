@@ -37,7 +37,10 @@ a {
 
 .avatar {
   border-radius: 50%;
+
 }
+
+
 
 /** Hide up down arrow in input */
 input::-webkit-outer-spin-button,
@@ -137,6 +140,13 @@ input:active {
 /** FUNCTIONS  */
 .hidden {
   visibility: hidden;
+}
+
+.unselectable {
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
 }
 
 /** SMALL TABLET */

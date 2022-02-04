@@ -1,9 +1,7 @@
 import { Bell } from "akar-icons";
-import { Unsubscribe } from "firebase/firestore";
-import { useRouter } from "next/router";
-import { useEffect, useMemo, useState } from "react";
+import { MouseEventHandler, useEffect, useMemo, useState } from "react";
 import { FireStoreHelper } from "../../classes/FireStoreHelper";
-import MyUser, { HealthWorker, Formatted } from "../../classes/MyUser";
+import MyUser, { Formatted, HealthWorker } from "../../classes/MyUser";
 import sortNotifs from "../../function/sortNotifs";
 import { MonitorRequestNotif, RecordCommentNotif } from "../../types/Notification";
 import NotifBlock from "./NotifBlock";
@@ -34,12 +32,13 @@ const useNotif = (user?: MyUser) => {
 		};
 	}, [user]);
 
-	const toggleNotif = () => {
+	const toggleNotif: MouseEventHandler = (e) => {
+		e.preventDefault();
 		setIsNotifOpen((isNotifOpen) => !isNotifOpen);
 	};
 
 	const NotifBell: React.FC = () => (
-		<Bell size={24} color='whitesmoke' strokeWidth={1} cursor='pointer' onClick={toggleNotif} />
+		<Bell size={32} color='whitesmoke' strokeWidth={1} cursor='pointer' onClick={toggleNotif} />
 	);
 
 	const Notif: React.FC = () => (

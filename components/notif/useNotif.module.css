@@ -14,10 +14,11 @@
     position: absolute;
     z-index: 3;
     top: calc(var(--header-margin-top) + var(--header-height) + 4px);
-    transform: translateX(calc(-1 * (var(--avatar-width) + var(--header-gap))));
+    transform: translateX(calc(-1 * (var(--avatar-width) + 2 * var(--header-gap))));
     width: 300px;
     /* height: 100px; */
     background-color: var(--background-light);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 4px;
+
 }

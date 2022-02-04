@@ -4,6 +4,7 @@ import { SettingsHorizontal } from "akar-icons";
 import { useRouter } from "next/router";
 import { isRecordCommentNotif, MonitorRequestNotif, RecordCommentNotif } from "../../types/Notification";
 import MyUser from "../../classes/MyUser";
+import clsx from "clsx";
 
 interface NotifBlockProps {
 	notifs: (MonitorRequestNotif | RecordCommentNotif)[];
@@ -17,7 +18,7 @@ const NotifBlock: React.FC<NotifBlockProps> = ({ notifs, user }) => {
 	return (
 		<div>
 			<div className={styles.header}>
-				<h3 className={styles.title}>Notifications</h3>
+				<h3 className={clsx(styles.title, "unselectable")}>Notifications</h3>
 				<div className={styles.configIconWrapper}>
 					<SettingsHorizontal size={18} cursor='pointer' onClick={goToSettings} />
 				</div>

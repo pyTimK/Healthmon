@@ -15,31 +15,32 @@ const Home: NextPage = () => {
 	const { user, records } = useHome();
 
 	return (
-		<Layout title='HealthMon' description={PageDescriptions.HOME}>
-			<Header user={user} />
-			<main className={styles.main}>
-				<h1 className={styles.title}>
-					{dayGreetings()} {user?.name}
-				</h1>
+		<div>
+			<Layout title='HealthMon' description={PageDescriptions.HOME} header={<Header user={user} />}>
+				<main className={styles.main}>
+					<h1 className={styles.title}>
+						{dayGreetings()} {user?.name}
+					</h1>
 
-				<div className={styles.recordHeading}>
-					<Avatar />
-					<div className={styles.descriptionWrapper}>
-						<p className={styles.description}>Krisha is feeling good today</p>
+					<div className={styles.recordHeading}>
+						<Avatar />
+						<div className={styles.descriptionWrapper}>
+							<p className={styles.description}>Krisha is feeling good today</p>
+						</div>
 					</div>
-				</div>
 
-				{records.map((record, i) => (
-					<Record
-						key={i}
-						timestamp={record.timestamp}
-						temp={record.temp}
-						pulse={record.pulse}
-						spo2={record.spo2}
-					/>
-				))}
-			</main>
-		</Layout>
+					{records.map((record, i) => (
+						<Record
+							key={i}
+							timestamp={record.timestamp}
+							temp={record.temp}
+							pulse={record.pulse}
+							spo2={record.spo2}
+						/>
+					))}
+				</main>
+			</Layout>
+		</div>
 	);
 };
 
@@ -57,7 +58,7 @@ const Header: React.FC<HeaderProps> = ({ user }) => {
 			<NotifBell />
 			<Avatar
 				className={styles.avatar}
-				size={30}
+				size={50}
 				photoURL={user?.photoURL}
 				letter={user?.name}
 				onClick={goToAccounts}

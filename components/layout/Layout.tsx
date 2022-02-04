@@ -7,9 +7,10 @@ interface LayoutProps {
 	title: string;
 	description: string;
 	showSidebar?: boolean;
+	header?: React.ReactNode;
 }
 
-const Layout: NextPage<LayoutProps> = ({ title, description, showSidebar = true, children }) => {
+const Layout: NextPage<LayoutProps> = ({ title, description, showSidebar = true, children, header }) => {
 	// const user = CookiesHelper.get("user", new MyUser());
 
 	// if (user.id === "") return <></>;
@@ -21,6 +22,7 @@ const Layout: NextPage<LayoutProps> = ({ title, description, showSidebar = true,
 				<meta name='description' content={description} />
 			</Head>
 			{showSidebar && <Sidebar />}
+			{header}
 			<div className={styles.contentWrapper}>
 				<div className={styles.content}>
 					<div>{children}</div>
