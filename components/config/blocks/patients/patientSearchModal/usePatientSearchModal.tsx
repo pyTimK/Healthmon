@@ -3,14 +3,13 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 import dynamic from "next/dynamic";
 import { FormEventHandler, MouseEventHandler, useRef, useState } from "react";
 import { FireStoreHelper } from "../../../../../classes/FireStoreHelper";
-import MyUser from "../../../../../classes/MyUser";
+import MyUser, { Patient, RequestedUser } from "../../../../../classes/MyUser";
 import ButtonStatus from "../../../../../enums/ButtonStatus";
 import { db } from "../../../../../firebase/initFirebase";
 import alreadyPatient from "../../../../../function/alreadyPatient";
 import alreadyRequested from "../../../../../function/alreadyRequested";
 import logError from "../../../../../function/logError";
 import notify from "../../../../../function/notify";
-import Patient from "../../../../../types/Patient";
 import useConfirmModal from "../../../../myModal/useConfirmModal/useConfirmModal";
 import useMyModal from "../../../../myModal/useMyModal";
 import Sizedbox from "../../../../Sizedbox";
@@ -20,7 +19,7 @@ const QrReader = dynamic(() => import("react-qr-reader"), { ssr: false });
 
 interface PatientSearchModalProps {}
 
-const usePatientSearchModal = (user: MyUser) => {
+const usePatientSearchModal = (user: MyUser, patients: Patient[], requestedUsers: RequestedUser[]) => {
 	const [MyModal, openPatientSearchModal, closePatientSearchModal, isPatientSearchModalOpen] = useMyModal();
 	const { ConfirmModal, openConfirmModal, closeConfirmModal } = useConfirmModal();
 	const [searchResult, setSearchResult] = useState<Patient[]>([]);
@@ -51,12 +50,11 @@ const usePatientSearchModal = (user: MyUser) => {
 	};
 
 	const sendRequest = async (patient: Patient) => {
-		if (alreadyRequested(patient, user)) return;
-		if (alreadyPatient(patient, user)) return;
+		if (alreadyRequested(patient, requestedUsers)) return;
+		if (alreadyPatient(patient, patients)) return;
 
 		setButtonStatus(ButtonStatus.Disabled);
 		try {
-			await user.addRequestedUser(patient);
 			await FireStoreHelper.sendMonitorRequestNotif(patient, user.toHealthWorker());
 			notify("Request Sent", { type: "success" });
 		} catch (_e) {
@@ -68,11 +66,10 @@ const usePatientSearchModal = (user: MyUser) => {
 
 	const cancelRequest = async (patient: Patient | null) => {
 		if (!patient) return;
-		if (!alreadyRequested(patient, user)) return;
+		if (!alreadyRequested(patient, requestedUsers)) return;
 
 		setButtonStatus(ButtonStatus.Disabled);
 		try {
-			await user.removeRequestedUser(patient);
 			await FireStoreHelper.removeMonitorRequest(patient, user.toHealthWorker());
 			notify("Request Cancelled", { type: "info" });
 		} catch (_e) {
@@ -115,18 +112,21 @@ const usePatientSearchModal = (user: MyUser) => {
 										number={patient.number}
 										photoURL={patient.photoURL}
 									/>
-									{patient.number !== user.number &&
-										(alreadyRequested(patient, user) ? (
-											<CancelRequestButton
-												onClick={(_) => confirmCancelRequest(patient)}
-												buttonStatus={buttonStatus}
-											/>
-										) : (
-											<SendRequestButton
-												onClick={(_) => sendRequest(patient)}
-												buttonStatus={buttonStatus}
-											/>
-										))}
+									<div className={styles.resultRowButton}>
+										{!alreadyPatient(patient, patients) &&
+											patient.number !== user.number &&
+											(alreadyRequested(patient, requestedUsers) ? (
+												<CancelRequestButton
+													onClick={(_) => confirmCancelRequest(patient)}
+													buttonStatus={buttonStatus}
+												/>
+											) : (
+												<SendRequestButton
+													onClick={(_) => sendRequest(patient)}
+													buttonStatus={buttonStatus}
+												/>
+											))}
+									</div>
 									{/* <ConfirmModal
 									title='Confirm Cancel Request'
 									description={`Are you sure you want to cancel request to ${patient.name}?`}

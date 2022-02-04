@@ -1,19 +1,33 @@
-import { useRouter } from "next/router";
+import { Unsubscribe } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { CookiesHelper } from "../classes/CookiesHelper";
 import { FireStoreHelper } from "../classes/FireStoreHelper";
-import MyUser from "../classes/MyUser";
+import MyUser, { HealthWorker } from "../classes/MyUser";
 import logError from "../function/logError";
 import notify from "../function/notify";
-import HealthWorker from "../types/HealthWorker";
 
-const useHealthWorkers = (user: MyUser) => {
+type useHealthWorkersType = (user?: MyUser) => { healthWorkers: HealthWorker[] };
+
+const useHealthWorkers: useHealthWorkersType = (user) => {
+	if (!user) return { healthWorkers: [] };
+
 	const [healthWorkers, setHealthWorkers] = useState<HealthWorker[]>([]);
-	const router = useRouter();
 
+	//* Does not require reload on page to get updated data
+	const getHealthWorkersListener = () => {
+		try {
+			const unsub = FireStoreHelper.healthWorkersListener(user, setHealthWorkers);
+			return () => unsub();
+		} catch (_e) {
+			logError(_e);
+			notify("Could not get records online");
+		}
+		return () => {};
+	};
+
+	//* Requires reload on page to get updated data
 	const getHealthWorkersData = async () => {
 		try {
-			const fetchedHealthWorkers = await FireStoreHelper.getUser(user.id);
+			const fetchedHealthWorkers = await FireStoreHelper.getHealthWorkers(user);
 			setHealthWorkers(fetchedHealthWorkers);
 		} catch (_e) {
 			logError(_e);
@@ -23,7 +37,8 @@ const useHealthWorkers = (user: MyUser) => {
 
 	// TODO: move to serverside
 	useEffect(() => {
-		getHealthWorkersData();
+		// getHealthWorkersData();
+		return getHealthWorkersListener();
 	}, []);
 
 	return { healthWorkers: healthWorkers };

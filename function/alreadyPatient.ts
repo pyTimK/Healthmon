@@ -1,7 +1,5 @@
-import MyUser from "../classes/MyUser";
-import Patient from "../types/Patient";
+import { Patient } from "./../classes/MyUser";
 
-const alreadyPatient = (patient: Patient, user: MyUser) =>
-	user.monitoring.some((monitoringPatient) => monitoringPatient.id === patient.id);
+const alreadyPatient = (patient: Patient, patients: Patient[]) => patients.some((p) => p.id === patient.id);
 
 export default alreadyPatient;

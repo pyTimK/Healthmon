@@ -13,14 +13,13 @@ import styles from "./Home.module.css";
 
 const Home: NextPage = () => {
 	const { user, records } = useHome();
-	if (!user) return <></>;
 
 	return (
 		<Layout title='HealthMon' description={PageDescriptions.HOME}>
 			<Header user={user} />
 			<main className={styles.main}>
 				<h1 className={styles.title}>
-					{dayGreetings()} {user.name}
+					{dayGreetings()} {user?.name}
 				</h1>
 
 				<div className={styles.recordHeading}>
@@ -45,7 +44,7 @@ const Home: NextPage = () => {
 };
 
 interface HeaderProps {
-	user: MyUser;
+	user?: MyUser;
 }
 
 const Header: React.FC<HeaderProps> = ({ user }) => {
@@ -59,8 +58,8 @@ const Header: React.FC<HeaderProps> = ({ user }) => {
 			<Avatar
 				className={styles.avatar}
 				size={30}
-				photoURL={user.photoURL}
-				letter={user.name ?? "U"}
+				photoURL={user?.photoURL}
+				letter={user?.name}
 				onClick={goToAccounts}
 			/>
 			{isNotifOpen && <Notif />}

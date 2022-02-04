@@ -1,4 +1,6 @@
-import MyUser from "../../../../classes/MyUser";
+import MyUser, { Patient } from "../../../../classes/MyUser";
+import usePatients from "../../../../hooks/usePatients";
+import useRequestedUsers from "../../../../hooks/useRequestedUsers";
 import SettingsBlock from "../../settingsBlock/SettingsBlock";
 import SettingsRow from "../../settingsRow/SettingsRow";
 import usePatientSearchModal from "./patientSearchModal/usePatientSearchModal";
@@ -6,9 +8,14 @@ import usePatientSearchModal from "./patientSearchModal/usePatientSearchModal";
 interface PatientsSettingsBlockProps {
 	user: MyUser;
 }
-
 const PatientsSettingsBlock: React.FC<PatientsSettingsBlockProps> = ({ user }) => {
-	const { PatientSearchModal, openPatientSearchModal, setSearchResult } = usePatientSearchModal(user);
+	const { patients } = usePatients(user);
+	const { requestedUsers } = useRequestedUsers(user);
+	const { PatientSearchModal, openPatientSearchModal, setSearchResult } = usePatientSearchModal(
+		user,
+		patients,
+		requestedUsers
+	);
 
 	const addPatient = () => {
 		// TODO
@@ -21,7 +28,7 @@ const PatientsSettingsBlock: React.FC<PatientsSettingsBlockProps> = ({ user }) =
 			hasOptionButton
 			onOptionButtonClick={addPatient}
 			optionButtonName='Add'>
-			{user.monitoring.map((patient, _i) => (
+			{patients.map((patient, _i) => (
 				<SettingsRow key={_i} title={patient.name} subtitle={patient.number} />
 			))}
 			{/* <SettingsRow title={user.name} subtitle={user.number} /> */}

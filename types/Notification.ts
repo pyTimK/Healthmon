@@ -1,5 +1,5 @@
+import { HealthWorker } from "./../classes/MyUser";
 import { FieldValue } from "firebase/firestore";
-import HealthWorker from "./HealthWorker";
 export const enum NotifSubject {
 	MonitorRequest = "monitor_request",
 	RecordComment = "record_comment",

@@ -4,7 +4,6 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { ToastContainer } from "react-toastify";
 import { PageDescriptions } from "../../classes/Constants";
-import MyUser from "../../classes/MyUser";
 import usePersonalDetailsSettingsBlock from "../../components/config/blocks/personalDetails/usePersonalDetailsSettingsBlock";
 import Layout from "../../components/layout/Layout";
 import Sizedbox from "../../components/Sizedbox";
@@ -17,9 +16,8 @@ import styles from "./Account.module.css";
 
 const Account: NextPage = () => {
 	const { user } = useUser();
-	if (!user) return <></>;
-
 	const { logout } = useAccount();
+
 	const { PersonalDetailsSettingsBlock, nameInputRef, numberInputRef, role, editing, setEditing } =
 		usePersonalDetailsSettingsBlock(user, true);
 	const [saveButtonStatus, setSaveButtonStatus] = useState(ButtonStatus.Hidden);
@@ -28,7 +26,7 @@ const Account: NextPage = () => {
 	const updateUser = async () => {
 		setSaveButtonStatus(ButtonStatus.Disabled);
 		try {
-			await user.updatePersonalDetails(nameInputRef.current!.value, numberInputRef.current!.value, role);
+			await user?.updatePersonalDetails(nameInputRef.current!.value, numberInputRef.current!.value, role);
 			notify("Successfully updated details", { type: "success" });
 			setEditing(false);
 		} catch (_e) {
@@ -41,8 +39,8 @@ const Account: NextPage = () => {
 	const discardChanges = () => {
 		if (!nameInputRef.current || !numberInputRef.current) return;
 
-		nameInputRef.current.value = user.name;
-		numberInputRef.current.value = user.number;
+		nameInputRef.current.value = user?.name ?? "";
+		numberInputRef.current.value = user?.number ?? "";
 		setEditing(false);
 	};
 

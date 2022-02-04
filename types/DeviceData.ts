@@ -1,5 +1,4 @@
 import { FieldValue } from "firebase/firestore";
-import HealthWorker from "./HealthWorker";
 
 interface DeviceData {
 	name: string;

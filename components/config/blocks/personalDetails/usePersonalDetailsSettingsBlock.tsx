@@ -1,4 +1,4 @@
-import React, { ChangeEventHandler, useMemo, useRef, useState } from "react";
+import React, { ChangeEventHandler, useEffect, useMemo, useRef, useState } from "react";
 import ReactDropdown from "react-dropdown";
 import MyUser, { Role } from "../../../../classes/MyUser";
 import InputOption from "../../options/inputOption/InputOption";
@@ -14,6 +14,10 @@ const usePersonalDetailsSettingsBlock = (user?: MyUser, hasEditOption = false) =
 	const [role, setRole] = useState<Role>(user?.role ?? Role.Patient);
 	const [editing, setEditing] = useState(!hasEditOption);
 
+	useEffect(() => {
+		if (user) setRole(user.role);
+	}, [user]);
+
 	const startEditing = () => {
 		setEditing(true);
 	};
@@ -23,7 +27,7 @@ const usePersonalDetailsSettingsBlock = (user?: MyUser, hasEditOption = false) =
 			function PersonalDetailsSettingsBlockInner({}) {
 				return (
 					<>
-						{user && (
+						{
 							<SettingsBlock
 								hint='Personal Details'
 								hasOptionButton={hasEditOption}
@@ -31,16 +35,19 @@ const usePersonalDetailsSettingsBlock = (user?: MyUser, hasEditOption = false) =
 								editing={editing}>
 								<SettingsRow title='Name'>
 									{editing ? (
-										<InputOption inputRef={nameInputRef} value={user.name} maxLength={15} />
+										<InputOption
+											inputRef={nameInputRef}
+											value={user?.name}
+											maxLength={15}></InputOption>
 									) : (
-										<p className={styles.settingsRowValue}>{user.name}</p>
+										<p className={styles.settingsRowValue}>{user?.name}</p>
 									)}
 								</SettingsRow>
 								<SettingsRow title='Phone'>
 									{editing ? (
-										<InputOption inputRef={numberInputRef} value={user.number} maxLength={15} />
+										<InputOption inputRef={numberInputRef} value={user?.number} maxLength={15} />
 									) : (
-										<p className={styles.settingsRowValue}>{user.number}</p>
+										<p className={styles.settingsRowValue}>{user?.number}</p>
 									)}
 								</SettingsRow>
 								<SettingsRow title='Role'>
@@ -59,15 +66,15 @@ const usePersonalDetailsSettingsBlock = (user?: MyUser, hasEditOption = false) =
 											value={role}
 										/>
 									) : (
-										<p className={styles.settingsRowValue}>{user.role}</p>
+										<p className={styles.settingsRowValue}>{user?.role}</p>
 									)}
 								</SettingsRow>
 							</SettingsBlock>
-						)}
+						}
 					</>
 				);
 			},
-		[editing]
+		[editing, user]
 	);
 	// PersonalDetailsSettingsBlock.displayName = "PersonalDetailsSettingsBlock";
 

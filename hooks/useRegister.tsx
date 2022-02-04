@@ -1,10 +1,11 @@
 import { useRouter } from "next/router";
-import MyUser from "../classes/MyUser";
-import usePersonalDetailsSettingsBlock from "../components/config/blocks/personalDetails/usePersonalDetailsSettingsBlock";
-import logError from "../function/logError";
 import { useState } from "react";
-import notify from "../function/notify";
+import usePersonalDetailsSettingsBlock from "../components/config/blocks/personalDetails/usePersonalDetailsSettingsBlock";
 import ButtonStatus from "../enums/ButtonStatus";
+import logError from "../function/logError";
+import notify from "../function/notify";
+import useHealthWorkers from "./useHealthWorkers";
+import usePatients from "./usePatients";
 import useUser from "./useUser";
 
 const useRegister = () => {

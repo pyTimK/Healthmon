@@ -7,7 +7,7 @@ import MyUser from "../../classes/MyUser";
 
 interface NotifBlockProps {
 	notifs: (MonitorRequestNotif | RecordCommentNotif)[];
-	user: MyUser;
+	user?: MyUser;
 }
 
 const NotifBlock: React.FC<NotifBlockProps> = ({ notifs, user }) => {
@@ -22,9 +22,7 @@ const NotifBlock: React.FC<NotifBlockProps> = ({ notifs, user }) => {
 					<SettingsHorizontal size={18} cursor='pointer' onClick={goToSettings} />
 				</div>
 			</div>
-			{notifs.map((notif, _i) => (
-				<NotifItem key={_i} notif={notif} user={user} />
-			))}
+			{user && notifs.map((notif, _i) => <NotifItem key={_i} notif={notif} user={user} />)}
 		</div>
 	);
 };

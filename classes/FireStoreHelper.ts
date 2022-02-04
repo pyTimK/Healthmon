@@ -3,6 +3,7 @@ import {
 	deleteDoc,
 	deleteField,
 	doc,
+	FieldValue,
 	getDoc,
 	onSnapshot,
 	query,
@@ -18,7 +19,7 @@ import DeviceData from "../types/DeviceData";
 import { NotifSubject } from "../types/Notification";
 import { MonitorRequestNotif, RecordCommentNotif } from "./../types/Notification";
 import RecordComment, { date_time_healthWorkerId } from "./../types/RecordComment";
-import MyUser, { Formatted, toUnformatted } from "./MyUser";
+import MyUser, { BaseUser, Formatted, HealthWorker, IMyUser, Patient, RequestedUser, toUnformatted } from "./MyUser";
 
 export abstract class FireStoreHelper {
 	//! DEVICE------------------------
@@ -40,8 +41,11 @@ export abstract class FireStoreHelper {
 			confirmed: true,
 			request_timestamp: serverTimestamp(),
 		};
-
+		const deviceDoc = await getDoc(doc(db, "devices", deviceId));
+		const deviceData = deviceDoc.data() as DeviceData;
+		if (deviceData.id) await updateDoc(doc(db, "users", deviceData.id), { device: "" });
 		await updateDoc(doc(db, "devices", deviceId), { ...paired_doc });
+		await updateDoc(doc(db, "users", user.id), { device: deviceId });
 	};
 
 	private static _isDevicePaired = async (user: MyUser, deviceId: string = "") => {
@@ -71,6 +75,7 @@ export abstract class FireStoreHelper {
 			confirmed: false,
 			request_timestamp: serverTimestamp(),
 		};
+		await updateDoc(doc(db, "users", user.id), { device: "" });
 		await setDoc(doc(db, "devices", deviceId), { ...clearedDeviceData });
 	};
 
@@ -109,45 +114,16 @@ export abstract class FireStoreHelper {
 	};
 
 	//! COMMENT------------------------
-	static getComments = async (user: MyUser) => {
-		const commentsDoc = await getDoc(doc(db, "users", user.id, "comments", "comments"));
-		const formattedComments = commentsDoc.data() as Formatted<RecordComment>;
-		const comments = toUnformatted(formattedComments);
-		return comments;
-	};
-
-	private static _updatePersonalDetailsOnComments = async (user: MyUser) => {
-		const comments = await FireStoreHelper.getComments(user);
+	private static _updatePersonalDetailsOnComments = async (user: MyUser, comments: RecordComment[]) => {
 		for (const comment of comments) {
 			await updateDoc(
 				doc(db, "records", comment.recordDate, comment.patientID, comment.recordTime, "comments", user.id),
-				user.toHealthWorker()
+				{ sender: user.toHealthWorker() }
 			);
 		}
 	};
 
-	//! USER------------------------ RESUME!!!!!!!!!!!!!!!!!
-	static getUser = async (id: string) => {
-		const userDoc = await getDoc(doc(db, "users", id));
-		return userDoc.data() as MyUser;
-	};
-	static getHealthWorkers = async (user: MyUser) => {
-		const healthWorkersDoc = await getDoc(doc(db, "users", user.id, "associates", "healthWorkers"));
-		const formattedHealthWorkers = healthWorkersDoc.data() as FormattedHealthWorkers;
-		return toHealthWorkers(formattedHealthWorkers);
-	};
-
-	static getPatients = async (user: MyUser) => {
-		const patientsDoc = await getDoc(doc(db, "users", user.id, "associates", "monitoring"));
-		const formattedPatients = patientsDoc.data() as FormattedPatients;
-		return toPatients(formattedPatients);
-	};
-
-	static getRequestedUsers = async (user: MyUser) => {
-		const requestedUsersDoc = await getDoc(doc(db, "users", user.id, "associates", "requestedUsers"));
-		const formattedHealthWorkers = requestedUsersDoc.data() as FormattedHealthWorkers;
-		return toHealthWorkers(formattedHealthWorkers);
-	};
+	//! USER------------------------
 	static setUser = async (user: MyUser) => {
 		await setDoc(doc(db, "users", user.id), user.getUserProps());
 
@@ -155,28 +131,92 @@ export abstract class FireStoreHelper {
 		await setDoc(doc(db, "users", user.id, "associates", "healthWorkers"), { exists: true });
 		await setDoc(doc(db, "users", user.id, "associates", "requestedUsers"), { exists: true });
 		await setDoc(doc(db, "users", user.id, "associates", "monitoring"), { exists: true });
-		await setDoc(doc(db, "users", user.id, "associates", "comments"), { exists: true });
+		await setDoc(doc(db, "users", user.id, "comments", "comments"), { exists: true });
 	};
+
+	static getUser = async (id: string) => {
+		const userDoc = await getDoc(doc(db, "users", id));
+		const Iuser = userDoc.data() as IMyUser;
+		return new MyUser(Iuser);
+	};
+
+	private static _getAssociated = async <T extends BaseUser>(user: MyUser, docName: string): Promise<T[]> => {
+		const associateDoc = await getDoc(doc(db, "users", user.id, "associates", docName));
+		const associateDocData = associateDoc.data();
+		delete associateDocData!.exists;
+		const formattedAssociate = associateDocData as Formatted<T>;
+		return toUnformatted(formattedAssociate);
+	};
+
+	static getHealthWorkers = async (user: MyUser) =>
+		await FireStoreHelper._getAssociated<HealthWorker>(user, "healthWorkers");
+
+	static getPatients = async (user: MyUser) => await FireStoreHelper._getAssociated<Patient>(user, "monitoring");
+
+	static getRequestedUsers = async (user: MyUser) =>
+		await FireStoreHelper._getAssociated<RequestedUser>(user, "requestedUsers");
+
+	static getComments = async (user: MyUser) => {
+		const commentsDoc = await getDoc(doc(db, "users", user.id, "comments", "comments"));
+		const commentsDocData = commentsDoc.data();
+		delete commentsDocData!.exists;
+		const formattedComments = commentsDocData as Formatted<RecordComment>;
+		const comments = toUnformatted(formattedComments);
+		return comments;
+	};
+
+	private static _associateListener = <T extends BaseUser>(
+		user: MyUser,
+		setRecords: Dispatch<SetStateAction<T[]>>,
+		docName: string
+	) => {
+		const unsubscribe = onSnapshot(doc(db, "users", user.id, "associates", docName), (associateDoc) => {
+			console.log(docName, " snap");
+			const associateDocData = associateDoc.data();
+			delete associateDocData!.exists;
+			const formattedAssociate = associateDocData as Formatted<T>;
+			const healthWorkers = toUnformatted(formattedAssociate);
+			setRecords(() => healthWorkers);
+		});
+
+		return unsubscribe;
+	};
+
+	static healthWorkersListener = (user: MyUser, setRecords: Dispatch<SetStateAction<HealthWorker[]>>) =>
+		FireStoreHelper._associateListener(user, setRecords, "healthWorkers");
+
+	static patientsListener = (user: MyUser, setRecords: Dispatch<SetStateAction<HealthWorker[]>>) =>
+		FireStoreHelper._associateListener(user, setRecords, "monitoring");
+
+	static requestedUsersListener = (user: MyUser, setRecords: Dispatch<SetStateAction<HealthWorker[]>>) =>
+		FireStoreHelper._associateListener(user, setRecords, "requestedUsers");
 
 	static updatePersonalDetails = async (user: MyUser) => {
 		//* Updates the original doc containing user info and also all other docs dependent on it
 		await updateDoc(doc(db, "users", user.id), user.getPersonalDetails());
 
 		await FireStoreHelper._updatePersonalDetailsOnDevice(user);
+		console.log("UMABOT D2");
 		await FireStoreHelper._updatePersonalDetailsOnAssociatedHealthWorkers(user);
+		console.log("UMABOT D2 1.5");
 		await FireStoreHelper._updatePersonalDetailsOnAssociatedMonitoring(user);
+		console.log("UMABOT D2 2");
 		await FireStoreHelper._updatePersonalDetailsOnMonitorRequestNotif(user);
-		await FireStoreHelper._updatePersonalDetailsOnRecordCommentNotif(user);
-		await FireStoreHelper._updatePersonalDetailsOnComments(user);
-	};
+		console.log("UMABOT D2 2.5");
 
-	static updateRequestedUsers = async (user: MyUser) => {
-		//TODO FIX IT FILIX
-		await updateDoc(doc(db, "users", user.id), { requestedUsers: user.requestedUsers });
+		const comments = await FireStoreHelper.getComments(user);
+		console.log("UMABOT D2 3");
+		await FireStoreHelper._updatePersonalDetailsOnRecordCommentNotif(user, comments);
+		console.log("UMABOT D2 4");
+		await FireStoreHelper._updatePersonalDetailsOnComments(user, comments);
+		console.log("UMABOT D2 5");
 	};
 
 	private static _updatePersonalDetailsOnAssociatedHealthWorkers = async (user: MyUser) => {
-		for (const healthWorker of user.healthWorkers) {
+		const healthWorkers = await FireStoreHelper.getHealthWorkers(user);
+		console.log(healthWorkers);
+
+		for (const healthWorker of healthWorkers) {
 			const newField = <{ [key: string]: Patient }>{};
 			newField[user.id] = user.toPatient();
 			await updateDoc(doc(db, "users", healthWorker.id, "associates", "monitoring"), newField);
@@ -184,16 +224,29 @@ export abstract class FireStoreHelper {
 	};
 
 	private static _updatePersonalDetailsOnAssociatedMonitoring = async (user: MyUser) => {
-		for (const patient of user.monitoring) {
-			const newField = <{ [key: string]: Patient }>{};
+		const patients = await FireStoreHelper.getPatients(user);
+
+		for (const patient of patients) {
+			const newField = <{ [key: string]: HealthWorker }>{};
 			newField[user.id] = user.toHealthWorker();
 			await updateDoc(doc(db, "users", patient.id, "associates", "healthWorkers"), newField);
 		}
 	};
 
+	private static _addMonitorRequestToRequestedUsers = async (patient: Patient, healthWorker: HealthWorker) => {
+		const requestField = <{ [key: string]: Patient }>{};
+		requestField[patient.id] = patient;
+		await updateDoc(doc(db, "users", healthWorker.id, "associates", "requestedUsers"), requestField);
+	};
+
+	private static _removeMonitorRequestFromRequestedUsers = async (patient: Patient, healthWorker: HealthWorker) => {
+		const requestField = <{ [key: string]: FieldValue }>{};
+		requestField[patient.id] = deleteField();
+		await updateDoc(doc(db, "users", healthWorker.id, "associates", "requestedUsers"), requestField);
+	};
+
 	//! NOTIF------------------------
-	static sendMonitorRequestNotif = async (patient: Patient, healthWorker: HealthWorker) => {
-		//* Send notification to patient user
+	private static _addMonitorRequestNotif = async (patient: Patient, healthWorker: HealthWorker) => {
 		await setDoc(doc(db, "notifications", patient.id, NotifSubject.MonitorRequest, healthWorker.id), {
 			timestamp: serverTimestamp(),
 			sender: healthWorker,
@@ -204,10 +257,9 @@ export abstract class FireStoreHelper {
 		await deleteDoc(doc(db, "notifications", patient.id, NotifSubject.MonitorRequest, healthWorker.id));
 	};
 
-	private static _removeMonitorRequestFromRequestedUsers = async (patient: Patient, healthWorker: HealthWorker) => {
-		const requestField = <{ [key: string]: any }>{};
-		requestField[patient.id] = deleteField();
-		await updateDoc(doc(db, "users", healthWorker.id, "associates", "requestedUsers"), requestField);
+	static sendMonitorRequestNotif = async (patient: Patient, healthWorker: HealthWorker) => {
+		await FireStoreHelper._addMonitorRequestNotif(patient, healthWorker);
+		await FireStoreHelper._addMonitorRequestToRequestedUsers(patient, healthWorker);
 	};
 
 	static removeMonitorRequest = async (patient: Patient, healthWorker: HealthWorker) => {
@@ -237,13 +289,13 @@ export abstract class FireStoreHelper {
 		return unsubscribe;
 	};
 
-	static _addHealthWorker = async (patient: Patient, healthWorker: HealthWorker) => {
+	private static _addHealthWorker = async (patient: Patient, healthWorker: HealthWorker) => {
 		const newHealthWorkerField = <{ [key: string]: any }>{};
 		newHealthWorkerField[healthWorker.id] = healthWorker;
 		await updateDoc(doc(db, "users", patient.id, "associates", "healthWorkers"), newHealthWorkerField);
 	};
 
-	static _addPatient = async (patient: Patient, healthWorker: HealthWorker) => {
+	private static _addPatient = async (patient: Patient, healthWorker: HealthWorker) => {
 		const newPatientField = <{ [key: string]: any }>{};
 		newPatientField[patient.id] = patient;
 		await updateDoc(doc(db, "users", healthWorker.id, "associates", "monitoring"), newPatientField);
@@ -277,15 +329,17 @@ export abstract class FireStoreHelper {
 	};
 
 	private static _updatePersonalDetailsOnMonitorRequestNotif = async (user: MyUser) => {
-		for (const reqUser of user.requestedUsers) {
+		const requestedUsers = await FireStoreHelper.getRequestedUsers(user);
+
+		for (const reqUser of requestedUsers) {
 			await updateDoc(doc(db, "notifications", reqUser.id, NotifSubject.MonitorRequest, user.id), {
 				sender: user.toHealthWorker(),
 			});
 		}
 	};
 
-	private static _updatePersonalDetailsOnRecordCommentNotif = async (user: MyUser) => {
-		for (const comment of user.comments) {
+	private static _updatePersonalDetailsOnRecordCommentNotif = async (user: MyUser, comments: RecordComment[]) => {
+		for (const comment of comments) {
 			if (!comment.hasNotif) continue;
 
 			const notifUpdate: Partial<RecordCommentNotif> = {

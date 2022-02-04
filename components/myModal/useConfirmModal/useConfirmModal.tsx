@@ -13,7 +13,6 @@ const useConfirmModal = () => {
 	const [MyModal, openConfirmModal, closeConfirmModal, isConfirmModalOpen] = useMyModal();
 
 	const ConfirmModal: React.FC<ConfirmModalProps> = ({ title, description, onConfirm }) => {
-		console.log("confim modal rerendered");
 		return (
 			<MyModal>
 				<div className={styles.section}>

@@ -10,17 +10,18 @@ import useUser from "../../hooks/useUser";
 
 const Settings: NextPage = () => {
 	const { user } = useUser();
-	if (!user) return <></>;
+	// if (!user) return <></>;
 
 	return (
 		<Layout title='Settings - Healthmon' description={PageDescriptions.HOME}>
 			<h1>Settings</h1>
 			<GeneralSettingsBlock user={user} />
-			{user.role === Role.Patient ? (
-				<HealthWorkersSettingsBlock user={user} />
-			) : (
-				<PatientsSettingsBlock user={user} />
-			)}
+			{user &&
+				(user.role === Role.Patient ? (
+					<HealthWorkersSettingsBlock user={user} />
+				) : (
+					<PatientsSettingsBlock user={user} />
+				))}
 			<ToastContainer theme='colored' autoClose={2} />
 		</Layout>
 	);

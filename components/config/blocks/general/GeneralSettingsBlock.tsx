@@ -7,7 +7,7 @@ import ScanFromFile from "./scanFromFile/ScanFromFile";
 import useGeneralSettingsBlock from "./useGeneralSettingsBlock";
 
 interface GeneralSettingsBlockProps {
-	user: MyUser;
+	user?: MyUser;
 }
 
 const GeneralSettingsBlock: React.FC<GeneralSettingsBlockProps> = ({ user }) => {
@@ -28,19 +28,23 @@ const GeneralSettingsBlock: React.FC<GeneralSettingsBlockProps> = ({ user }) => 
 			<SettingsBlock hint='General'>
 				<SettingsRow
 					title='Pair Healthmon Device'
-					subtitle={isConnectedToDevice(user) ? "Connected" : undefined}>
+					subtitle={user && isConnectedToDevice(user) ? "Connected" : undefined}>
 					<AddOption
-						isAdd={!isConnectedToDevice(user)}
+						isAdd={!user || !isConnectedToDevice(user)}
 						addCallback={openPickTypeOfScanModal}
 						removeCallback={unpairDevice}
 					/>
 				</SettingsRow>
 			</SettingsBlock>
 
-			<PickTypeOfScanModal onFileIconClick={scanFromFile} onCameraIconClick={openScanFromCamModal} />
-			<ScanFromCamModal onSuccessScan={onSuccessScan} />
-			<CodeInputModal />
-			<ScanFromFile onSuccessScan={onSuccessScan} qrFromFileRef={qrFromFileRef} />
+			{user && (
+				<>
+					<PickTypeOfScanModal onFileIconClick={scanFromFile} onCameraIconClick={openScanFromCamModal} />
+					<ScanFromCamModal onSuccessScan={onSuccessScan} />
+					<CodeInputModal />
+					<ScanFromFile onSuccessScan={onSuccessScan} qrFromFileRef={qrFromFileRef} />
+				</>
+			)}
 		</>
 	);
 };

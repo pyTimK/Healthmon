@@ -44,8 +44,17 @@
 
 .resultRow {
     background-color: var(--background-dark);
+    width: 70%;
     padding: 8px 12px;
     border-radius: 5px;
     display: flex;
     gap: 30px;
+    margin: 12px 0;
+    display: flex;
+}
+
+.resultRowButton {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
 }

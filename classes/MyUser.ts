@@ -97,18 +97,6 @@ class MyUser {
 
 		await FireStoreHelper.updatePersonalDetails(this);
 	}
-
-	async addRequestedUser(patient: Patient) {
-		//TODO FIX IT FILIX
-		// this.requestedUsers.push(patient);
-		await FireStoreHelper.updateRequestedUsers(this);
-	}
-
-	async removeRequestedUser(patient: Patient) {
-		//TODO FIX IT FILIX
-		// this.requestedUsers = removeRequestedPatient(patient, this);
-		await FireStoreHelper.updateRequestedUsers(this);
-	}
 }
 
 export default MyUser;
