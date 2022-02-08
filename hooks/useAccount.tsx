@@ -7,22 +7,25 @@ import { auth } from "../firebase/initFirebase";
 import logError from "../function/logError";
 import notify from "../function/notify";
 import useUser from "./useUser";
+import useUserConfig from "./useUserConfig";
 
 const useAccount = () => {
 	const { user } = useUser();
+	const { userConfig } = useUserConfig();
 	const router = useRouter();
 	const authUser = getAuth().currentUser;
 
 	const { PersonalDetailsSettingsBlock, nameInputRef, numberInputRef, role, editing, setEditing } =
-		usePersonalDetailsSettingsBlock(user, true);
+		usePersonalDetailsSettingsBlock(user, userConfig, true);
 	const [saveButtonStatus, setSaveButtonStatus] = useState(ButtonStatus.Hidden);
 
 	const updateUser: FormEventHandler<HTMLFormElement> = async (e) => {
 		e.preventDefault();
 		setSaveButtonStatus(ButtonStatus.Disabled);
 		try {
-			await user?.updatePersonalDetails(nameInputRef.current!.value, numberInputRef.current!.value, role);
-			notify("Successfully updated details", { type: "success" });
+			await user.updatePersonalDetails(nameInputRef.current!.value, numberInputRef.current!.value);
+			await userConfig.updateRole(role);
+			await notify("Successfully updated details", { type: "success" });
 			setEditing(false);
 		} catch (_e) {
 			notify("Updating user details failed");
@@ -34,8 +37,8 @@ const useAccount = () => {
 	const discardChanges = () => {
 		if (!nameInputRef.current || !numberInputRef.current) return;
 
-		nameInputRef.current.value = user?.name ?? "";
-		numberInputRef.current.value = user?.number ?? "";
+		nameInputRef.current.value = user.name;
+		numberInputRef.current.value = user.number;
 		setEditing(false);
 	};
 

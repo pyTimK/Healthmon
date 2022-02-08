@@ -21,6 +21,7 @@ const Layout: NextPage<LayoutProps> = ({ title, description, showSidebar = true,
 				<title>{title}</title>
 				<meta name='description' content={description} />
 			</Head>
+
 			{showSidebar && <Sidebar />}
 			{header}
 			<div className={styles.contentWrapper}>

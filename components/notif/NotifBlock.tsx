@@ -9,7 +9,7 @@ import Divider from "../Divider";
 
 interface NotifBlockProps {
 	notifs: (MonitorRequestNotif | RecordCommentNotif)[];
-	user?: MyUser;
+	user: MyUser;
 }
 
 const NotifBlock: React.FC<NotifBlockProps> = ({ notifs, user }) => {
@@ -28,10 +28,12 @@ const NotifBlock: React.FC<NotifBlockProps> = ({ notifs, user }) => {
 			{notifs.length === 0 && (
 				<div className={clsx(styles.emptyContainer, "unselectable")}>
 					<img className={styles.emptySvg} src='/img/void.svg' />
-					<p className={styles.emptyText}>It's quiet out here...</p>
+					<p className={styles.emptyText}>It&#39;s quiet out here...</p>
 				</div>
 			)}
-			{user && notifs.map((notif, _i) => <NotifItem key={_i} notif={notif} user={user} />)}
+			{notifs.map((notif, _i) => (
+				<NotifItem key={_i} notif={notif} user={user} />
+			))}
 		</div>
 	);
 };

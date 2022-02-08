@@ -9,8 +9,6 @@ interface InputOptionProps {
 }
 
 const InputOption: React.FC<InputOptionProps> = ({ inputRef, type = "text", value, maxLength }) => {
-	console.log("InputOption Rerendered");
-
 	return (
 		<input
 			className={styles.inputOption}

@@ -1,0 +1,25 @@
+.container {
+    position: relative;
+    width: fit-content;
+    margin: 0 auto;
+}
+
+.monthYearButtonContainer {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid rgba(255, 192, 203, 0.528);
+    border-radius: 8px;
+    padding: 8px 12px;
+}
+
+.monthYearButtonContainer p {
+    margin: 0;
+}
+
+.datePickerWrapper {
+    position: absolute;
+    transform: translateX(-25%);
+    z-index: 2;
+}

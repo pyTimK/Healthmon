@@ -7,22 +7,25 @@ import HealthWorkersSettingsBlock from "../../components/config/blocks/healthWor
 import PatientsSettingsBlock from "../../components/config/blocks/patients/PatientsSettingsBlock";
 import Layout from "../../components/layout/Layout";
 import useUser from "../../hooks/useUser";
+import useUserConfig from "../../hooks/useUserConfig";
+import style from "./Settings.module.css";
 
 const Settings: NextPage = () => {
 	const { user } = useUser();
-	// if (!user) return <></>;
+	const { userConfig } = useUserConfig();
 
 	return (
 		<Layout title='Settings - Healthmon' description={PageDescriptions.HOME}>
-			<h1>Settings</h1>
-			<GeneralSettingsBlock user={user} />
-			{user &&
-				(user.role === Role.Patient ? (
+			<div className={style.container}>
+				<h1>Settings</h1>
+				{user.id !== "" && userConfig.role === Role.Patient && <GeneralSettingsBlock user={user} />}
+				{user.id !== "" && userConfig.role === Role.Patient ? (
 					<HealthWorkersSettingsBlock user={user} />
 				) : (
 					<PatientsSettingsBlock user={user} />
-				))}
-			<ToastContainer theme='colored' autoClose={2} />
+				)}
+				<ToastContainer theme='colored' autoClose={2} />
+			</div>
 		</Layout>
 	);
 };

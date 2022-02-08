@@ -13,6 +13,7 @@ import { doc, getDoc } from "firebase/firestore";
 import MyUser from "../../classes/MyUser";
 import { ToastContainer } from "react-toastify";
 import { CookiesHelper } from "../../classes/CookiesHelper";
+import { UserConfig } from "../../types/userConfig";
 
 const SignInScreen: NextPage = () => {
 	const [authUser, setAuthUser] = useState<User | null>(null);
@@ -27,7 +28,8 @@ const SignInScreen: NextPage = () => {
 		} else {
 			//* Go to registration if first time logging in
 			const myUser = MyUser.fromFirebaseUser(authUser);
-			FireStoreHelper.setUser(myUser);
+			await FireStoreHelper.setUser(myUser);
+			await FireStoreHelper.createUserConfig(authUser.uid);
 			router.replace("/register");
 		}
 	};

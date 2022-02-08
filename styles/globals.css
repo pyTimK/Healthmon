@@ -145,6 +145,34 @@ input:active {
   -ms-user-select: none;
 }
 
+/** npm package: Sassy Datepicker */
+
+.sdp {
+  --theme-color: var(--pink) !important;
+  --selected-date-color: #eeeeee !important;
+}
+
+
+.sdp--month-name {
+  color: #17171B !important;
+  user-select: none !important;
+  -moz-user-select: none !important;
+  -webkit-user-select: none !important;
+  -ms-user-select: none !important;
+  outline: none !important;
+  border: none !important;
+}
+
+.sdp--month-name:focus {
+  outline: none !important;
+  border: none !important;
+}
+
+.sdp--month-name:active {
+  outline: none !important;
+  border: none !important;
+}
+
 /** SMALL TABLET */
 @media screen and (max-width: var(--tablet-max-width)) {
   .content {

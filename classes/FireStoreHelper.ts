@@ -1,3 +1,4 @@
+import { UserConfig, UserConfigProps } from "./../types/userConfig";
 import {
 	collection,
 	deleteDoc,
@@ -19,7 +20,16 @@ import DeviceData from "../types/DeviceData";
 import { NotifSubject } from "../types/Notification";
 import { MonitorRequestNotif, RecordCommentNotif } from "./../types/Notification";
 import RecordComment, { date_time_healthWorkerId } from "./../types/RecordComment";
-import MyUser, { BaseUser, Formatted, HealthWorker, IMyUser, Patient, RequestedUser, toUnformatted } from "./MyUser";
+import MyUser, {
+	BaseUser,
+	Formatted,
+	HealthWorker,
+	IMyUser,
+	Patient,
+	RequestedUser,
+	Role,
+	toUnformatted,
+} from "./MyUser";
 
 export abstract class FireStoreHelper {
 	//! DEVICE------------------------
@@ -237,6 +247,22 @@ export abstract class FireStoreHelper {
 		const requestField = <{ [key: string]: FieldValue }>{};
 		requestField[patient.id] = deleteField();
 		await updateDoc(doc(db, "users", healthWorker.id, "associates", "requestedUsers"), requestField);
+	};
+
+	//! USERCONFIG ----------------------
+	static createUserConfig = async (id: string) => {
+		await setDoc(doc(db, "config", id), { id: id, role: Role.Patient, date: "1999-11-02" } as UserConfigProps);
+	};
+	static updateUserConfig = async (userConfig: UserConfig) => {
+		await updateDoc(doc(db, "config", userConfig.id), userConfig.getProps());
+	};
+
+	static userConfigListener = (id: string, setUserConfig: Dispatch<SetStateAction<UserConfig>>) => {
+		const unsubscribe = onSnapshot(doc(db, "config", id), (configDoc) => {
+			const configDocData = configDoc.data() as UserConfig;
+			setUserConfig(UserConfig.fromFirebaseUserConfig(configDocData));
+		});
+		return unsubscribe;
 	};
 
 	//! NOTIF------------------------

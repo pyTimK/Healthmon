@@ -5,11 +5,9 @@ import { FireStoreHelper } from "../classes/FireStoreHelper";
 import logError from "../function/logError";
 import notify from "../function/notify";
 
-type usePatientsType = (user?: MyUser) => { patients: Patient[] };
+type usePatientsType = (user: MyUser) => { patients: Patient[] };
 
 const usePatients: usePatientsType = (user) => {
-	if (!user) return { patients: [] };
-
 	const [patients, setPatients] = useState<Patient[]>([]);
 
 	//* Does not require reload on page to get updated data
@@ -24,20 +22,10 @@ const usePatients: usePatientsType = (user) => {
 		return () => {};
 	};
 
-	//* Requires reload on page to get updated data
-	const getPatientsData = async () => {
-		try {
-			const fetchedPatients = await FireStoreHelper.getPatients(user);
-			setPatients(fetchedPatients);
-		} catch (_e) {
-			logError(_e);
-			notify("Could not fetch data online");
-		}
-	};
-
 	// TODO: move to serverside
 	useEffect(() => {
-		//getPatientsData();
+		if (user.id === "") return;
+		console.log("usePatients accessed");
 		return getPatientsListener();
 	}, []);
 

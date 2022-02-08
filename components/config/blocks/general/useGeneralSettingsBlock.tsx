@@ -7,7 +7,7 @@ import useCodeInputModal from "./codeInputModal/useCodeInputModal";
 import usePickTypeOfScanModal from "./pickTypeOfScanModal/usePickTypeOfScanModal";
 import useScanFromCamModal from "./scanFromCamModal/useScanFromCamModal";
 
-const useGeneralSettingsBlock = (user?: MyUser) => {
+const useGeneralSettingsBlock = (user: MyUser) => {
 	const [parsedQR, setParsedQR] = useState<string | null>("");
 
 	const [PickTypeOfScanModal, openPickTypeOfScanModal, closePickTypeOfScanModal, isPickTypeOfScanModalOpen] =
@@ -17,7 +17,7 @@ const useGeneralSettingsBlock = (user?: MyUser) => {
 		useScanFromCamModal();
 
 	const [CodeInputModal, openCodeInputModal, closeCodeInputModal, isCodeInputModalOpen] = useCodeInputModal(
-		user!,
+		user,
 		parsedQR,
 		setParsedQR
 	);
@@ -34,7 +34,7 @@ const useGeneralSettingsBlock = (user?: MyUser) => {
 
 	const onSuccessScan = async (qr: string) => {
 		try {
-			await FireStoreHelper.askPairDevice(qr, user!);
+			await FireStoreHelper.askPairDevice(qr, user);
 		} catch (_e) {
 			logError(_e);
 			notify("No Healthmon device associated with qr code");
@@ -47,7 +47,7 @@ const useGeneralSettingsBlock = (user?: MyUser) => {
 
 	//! UNPAIRING --------------------------------
 	const unpairDevice = async () => {
-		if (!user || user.device === "") return;
+		if (user.device === "") return;
 
 		try {
 			await FireStoreHelper.unPairDevice(user, user.device);

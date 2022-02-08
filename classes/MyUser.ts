@@ -31,7 +31,6 @@ export const toFormatted = <T extends BaseUser>(list: T[]) => {
 export const toUnformatted = <T>(formattedList: Formatted<T>) => Object.values(formattedList);
 
 export interface IMyUser extends BaseUser {
-	role: Role;
 	device: string;
 }
 
@@ -39,7 +38,6 @@ class MyUser {
 	public name: string;
 	public id: string;
 	public number: string;
-	public role: Role;
 	public device: string;
 	public photoURL: string;
 
@@ -47,7 +45,6 @@ class MyUser {
 		this.name = user?.name ?? "";
 		this.id = user?.id ?? "";
 		this.number = user?.number ?? "09";
-		this.role = user?.role ?? Role.Patient;
 		this.device = user?.device ?? "";
 		this.photoURL = user?.photoURL ?? "";
 	}
@@ -75,7 +72,6 @@ class MyUser {
 			id: this.id,
 			name: this.name,
 			number: this.number,
-			role: this.role,
 			photoURL: this.photoURL,
 			device: this.device,
 		};
@@ -85,16 +81,14 @@ class MyUser {
 		return {
 			name: this.name,
 			number: this.number,
-			role: this.role,
 			photoURL: this.photoURL,
 		};
 	};
 
-	async updatePersonalDetails(newName: string, newNumber: string, newRole: Role) {
+	async updatePersonalDetails(newName: string, newNumber: string) {
+		if (this.name === newName && this.number === newNumber) return;
 		this.name = newName;
 		this.number = newNumber;
-		this.role = newRole;
-
 		await FireStoreHelper.updatePersonalDetails(this);
 	}
 }

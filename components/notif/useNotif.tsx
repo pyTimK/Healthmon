@@ -10,7 +10,7 @@ import styles from "./useNotif.module.css";
 const inSenders = (senders: Formatted<HealthWorker>, newSenderId: string) =>
 	Object.prototype.hasOwnProperty.call(senders, newSenderId);
 
-const useNotif = (user?: MyUser) => {
+const useNotif = (user: MyUser) => {
 	const [isNotifOpen, setIsNotifOpen] = useState(false);
 	const [monitorRequestNotifs, setMonitorRequestNotifs] = useState<MonitorRequestNotif[]>([]);
 	const [recordCommentNotifs, setRecordCommentNotifs] = useState<RecordCommentNotif[]>([]);
@@ -21,7 +21,7 @@ const useNotif = (user?: MyUser) => {
 	);
 
 	useEffect(() => {
-		if (!user) return;
+		if (user.id.length === 0) return;
 
 		const unsubMonitorRequestNotif = FireStoreHelper.monitorRequestNotifListener(user.id, setMonitorRequestNotifs);
 		const unsubRecordCommentNotif = FireStoreHelper.recordCommentNotifListener(user.id, setRecordCommentNotifs);
