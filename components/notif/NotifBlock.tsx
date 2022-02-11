@@ -33,9 +33,9 @@ const NotifBlock: React.FC<NotifBlockProps> = ({ notifs, user }) => {
 				</div>
 			)}
 			{notifs.map((notif, _i) => (
-				<div>
+				<div key={_i}>
 					<Divider />
-					<NotifItem key={_i} notif={notif} user={user} />
+					<NotifItem notif={notif} user={user} />
 					<Sizedbox height={10} />
 				</div>
 			))}

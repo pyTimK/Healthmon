@@ -1,5 +1,6 @@
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
+import React from "react";
 import { ToastContainer } from "react-toastify";
 import { PageDescriptions } from "../../classes/Constants";
 import MyUser, { Role } from "../../classes/MyUser";
@@ -16,6 +17,9 @@ import useUserConfig from "../../hooks/useUserConfig";
 import { UserConfig } from "../../types/userConfig";
 import styles from "./Home.module.css";
 
+export const UserContext = React.createContext<MyUser>(new MyUser());
+const UserProvider = UserContext.Provider;
+
 const Home: NextPage = () => {
 	const { user } = useUser();
 	const { userConfig } = useUserConfig();
@@ -23,7 +27,7 @@ const Home: NextPage = () => {
 	if (user.id === "") return <div></div>;
 
 	return (
-		<div>
+		<UserProvider value={user}>
 			<Layout title='HealthMon' description={PageDescriptions.HOME} header={<Header user={user} />}>
 				<main className={styles.main}>
 					<div className={styles.title}>
@@ -42,7 +46,7 @@ const Home: NextPage = () => {
 					)}
 				</main>
 			</Layout>
-		</div>
+		</UserProvider>
 	);
 };
 

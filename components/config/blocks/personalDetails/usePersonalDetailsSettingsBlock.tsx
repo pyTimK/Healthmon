@@ -36,10 +36,7 @@ const usePersonalDetailsSettingsBlock = (user: MyUser, userConfig: UserConfig, h
 								editing={editing}>
 								<SettingsRow title='Name'>
 									{editing ? (
-										<InputOption
-											inputRef={nameInputRef}
-											value={user.name}
-											maxLength={15}></InputOption>
+										<InputOption inputRef={nameInputRef} value={user.name} maxLength={15} />
 									) : (
 										<p className={styles.settingsRowValue}>{user.name}</p>
 									)}

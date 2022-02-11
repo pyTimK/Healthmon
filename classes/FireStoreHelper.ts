@@ -1,4 +1,3 @@
-import { UserConfig, UserConfigProps } from "./../types/userConfig";
 import {
 	collection,
 	deleteDoc,
@@ -15,11 +14,12 @@ import {
 import { Dispatch, SetStateAction } from "react";
 import { RecordData } from "../components/record/Record";
 import { db } from "../firebase/initFirebase";
-import { getYYYYMMDD } from "../function/dateConversions";
 import DeviceData from "../types/DeviceData";
 import { NotifSubject } from "../types/Notification";
+import { RecordMetaData } from "./../components/record/Record";
 import { MonitorRequestNotif, RecordCommentNotif } from "./../types/Notification";
-import RecordComment, { date_time_healthWorkerId } from "./../types/RecordComment";
+import UserComment, { date_time_healthWorkerId, date_time_patientId, RecordComment } from "./../types/RecordComment";
+import { UserConfig, UserConfigProps } from "./../types/userConfig";
 import MyUser, {
 	BaseUser,
 	Formatted,
@@ -105,33 +105,116 @@ export abstract class FireStoreHelper {
 	};
 
 	//! RECORD----------------------
-	static recordDataListener = (id: string, dateStr: string, setRecords: Dispatch<SetStateAction<RecordData[]>>) => {
-		if (id === "" || dateStr === "") return;
+	static recordDataListener = (
+		patientId: string,
+		dateStr: string,
+		setRecords: Dispatch<SetStateAction<RecordData[]>>,
+		setRecordsMetaData: Dispatch<SetStateAction<RecordMetaData[]>>
+	) => {
+		if (patientId === "" || dateStr === "") return;
 
-		const q = query(collection(db, "records", dateStr, id));
+		const q = query(collection(db, "records", dateStr, patientId));
 
 		const unsubscribe = onSnapshot(q, (querySnapshot) => {
 			console.log("record snap");
 			let gotRecords: RecordData[] = [];
+			let gotRecordsMetaData: RecordMetaData[] = [];
+
 			querySnapshot.forEach((doc) => {
 				const recordData = doc.data() as RecordData;
 				gotRecords.push(recordData);
+				gotRecordsMetaData.push({ recordTime: doc.id, recordDate: dateStr, patientId: patientId });
 			});
+
 			gotRecords.reverse();
 			setRecords(() => gotRecords);
+			setRecordsMetaData(() => gotRecordsMetaData);
 		});
 
 		return unsubscribe;
 	};
 
 	//! COMMENT------------------------
-	private static _updatePersonalDetailsOnComments = async (user: MyUser, comments: RecordComment[]) => {
-		for (const comment of comments) {
+	private static _updatePersonalDetailsOnComments = async (user: MyUser, userComments: UserComment[]) => {
+		for (const comment of userComments) {
 			await updateDoc(
-				doc(db, "records", comment.recordDate, comment.patientID, comment.recordTime, "comments", user.id),
+				doc(db, "records", comment.recordDate, comment.patientId, comment.recordTime, "comments", user.id),
 				{ sender: user.toHealthWorker() }
 			);
 		}
+	};
+
+	static addComment = async (commenter: MyUser, comment: string, userComment: UserComment) => {
+		if (commenter.id === "") return;
+
+		//* Update list of comments by the user
+		const newUserCommentField = <{ [key: string]: UserComment }>{};
+		newUserCommentField[date_time_patientId(userComment)] = userComment;
+
+		await updateDoc(doc(db, "users", commenter.id, "comments", "comments"), newUserCommentField);
+
+		//* Add comment on record
+		const newComment: RecordComment = {
+			comment: comment,
+			sender: commenter.toHealthWorker(),
+			timestamp: serverTimestamp(),
+		};
+
+		await setDoc(
+			doc(
+				db,
+				"records",
+				userComment.recordDate,
+				userComment.patientId,
+				userComment.recordTime,
+				"comments",
+				commenter.id
+			),
+			newComment
+		);
+
+		//* Send comment notif to patient
+		const recordCommentNotif: RecordCommentNotif = {
+			sender: commenter.toHealthWorker(),
+			recordDate: userComment.recordDate,
+			recordTime: userComment.recordTime,
+			timestamp: serverTimestamp(),
+		};
+
+		await setDoc(
+			doc(
+				db,
+				"notifications",
+				userComment.patientId,
+				NotifSubject.RecordComment,
+				date_time_healthWorkerId(userComment, commenter.id)
+			),
+			recordCommentNotif
+		);
+
+		//TODO {not here} see two white unimplemented in recordcommentnotif
+	};
+
+	static commentsListener = (userComment: UserComment, setComments: Dispatch<SetStateAction<RecordComment[]>>) => {
+		if (userComment.patientId === "") return;
+		const q = query(
+			collection(db, "records", userComment.recordDate, userComment.patientId, userComment.recordTime, "comments")
+		);
+
+		const unsubscribe = onSnapshot(q, (querySnapshot) => {
+			console.log("comment snap");
+			let gotComments: RecordComment[] = [];
+
+			querySnapshot.forEach((doc) => {
+				const recordComment = doc.data() as RecordComment;
+				gotComments.push(recordComment);
+			});
+
+			gotComments.reverse();
+			setComments(() => gotComments);
+		});
+
+		return unsubscribe;
 	};
 
 	//! USER------------------------
@@ -171,7 +254,7 @@ export abstract class FireStoreHelper {
 		const commentsDoc = await getDoc(doc(db, "users", user.id, "comments", "comments"));
 		const commentsDocData = commentsDoc.data();
 		delete commentsDocData!.exists;
-		const formattedComments = commentsDocData as Formatted<RecordComment>;
+		const formattedComments = commentsDocData as Formatted<UserComment>;
 		const comments = toUnformatted(formattedComments);
 		return comments;
 	};
@@ -343,7 +426,7 @@ export abstract class FireStoreHelper {
 		}
 	};
 
-	private static _updatePersonalDetailsOnRecordCommentNotif = async (user: MyUser, comments: RecordComment[]) => {
+	private static _updatePersonalDetailsOnRecordCommentNotif = async (user: MyUser, comments: UserComment[]) => {
 		for (const comment of comments) {
 			if (!comment.hasNotif) continue;
 
@@ -355,7 +438,7 @@ export abstract class FireStoreHelper {
 				doc(
 					db,
 					"notifications",
-					comment.patientID,
+					comment.patientId,
 					NotifSubject.RecordComment,
 					date_time_healthWorkerId(comment, user.id)
 				),
