@@ -14,7 +14,10 @@ const usePatients: usePatientsType = (user) => {
 	const getPatientsListener = () => {
 		try {
 			const unsub = FireStoreHelper.patientsListener(user, setPatients);
-			return () => unsub();
+			return () => {
+				console.log("successfully unsubscribed");
+				unsub();
+			};
 		} catch (_e) {
 			logError(_e);
 			notify("Could not get records online");
@@ -27,7 +30,7 @@ const usePatients: usePatientsType = (user) => {
 		if (user.id === "") return;
 		console.log("usePatients accessed");
 		return getPatientsListener();
-	}, []);
+	}, [user]);
 
 	return { patients: patients };
 };

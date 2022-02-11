@@ -4,11 +4,14 @@
     align-items: center;
     padding: 10px 15px;
     border-radius: 100px;
+    opacity: 0.8;
 }
 
 .selectedContainer {
     background-color: var(--background-light);
+    opacity: 1;
 }
+
 
 .numberWrapper {
     background-color: var(--background-light);

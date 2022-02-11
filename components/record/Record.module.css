@@ -27,8 +27,26 @@
     align-items: center;
     justify-content: center;
     border-right: 1px solid gray;
+    /* background-image: radial-gradient(rgba(107, 137, 172, 0.111) 40%, rgba(29, 91, 161, 0) 80%); */
+    /* margin: 0 10px;
+    border-radius: 10px; */
+
 }
 
 .measurement:last-of-type {
     border-right: none;
+}
+
+.number {
+    font-size: 1.3rem;
+    font-weight: 300;
+    color: var(--text-light);
+}
+
+.blue {
+    color: skyblue;
+}
+
+.orange {
+    color: #fd712e;
 }

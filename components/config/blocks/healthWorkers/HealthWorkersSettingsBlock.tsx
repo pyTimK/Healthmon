@@ -39,7 +39,11 @@ const HealthWorkersSettingsBlock: React.FC<HealthWorkersSettingsBlockProps> = ({
 	return (
 		<SettingsBlock hint='Health Workers'>
 			{healthWorkers.map((healthWorker, _i) => (
-				<SettingsRow key={_i} title={healthWorker.name} subtitle={healthWorker.number}>
+				<SettingsRow
+					key={_i}
+					photoURL={healthWorker.photoURL}
+					title={healthWorker.name}
+					subtitle={healthWorker.number}>
 					<button className='transparent-button' onClick={() => confirmUnPairHealthWorker(healthWorker)}>
 						Unpair
 					</button>

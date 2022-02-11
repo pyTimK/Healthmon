@@ -26,7 +26,7 @@ const useRequestedUsers: useRequestedUsersType = (user) => {
 		if (user.id === "") return;
 		console.log("useRequestedUsers accessed");
 		return getRequestedUsersListener();
-	}, []);
+	}, [user]);
 
 	return { requestedUsers: requestedUsers };
 };

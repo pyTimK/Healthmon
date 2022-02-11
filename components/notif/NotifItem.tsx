@@ -6,6 +6,7 @@ import logError from "../../function/logError";
 import notify from "../../function/notify";
 import { isRecordCommentNotif, MonitorRequestNotif, RecordCommentNotif } from "../../types/Notification";
 import Avatar from "../Avatar";
+import Divider from "../Divider";
 import styles from "./NotifItem.module.css";
 
 interface NotifItemProp {
@@ -39,7 +40,7 @@ const NotifItem: React.FC<NotifItemProp> = ({ notif, user }) => {
 		<div className={styles.container}>
 			<div className={styles.main}>
 				<div className={styles.avatarWrapper}>
-					<Avatar letter={sender.name} nonclickable photoURL={sender.photoURL} />
+					<Avatar size={45} letter={sender.name} nonclickable photoURL={sender.photoURL} />
 				</div>
 				<p className={styles.description}>
 					<b className={styles.name}>{sender.name}</b>
@@ -51,10 +52,12 @@ const NotifItem: React.FC<NotifItemProp> = ({ notif, user }) => {
 					<button
 						className={clsx(styles.notifButton, styles.declineButton)}
 						onClick={onDeclineMonitorRequest}>
-						<Cross size={16} /> Decline
+						{/* <Cross size={16} /> */}
+						Decline
 					</button>
 					<button className={clsx(styles.notifButton, styles.acceptButton)} onClick={onAcceptMonitorRequest}>
-						<Check size={16} /> Accept
+						{/* <Check size={16} />  */}
+						Accept
 					</button>
 				</div>
 			)}

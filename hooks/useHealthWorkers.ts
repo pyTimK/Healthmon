@@ -27,7 +27,7 @@ const useHealthWorkers: useHealthWorkersType = (user) => {
 		if (user.id === "") return;
 		console.log("useHealthWorkers accessed");
 		return getHealthWorkersListener();
-	}, []);
+	}, [user]);
 
 	return { healthWorkers: healthWorkers };
 };

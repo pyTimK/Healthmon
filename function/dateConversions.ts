@@ -28,10 +28,18 @@ export function daysInMonth(month: number, year: number) {
 	return new Date(year, month, 0).getDate();
 }
 
+// Month is 1 indexed
 export function daysInMonthArray(month: number, year: number) {
 	const days: number[] = [];
 	for (let i = 1; i <= daysInMonth(month, year); i++) {
 		days.push(i);
 	}
 	return days;
+}
+
+export const DayAbbrev = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+// Month is 1 indexed
+export function getDay(day: number, month: number, year: number) {
+	return DayAbbrev[new Date(year, month, day).getDay()];
 }

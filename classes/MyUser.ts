@@ -50,7 +50,6 @@ class MyUser {
 	}
 
 	static fromFirebaseUser(user: User) {
-		console.log(user);
 		return new this({
 			name: user.displayName?.substring(0, Math.min(15, user.displayName.length)) ?? "",
 			id: user.uid,

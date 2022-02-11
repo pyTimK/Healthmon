@@ -49,13 +49,12 @@ const PatientsSettingsBlock: React.FC<PatientsSettingsBlockProps> = ({ user }) =
 	return (
 		<SettingsBlock hint='Patients' hasOptionButton onOptionButtonClick={addPatient} optionButtonName='Add'>
 			{patients.map((patient, _i) => (
-				<SettingsRow key={_i} title={patient.name} subtitle={patient.number}>
+				<SettingsRow key={_i} photoURL={patient.photoURL} title={patient.name} subtitle={patient.number}>
 					<button className='transparent-button' onClick={() => confirmUnPairPatient(patient)}>
 						Unpair
 					</button>
 				</SettingsRow>
 			))}
-			{/* <SettingsRow title={user.name} subtitle={user.number} /> */}
 			<PatientSearchModal />
 			<ConfirmModal
 				title='Confirm Unpair'

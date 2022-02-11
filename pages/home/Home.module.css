@@ -48,26 +48,11 @@
   text-align: left;
 }
 
-.recordHeading {
-  margin: 60px 0 20px;
+.recordsWrapper {
   width: 100%;
-  display: flex;
-  text-align: center;
-  justify-content: flex-start;
 }
 
-.descriptionWrapper {
-  display: flex;
-  margin-left: 10px;
-}
 
-.description {
-  margin: auto 0;
-  font-size: 1.5rem;
-  line-height: 1;
-  color: gray;
-
-}
 
 .code {
   background: var(--background-light);

@@ -9,7 +9,7 @@ import styles from "./DropdownPicker.module.css";
 
 interface DropdownPickerProps {
 	userConfig: UserConfig;
-	month: number;
+	month: number; //1 indexed
 	year: number;
 }
 

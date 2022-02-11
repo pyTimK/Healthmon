@@ -1,11 +1,12 @@
-import NotifItem from "./NotifItem";
-import styles from "./NotifBlock.module.css";
 import { SettingsHorizontal } from "akar-icons";
-import { useRouter } from "next/router";
-import { isRecordCommentNotif, MonitorRequestNotif, RecordCommentNotif } from "../../types/Notification";
-import MyUser from "../../classes/MyUser";
 import clsx from "clsx";
+import { useRouter } from "next/router";
+import MyUser from "../../classes/MyUser";
+import { MonitorRequestNotif, RecordCommentNotif } from "../../types/Notification";
 import Divider from "../Divider";
+import Sizedbox from "../Sizedbox";
+import styles from "./NotifBlock.module.css";
+import NotifItem from "./NotifItem";
 
 interface NotifBlockProps {
 	notifs: (MonitorRequestNotif | RecordCommentNotif)[];
@@ -32,7 +33,11 @@ const NotifBlock: React.FC<NotifBlockProps> = ({ notifs, user }) => {
 				</div>
 			)}
 			{notifs.map((notif, _i) => (
-				<NotifItem key={_i} notif={notif} user={user} />
+				<div>
+					<Divider />
+					<NotifItem key={_i} notif={notif} user={user} />
+					<Sizedbox height={10} />
+				</div>
 			))}
 		</div>
 	);

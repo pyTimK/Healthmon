@@ -12,7 +12,7 @@ export class UserConfig implements UserConfigProps {
 	constructor(public id: string, public role: Role, public date: string) {}
 
 	static constructEmpty() {
-		return new this("", Role.Patient, "1999-11-02");
+		return new this("", Role.Patient, "2022-02-08");
 	}
 
 	getProps = () => {

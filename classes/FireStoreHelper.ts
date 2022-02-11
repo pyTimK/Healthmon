@@ -105,9 +105,10 @@ export abstract class FireStoreHelper {
 	};
 
 	//! RECORD----------------------
-	static recordDataListener = (id: string, setRecords: Dispatch<SetStateAction<RecordData[]>>) => {
-		const dateDoc = getYYYYMMDD(new Date());
-		const q = query(collection(db, "records", dateDoc, id));
+	static recordDataListener = (id: string, dateStr: string, setRecords: Dispatch<SetStateAction<RecordData[]>>) => {
+		if (id === "" || dateStr === "") return;
+
+		const q = query(collection(db, "records", dateStr, id));
 
 		const unsubscribe = onSnapshot(q, (querySnapshot) => {
 			console.log("record snap");
@@ -251,7 +252,7 @@ export abstract class FireStoreHelper {
 
 	//! USERCONFIG ----------------------
 	static createUserConfig = async (id: string) => {
-		await setDoc(doc(db, "config", id), { id: id, role: Role.Patient, date: "1999-11-02" } as UserConfigProps);
+		await setDoc(doc(db, "config", id), { id: id, role: Role.Patient, date: "2022-02-06" } as UserConfigProps);
 	};
 	static updateUserConfig = async (userConfig: UserConfig) => {
 		await updateDoc(doc(db, "config", userConfig.id), userConfig.getProps());
@@ -259,6 +260,7 @@ export abstract class FireStoreHelper {
 
 	static userConfigListener = (id: string, setUserConfig: Dispatch<SetStateAction<UserConfig>>) => {
 		const unsubscribe = onSnapshot(doc(db, "config", id), (configDoc) => {
+			console.log("userConfig snap");
 			const configDocData = configDoc.data() as UserConfig;
 			setUserConfig(UserConfig.fromFirebaseUserConfig(configDocData));
 		});

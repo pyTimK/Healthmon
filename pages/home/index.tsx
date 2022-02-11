@@ -10,8 +10,10 @@ import useNotif from "../../components/notif/useNotif";
 import RecordsBlock from "../../components/record/RecordsBlock";
 import Sizedbox from "../../components/Sizedbox";
 import dayGreetings from "../../function/dayGreetings";
+import usePatients from "../../hooks/usePatients";
 import useUser from "../../hooks/useUser";
 import useUserConfig from "../../hooks/useUserConfig";
+import { UserConfig } from "../../types/userConfig";
 import styles from "./Home.module.css";
 
 const Home: NextPage = () => {
@@ -29,13 +31,14 @@ const Home: NextPage = () => {
 							{dayGreetings()} {user?.name}
 						</h1>
 					</div>
+					<Sizedbox height={30} />
 					<MyDatePicker userConfig={userConfig} />
 					<Sizedbox height={100} />
 
 					{userConfig.role === Role.Patient ? (
-						<PatientRecordBlock user={user} />
+						<PatientRecordBlock user={user} userConfig={userConfig} />
 					) : (
-						<HealthWorkerRecordBlock user={user} />
+						<HealthWorkerRecordBlock user={user} userConfig={userConfig} />
 					)}
 				</main>
 			</Layout>
@@ -45,33 +48,27 @@ const Home: NextPage = () => {
 
 interface PatientRecordBlockProps {
 	user: MyUser;
+	userConfig: UserConfig;
 }
 
-const PatientRecordBlock: React.FC<PatientRecordBlockProps> = ({ user }) => <RecordsBlock user={user} />;
+const PatientRecordBlock: React.FC<PatientRecordBlockProps> = ({ user, userConfig }) => {
+	return <RecordsBlock headerHidden patient={user.toPatient()} userConfig={userConfig} />;
+};
 
 interface HealthWorkerRecordBlockProps {
 	user: MyUser;
+	userConfig: UserConfig;
 }
 
-const HealthWorkerRecordBlock: React.FC<HealthWorkerRecordBlockProps> = ({ user }) => (
+const HealthWorkerRecordBlock: React.FC<HealthWorkerRecordBlockProps> = ({ user, userConfig }) => {
 	//TODO show patient records on health workers page
-	<div>
-		<RecordHeading user={user} />
-		<RecordsBlock user={user} />
-	</div>
-);
+	const { patients } = usePatients(user);
 
-interface RecordHeadingProps {
-	user: MyUser;
-}
-
-const RecordHeading: React.FC<RecordHeadingProps> = ({ user }) => {
 	return (
-		<div className={styles.recordHeading}>
-			<Avatar />
-			<div className={styles.descriptionWrapper}>
-				<p className={styles.description}>Krisha is feeling good today</p>
-			</div>
+		<div className={styles.recordsWrapper}>
+			{patients.map((patient, i) => (
+				<RecordsBlock key={i} patient={patient} userConfig={userConfig} />
+			))}
 		</div>
 	);
 };
