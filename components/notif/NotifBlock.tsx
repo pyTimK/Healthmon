@@ -1,7 +1,7 @@
 import { SettingsHorizontal } from "akar-icons";
 import clsx from "clsx";
 import { useRouter } from "next/router";
-import MyUser from "../../classes/MyUser";
+import { Dispatch, SetStateAction } from "react";
 import { MonitorRequestNotif, RecordCommentNotif } from "../../types/Notification";
 import Divider from "../Divider";
 import Sizedbox from "../Sizedbox";
@@ -10,10 +10,10 @@ import NotifItem from "./NotifItem";
 
 interface NotifBlockProps {
 	notifs: (MonitorRequestNotif | RecordCommentNotif)[];
-	user: MyUser;
+	setIsNotifOpen: Dispatch<SetStateAction<boolean>>;
 }
 
-const NotifBlock: React.FC<NotifBlockProps> = ({ notifs, user }) => {
+const NotifBlock: React.FC<NotifBlockProps> = ({ notifs, setIsNotifOpen }) => {
 	const router = useRouter();
 	const goToSettings = () => router.push("/settings");
 
@@ -35,7 +35,7 @@ const NotifBlock: React.FC<NotifBlockProps> = ({ notifs, user }) => {
 			{notifs.map((notif, _i) => (
 				<div key={_i}>
 					<Divider />
-					<NotifItem notif={notif} user={user} />
+					<NotifItem notif={notif} setIsNotifOpen={setIsNotifOpen} />
 					<Sizedbox height={10} />
 				</div>
 			))}

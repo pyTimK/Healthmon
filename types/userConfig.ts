@@ -33,10 +33,19 @@ export class UserConfig implements UserConfigProps {
 		await FireStoreHelper.updateUserConfig(this);
 	}
 
-	async updateDate(newDate: Date) {
-		const newDateStr = getYYYYMMDD(newDate);
+	async updateDate(newDate: Date): Promise<void>;
+	async updateDate(newDate: string): Promise<void>;
+	async updateDate(newDate: Date | string) {
+		const newDateStr = typeof newDate === "string" ? newDate : getYYYYMMDD(newDate);
 		if (this.date === newDateStr) return;
 		this.date = newDateStr;
 		await FireStoreHelper.updateUserConfig(this);
 	}
+
+	// async updateDate(newDate: string) {
+	// 	const newDateStr = getYYYYMMDD(newDate);
+	// 	if (this.date === newDateStr) return;
+	// 	this.date = newDateStr;
+	// 	await FireStoreHelper.updateUserConfig(this);
+	// }
 }

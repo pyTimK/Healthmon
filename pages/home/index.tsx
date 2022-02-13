@@ -1,6 +1,6 @@
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import { ToastContainer } from "react-toastify";
 import { PageDescriptions } from "../../classes/Constants";
 import MyUser, { Role } from "../../classes/MyUser";
@@ -11,14 +11,19 @@ import useNotif from "../../components/notif/useNotif";
 import RecordsBlock from "../../components/record/RecordsBlock";
 import Sizedbox from "../../components/Sizedbox";
 import dayGreetings from "../../function/dayGreetings";
+import groupCommentsBasedOnPatient from "../../function/groupCommentsBasedOnPatient";
 import usePatients from "../../hooks/usePatients";
 import useUser from "../../hooks/useUser";
+import useUserComments from "../../hooks/useUserComments";
 import useUserConfig from "../../hooks/useUserConfig";
+import UserComment from "../../types/RecordComment";
 import { UserConfig } from "../../types/userConfig";
 import styles from "./Home.module.css";
 
-export const UserContext = React.createContext<MyUser>(new MyUser());
-const UserProvider = UserContext.Provider;
+export const HomeContext = React.createContext({
+	user: new MyUser(),
+	userConfig: UserConfig.constructEmpty(),
+});
 
 const Home: NextPage = () => {
 	const { user } = useUser();
@@ -27,8 +32,8 @@ const Home: NextPage = () => {
 	if (user.id === "") return <div></div>;
 
 	return (
-		<UserProvider value={user}>
-			<Layout title='HealthMon' description={PageDescriptions.HOME} header={<Header user={user} />}>
+		<HomeContext.Provider value={{ user, userConfig }}>
+			<Layout title='HealthMon' description={PageDescriptions.HOME} header={<Header />}>
 				<main className={styles.main}>
 					<div className={styles.title}>
 						<h1>
@@ -36,53 +41,53 @@ const Home: NextPage = () => {
 						</h1>
 					</div>
 					<Sizedbox height={30} />
-					<MyDatePicker userConfig={userConfig} />
+					<MyDatePicker />
 					<Sizedbox height={100} />
 
-					{userConfig.role === Role.Patient ? (
-						<PatientRecordBlock user={user} userConfig={userConfig} />
-					) : (
-						<HealthWorkerRecordBlock user={user} userConfig={userConfig} />
-					)}
+					{userConfig.role === Role.Patient ? <PatientRecordBlock /> : <HealthWorkerRecordBlocks />}
+					<Sizedbox height={100} />
 				</main>
 			</Layout>
-		</UserProvider>
+		</HomeContext.Provider>
 	);
 };
 
-interface PatientRecordBlockProps {
-	user: MyUser;
-	userConfig: UserConfig;
-}
+interface PatientRecordBlockProps {}
 
-const PatientRecordBlock: React.FC<PatientRecordBlockProps> = ({ user, userConfig }) => {
-	return <RecordsBlock headerHidden patient={user.toPatient()} userConfig={userConfig} />;
+const PatientRecordBlock: React.FC<PatientRecordBlockProps> = () => {
+	const { user } = useContext(HomeContext);
+	return <RecordsBlock headerHidden patient={user.toPatient()} />;
 };
 
-interface HealthWorkerRecordBlockProps {
-	user: MyUser;
-	userConfig: UserConfig;
-}
+export const HealthWorkerRecodBlocksContext = React.createContext({
+	groupedCommentsBasedOnPatient: {} as {
+		[key: string]: UserComment[];
+	},
+});
 
-const HealthWorkerRecordBlock: React.FC<HealthWorkerRecordBlockProps> = ({ user, userConfig }) => {
-	//TODO show patient records on health workers page
+interface HealthWorkerRecordBlocksProps {}
+
+const HealthWorkerRecordBlocks: React.FC<HealthWorkerRecordBlocksProps> = () => {
+	const { user } = useContext(HomeContext);
 	const { patients } = usePatients(user);
+	const { userComments } = useUserComments(user);
+	const groupedCommentsBasedOnPatient = groupCommentsBasedOnPatient(userComments);
 
 	return (
-		<div className={styles.recordsWrapper}>
-			{patients.map((patient, i) => (
-				<RecordsBlock key={i} patient={patient} userConfig={userConfig} />
-			))}
-		</div>
+		<HealthWorkerRecodBlocksContext.Provider value={{ groupedCommentsBasedOnPatient }}>
+			<div className={styles.recordsWrapper}>
+				{patients.map((patient, i) => (
+					<RecordsBlock key={i} patient={patient} />
+				))}
+			</div>
+		</HealthWorkerRecodBlocksContext.Provider>
 	);
 };
 
-interface HeaderProps {
-	user: MyUser;
-}
+interface HeaderProps {}
 
-const Header: React.FC<HeaderProps> = ({ user }) => {
-	const { Notif, NotifBell, Overlay, isNotifOpen } = useNotif(user);
+const Header: React.FC<HeaderProps> = () => {
+	const { user, Notif, NotifBell, Overlay, isNotifOpen } = useNotif();
 	const router = useRouter();
 	const goToAccounts = () => router.push("/account");
 	return (

@@ -1,24 +1,36 @@
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { FireStoreHelper } from "../../classes/FireStoreHelper";
-import { Patient } from "../../classes/MyUser";
-import ButtonStatus from "../../enums/ButtonStatus";
+import { Patient, Role } from "../../classes/MyUser";
+import alreadyCommented from "../../function/alreadyCommented";
 import { getYYYYMMDD } from "../../function/dateConversions";
 import { pulseStatus, spo2Status, tempStatus } from "../../function/healthRanges";
 import logError from "../../function/logError";
 import notify from "../../function/notify";
+import { HealthWorkerRecodBlocksContext, HomeContext } from "../../pages/home";
 import HealthStatus from "../../types/HealthStatus";
-import { UserConfig } from "../../types/userConfig";
+import UserComment from "../../types/RecordComment";
 import Record, { RecordData, RecordMetaData } from "./Record";
 import RecordHeader from "./RecordHeader";
 import styles from "./RecordsBlock.module.css";
 
-interface RecordsProps {
+export const RecordBlockContext = React.createContext({
+	userCommentsOnPatient: [] as UserComment[],
+});
+
+interface RecordsBlockProps {
 	patient: Patient;
-	userConfig: UserConfig;
 	headerHidden?: boolean;
 }
 
-const RecordsBlock: React.FC<RecordsProps> = ({ patient, userConfig, headerHidden = false }) => {
+const RecordsBlock: React.FC<RecordsBlockProps> = ({ patient, headerHidden = false }) => {
+	const { userConfig } = useContext(HomeContext);
+	let userCommentsOnPatient: UserComment[] = [];
+
+	if (userConfig.role === Role.HealthWorker) {
+		const { groupedCommentsBasedOnPatient } = useContext(HealthWorkerRecodBlocksContext);
+		userCommentsOnPatient = groupedCommentsBasedOnPatient[patient.id] ?? [];
+	}
+
 	const [selectedRecord, setSelectedRecord] = useState<number>(-1);
 	const [records, setRecords] = useState<RecordData[]>([]);
 	const [recordsMetaData, setRecordsMetaData] = useState<RecordMetaData[]>([]);
@@ -45,25 +57,26 @@ const RecordsBlock: React.FC<RecordsProps> = ({ patient, userConfig, headerHidde
 	}, [patient, userConfig]);
 
 	return (
-		<div className={styles.container}>
-			{!headerHidden && records.length > 0 && (
-				<RecordHeader patient={patient} allNormal={allNormal} isPresent={isPresent} />
-			)}
-			{records.length === recordsMetaData.length &&
-				records.map((record, i) => (
-					<Record
-						key={i}
-						timestamp={record.timestamp}
-						temp={record.temp}
-						pulse={record.pulse}
-						spo2={record.spo2}
-						index={i}
-						showCommentButtons={selectedRecord === i}
-						setSelectedRecord={setSelectedRecord}
-						recordMetaData={recordsMetaData[i]}
-					/>
-				))}
-		</div>
+		<RecordBlockContext.Provider value={{ userCommentsOnPatient }}>
+			<div className={styles.container}>
+				{!headerHidden && records.length > 0 && (
+					<RecordHeader patient={patient} allNormal={allNormal} isPresent={isPresent} />
+				)}
+				{records.length === recordsMetaData.length &&
+					records.map((record, i) => {
+						return (
+							<Record
+								key={i}
+								record={record}
+								index={i}
+								showCommentButtons={selectedRecord === i}
+								setSelectedRecord={setSelectedRecord}
+								recordMetaData={recordsMetaData[i]}
+							/>
+						);
+					})}
+			</div>
+		</RecordBlockContext.Provider>
 	);
 };
 

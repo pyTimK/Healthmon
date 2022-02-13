@@ -7,8 +7,8 @@ const sortNotifs = (monitorRequestNotifs: MonitorRequestNotif[], recordCommentNo
 		b
 	) {
 		return (
-			(a.timestamp as firebase.firestore.Timestamp).seconds -
-			(b.timestamp as firebase.firestore.Timestamp).seconds
+			(b.timestamp as firebase.firestore.Timestamp).seconds -
+			(a.timestamp as firebase.firestore.Timestamp).seconds
 		);
 	});
 

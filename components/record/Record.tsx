@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import firebase from "firebase/compat/app";
 import { serverTimestamp } from "firebase/firestore";
-import {
+import React, {
 	Dispatch,
 	FocusEventHandler,
 	ReactElement,
@@ -12,16 +12,20 @@ import {
 	useState,
 } from "react";
 import { FireStoreHelper } from "../../classes/FireStoreHelper";
+import { Role } from "../../classes/MyUser";
 import ButtonStatus from "../../enums/ButtonStatus";
-import { getHHMMSS } from "../../function/dateConversions";
+import alreadyCommented from "../../function/alreadyCommented";
+import { getTimeFromDate } from "../../function/dateConversions";
 import { pulseStatus, spo2Status, tempStatus } from "../../function/healthRanges";
 import logError from "../../function/logError";
 import notify from "../../function/notify";
-import { UserContext } from "../../pages/home";
+import useRecordComments from "../../hooks/useRecordComments";
+import { HomeContext } from "../../pages/home";
 import HealthStatus from "../../types/HealthStatus";
 import UserComment from "../../types/RecordComment";
 import CommentBlock from "./comment/CommentBlock";
 import styles from "./Record.module.css";
+import { RecordBlockContext } from "./RecordsBlock";
 
 export interface RecordData {
 	temp: number;
@@ -36,28 +40,22 @@ export interface RecordMetaData {
 	patientId: string;
 }
 
-export interface Props {
-	temp: number;
-	pulse: number;
-	spo2: number;
-	timestamp: firebase.firestore.Timestamp;
+export interface RecordProps {
+	record: RecordData;
 	index: number;
 	showCommentButtons: boolean;
 	setSelectedRecord: Dispatch<SetStateAction<number>>;
 	recordMetaData: RecordMetaData;
 }
 
-const Record: React.FC<Props> = ({
-	temp,
-	pulse,
-	spo2,
-	timestamp,
-	index,
-	showCommentButtons,
-	setSelectedRecord,
-	recordMetaData,
-}) => {
-	const user = useContext(UserContext);
+export const RecordContext = React.createContext({
+	editMode: false,
+	setEditMode: (() => {}) as Dispatch<React.SetStateAction<boolean>>,
+});
+
+const Record: React.FC<RecordProps> = ({ record, index, showCommentButtons, setSelectedRecord, recordMetaData }) => {
+	const { user } = useContext(HomeContext);
+
 	const commentInputRef = useRef<HTMLTextAreaElement>(null);
 	const [cancelButtonStatus, setCancelButtonStatus] = useState<ButtonStatus>(ButtonStatus.Hidden);
 	const [commentButtonStatus, setCommentButtonStatus] = useState<ButtonStatus>(ButtonStatus.Hidden);
@@ -72,7 +70,17 @@ const Record: React.FC<Props> = ({
 		};
 	}, [recordMetaData]);
 
+	const { recordComments } = useRecordComments(userComment);
+	const { userConfig } = useContext(HomeContext);
+	const { userCommentsOnPatient } = useContext(RecordBlockContext);
+	const _alreadyCommented = alreadyCommented(userCommentsOnPatient, userConfig.date, recordMetaData.recordTime);
+	const [editMode, setEditMode] = useState<boolean>(false);
+
+	const canComment = userConfig.role === Role.HealthWorker && (!_alreadyCommented || editMode);
+
 	const onCommentInputFocus: FocusEventHandler<HTMLTextAreaElement> = (e) => {
+		if (!canComment) return;
+
 		setSelectedRecord(index);
 		setCancelButtonStatus(ButtonStatus.Enabled);
 		setCommentButtonStatus(
@@ -83,13 +91,18 @@ const Record: React.FC<Props> = ({
 	};
 
 	const cancelEdit = () => {
+		if (!canComment) return;
+
+		setEditMode(false);
 		setCancelButtonStatus(ButtonStatus.Hidden);
 		setCommentButtonStatus(ButtonStatus.Hidden);
 		if (!commentInputRef.current) return;
 		commentInputRef.current.value = "";
 	};
 
-	const onCommentChange = () => {
+	const updateCommentButtonStatus = () => {
+		if (!canComment) return;
+
 		setCommentButtonStatus(
 			commentInputRef.current && commentInputRef.current.value.length > 0
 				? ButtonStatus.Enabled
@@ -98,40 +111,42 @@ const Record: React.FC<Props> = ({
 	};
 
 	const submitComment = async () => {
-		if (!commentInputRef.current) return;
+		if (!canComment || !commentInputRef.current) return;
 
 		const comment = commentInputRef.current.value;
 
 		try {
-			await FireStoreHelper.addComment(user, comment, userComment);
+			if (editMode) await FireStoreHelper.editComment(user, comment, userComment);
+			else await FireStoreHelper.addComment(user, comment, userComment);
+			setEditMode(false);
 		} catch (_e) {
 			logError(_e);
-			notify("Error adding comment");
+			notify(`Error ${editMode ? "editing" : "adding"} comment`);
 		}
 	};
 
 	return (
-		<div>
-			<div className={styles.container}>
-				<div className={styles.left}>{getHHMMSS(timestamp.toDate())}</div>
+		<RecordContext.Provider value={{ editMode, setEditMode }}>
+			<div className={styles.container} id={recordMetaData.recordTime}>
+				<div className={styles.left}>{getTimeFromDate(record.timestamp.toDate())}</div>
 				<div className={styles.right}>
-					<div className={styles.data}>
+					<div className={clsx(styles.data, !canComment && !recordComments.length && styles.dataRoundBorder)}>
 						<Data
-							measurement={temp.toFixed(1)}
+							measurement={record.temp.toFixed(1)}
 							units=' °C'
 							name='Temp'
 							imgName='thermometer'
-							status={tempStatus(temp)}
+							status={tempStatus(record.temp)}
 						/>
 						<Data
-							measurement={Math.floor(pulse).toString()}
+							measurement={Math.floor(record.pulse).toString()}
 							units='BPM'
 							name='PR'
 							imgName='heartbeat'
-							status={pulseStatus(pulse)}
+							status={pulseStatus(record.pulse)}
 						/>
 						<Data
-							measurement={Math.floor(spo2).toString()}
+							measurement={Math.floor(record.spo2).toString()}
 							units='%'
 							name={
 								<>
@@ -139,42 +154,67 @@ const Record: React.FC<Props> = ({
 								</>
 							}
 							imgName='blood'
-							status={spo2Status(spo2)}
+							status={spo2Status(record.spo2)}
 						/>
 					</div>
 					<CommentBlock
 						commentInputRef={commentInputRef}
 						onFocus={onCommentInputFocus}
-						onChange={onCommentChange}
-						userComment={userComment}
+						updateCommentButtonStatus={updateCommentButtonStatus}
+						canComment={canComment}
+						recordComments={recordComments}
 					/>
 				</div>
 			</div>
-			<div className={styles.commentButtonsWrapper}>
-				{showCommentButtons && (
-					<div className={styles.commentButtons}>
-						<button
-							disabled={cancelButtonStatus === ButtonStatus.Disabled}
-							className={clsx(
-								"transparent-button",
-								cancelButtonStatus === ButtonStatus.Hidden && "hidden"
-							)}
-							onClick={cancelEdit}>
-							Cancel
-						</button>
-						<button
-							onClick={submitComment}
-							disabled={commentButtonStatus === ButtonStatus.Disabled}
-							className={clsx("pink-button", commentButtonStatus === ButtonStatus.Hidden && "hidden")}>
-							Comment
-						</button>
-					</div>
-				)}
-			</div>
-		</div>
+			{canComment && (
+				<CommentButtons
+					showCommentButtons={showCommentButtons}
+					cancelButtonStatus={cancelButtonStatus}
+					commentButtonStatus={commentButtonStatus}
+					onCancel={cancelEdit}
+					onComment={submitComment}
+				/>
+			)}
+		</RecordContext.Provider>
 	);
 };
 
+interface CommentButtonsProps {
+	showCommentButtons: boolean;
+	cancelButtonStatus: ButtonStatus;
+	commentButtonStatus: ButtonStatus;
+	onCancel: () => void;
+	onComment: () => void;
+}
+
+const CommentButtons: React.FC<CommentButtonsProps> = ({
+	showCommentButtons,
+	cancelButtonStatus,
+	commentButtonStatus,
+	onCancel,
+	onComment,
+}) => {
+	return (
+		<div className={styles.commentButtonsWrapper}>
+			{showCommentButtons && (
+				<div className={styles.commentButtons}>
+					<button
+						disabled={cancelButtonStatus === ButtonStatus.Disabled}
+						className={clsx("transparent-button", cancelButtonStatus === ButtonStatus.Hidden && "hidden")}
+						onClick={onCancel}>
+						Cancel
+					</button>
+					<button
+						onClick={onComment}
+						disabled={commentButtonStatus === ButtonStatus.Disabled}
+						className={clsx("pink-button", commentButtonStatus === ButtonStatus.Hidden && "hidden")}>
+						Comment
+					</button>
+				</div>
+			)}
+		</div>
+	);
+};
 interface DataProps {
 	measurement: string;
 	imgName: string;

@@ -24,7 +24,7 @@
 
 .description {
     flex: 5;
-    padding-left: 10px;
+    padding: 0 10px;
     text-align: start;
     font-size: 1rem;
     font-weight: 300;
@@ -32,6 +32,11 @@
 
 .name {
     color: rgb(202, 155, 155);
+}
+
+.gray {
+    color: rgb(188, 188, 188);
+    font-size: 0.9rem;
 }
 
 
@@ -45,7 +50,6 @@
     margin: 0 20px 20px 0;
 }
 
-
 .notifButton {
     /* margin: 4px 22px; */
     font-size: 0.75rem;
@@ -57,6 +61,26 @@
     align-items: center;
 }
 
+.discardButton {
+    /* color: var(--pink);
+    background-color: transparent;
+    border: 1px solid var(--pink); */
+    color: whitesmoke;
+    background-color: transparent;
+    border: 1px solid gray;
+}
+
+.viewButton {
+    /* color: var(--pink);
+    background-color: transparent;
+    border: 1px solid var(--pink); */
+    color: whitesmoke;
+    background-color: var(--calm-blue);
+    border: none;
+}
+
+
+
 .declineButton {
     /* color: var(--pink);
     background-color: transparent;
@@ -64,7 +88,6 @@
     color: whitesmoke;
     background-color: var(--calm-red);
     border: none;
-
 }
 
 .acceptButton {

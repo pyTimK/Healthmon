@@ -1,4 +1,3 @@
-import { recordHeaderDescriptions } from "../../classes/Constants";
 import { Patient } from "../../classes/MyUser";
 import generateRecordDescrip from "../../function/generateRecordDescrip";
 import Avatar from "../Avatar";

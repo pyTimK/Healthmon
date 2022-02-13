@@ -18,7 +18,13 @@ import DeviceData from "../types/DeviceData";
 import { NotifSubject } from "../types/Notification";
 import { RecordMetaData } from "./../components/record/Record";
 import { MonitorRequestNotif, RecordCommentNotif } from "./../types/Notification";
-import UserComment, { date_time_healthWorkerId, date_time_patientId, RecordComment } from "./../types/RecordComment";
+import UserComment, {
+	date_time_healthWorkerId,
+	date_time_healthWorkerId_from_recordComment,
+	date_time_patientId,
+	date_time_patientId_from_recordComment,
+	RecordComment,
+} from "./../types/RecordComment";
 import { UserConfig, UserConfigProps } from "./../types/userConfig";
 import MyUser, {
 	BaseUser,
@@ -127,6 +133,7 @@ export abstract class FireStoreHelper {
 			});
 
 			gotRecords.reverse();
+			gotRecordsMetaData.reverse();
 			setRecords(() => gotRecords);
 			setRecordsMetaData(() => gotRecordsMetaData);
 		});
@@ -174,25 +181,48 @@ export abstract class FireStoreHelper {
 		);
 
 		//* Send comment notif to patient
-		const recordCommentNotif: RecordCommentNotif = {
-			sender: commenter.toHealthWorker(),
-			recordDate: userComment.recordDate,
-			recordTime: userComment.recordTime,
-			timestamp: serverTimestamp(),
-		};
-
-		await setDoc(
-			doc(
-				db,
-				"notifications",
-				userComment.patientId,
-				NotifSubject.RecordComment,
-				date_time_healthWorkerId(userComment, commenter.id)
-			),
-			recordCommentNotif
-		);
+		FireStoreHelper._sendRecordCommentNotif(commenter, userComment);
 
 		//TODO {not here} see two white unimplemented in recordcommentnotif
+	};
+
+	static editComment = async (commenter: MyUser, comment: string, userComment: UserComment) => {
+		if (commenter.id === "") return;
+
+		//* Update comment on record
+		await updateDoc(
+			doc(
+				db,
+				"records",
+				userComment.recordDate,
+				userComment.patientId,
+				userComment.recordTime,
+				"comments",
+				commenter.id
+			),
+			{ comment: comment }
+		);
+	};
+
+	static getUserComments = async (user: MyUser) => {
+		const userCommentsDoc = await getDoc(doc(db, "users", user.id, "comments", "comments"));
+		const userCommentsDocData = userCommentsDoc.data();
+		delete userCommentsDocData!.exists;
+		const formattedUserComments = userCommentsDocData as Formatted<UserComment>;
+		return toUnformatted(formattedUserComments);
+	};
+
+	static userCommentsListener = (user: MyUser, setRecords: Dispatch<SetStateAction<UserComment[]>>) => {
+		const unsubscribe = onSnapshot(doc(db, "users", user.id, "comments", "comments"), (userCommentsDoc) => {
+			console.log("userComments snap");
+			const userCommentsDocData = userCommentsDoc.data();
+			delete userCommentsDocData!.exists;
+			const formattedUserComments = userCommentsDocData as Formatted<UserComment>;
+			const userComments = toUnformatted(formattedUserComments);
+			setRecords(() => userComments);
+		});
+
+		return unsubscribe;
 	};
 
 	static commentsListener = (userComment: UserComment, setComments: Dispatch<SetStateAction<RecordComment[]>>) => {
@@ -210,11 +240,19 @@ export abstract class FireStoreHelper {
 				gotComments.push(recordComment);
 			});
 
-			gotComments.reverse();
+			// gotComments.reverse();
 			setComments(() => gotComments);
 		});
 
 		return unsubscribe;
+	};
+
+	private static _removeHasNotif = async (user: MyUser, notif: RecordCommentNotif) => {
+		const hasNotifField = <{ [key: string]: boolean }>{};
+		const hasNotifFieldKey = `${date_time_patientId_from_recordComment(notif, user.id)}.hasNotif`;
+		hasNotifField[hasNotifFieldKey] = false;
+
+		await updateDoc(doc(db, "users", notif.sender.id, "comments", "comments"), hasNotifField);
 	};
 
 	//! USER------------------------
@@ -249,15 +287,6 @@ export abstract class FireStoreHelper {
 
 	static getRequestedUsers = async (user: MyUser) =>
 		await FireStoreHelper._getAssociated<RequestedUser>(user, "requestedUsers");
-
-	static getComments = async (user: MyUser) => {
-		const commentsDoc = await getDoc(doc(db, "users", user.id, "comments", "comments"));
-		const commentsDocData = commentsDoc.data();
-		delete commentsDocData!.exists;
-		const formattedComments = commentsDocData as Formatted<UserComment>;
-		const comments = toUnformatted(formattedComments);
-		return comments;
-	};
 
 	private static _associateListener = <T extends BaseUser>(
 		user: MyUser,
@@ -295,7 +324,7 @@ export abstract class FireStoreHelper {
 		await FireStoreHelper._updatePersonalDetailsOnAssociatedMonitoring(user);
 		await FireStoreHelper._updatePersonalDetailsOnMonitorRequestNotif(user);
 
-		const comments = await FireStoreHelper.getComments(user);
+		const comments = await FireStoreHelper.getUserComments(user);
 		await FireStoreHelper._updatePersonalDetailsOnRecordCommentNotif(user, comments);
 		await FireStoreHelper._updatePersonalDetailsOnComments(user, comments);
 	};
@@ -350,7 +379,7 @@ export abstract class FireStoreHelper {
 		return unsubscribe;
 	};
 
-	//! NOTIF------------------------
+	//! NOTIF - MONITOR REQUEST -----------------------
 	private static _addMonitorRequestNotif = async (patient: Patient, healthWorker: HealthWorker) => {
 		await setDoc(doc(db, "notifications", patient.id, NotifSubject.MonitorRequest, healthWorker.id), {
 			timestamp: serverTimestamp(),
@@ -394,6 +423,54 @@ export abstract class FireStoreHelper {
 		return unsubscribe;
 	};
 
+	private static _updatePersonalDetailsOnMonitorRequestNotif = async (user: MyUser) => {
+		const requestedUsers = await FireStoreHelper.getRequestedUsers(user);
+
+		for (const reqUser of requestedUsers) {
+			await updateDoc(doc(db, "notifications", reqUser.id, NotifSubject.MonitorRequest, user.id), {
+				sender: user.toHealthWorker(),
+			});
+		}
+	};
+
+	//! NOTIF - RECORD COMMENT -----------------------
+	private static _sendRecordCommentNotif = async (commenter: MyUser, userComment: UserComment) => {
+		const recordCommentNotif: RecordCommentNotif = {
+			sender: commenter.toHealthWorker(),
+			recordDate: userComment.recordDate,
+			recordTime: userComment.recordTime,
+			timestamp: serverTimestamp(),
+		};
+
+		await setDoc(
+			doc(
+				db,
+				"notifications",
+				userComment.patientId,
+				NotifSubject.RecordComment,
+				date_time_healthWorkerId(userComment, commenter.id)
+			),
+			recordCommentNotif
+		);
+	};
+
+	private static _removeRecordCommentNotif = async (user: MyUser, notif: RecordCommentNotif) => {
+		await deleteDoc(
+			doc(
+				db,
+				"notifications",
+				user.id,
+				NotifSubject.RecordComment,
+				date_time_healthWorkerId_from_recordComment(notif)
+			)
+		);
+	};
+
+	static removeRecordCommentNotif = async (user: MyUser, notif: RecordCommentNotif) => {
+		await FireStoreHelper._removeRecordCommentNotif(user, notif);
+		await FireStoreHelper._removeHasNotif(user, notif);
+	};
+
 	static recordCommentNotifListener = (
 		id: string,
 		setRecordCommentNotifs: Dispatch<SetStateAction<RecordCommentNotif[]>>
@@ -414,16 +491,6 @@ export abstract class FireStoreHelper {
 		});
 
 		return unsubscribe;
-	};
-
-	private static _updatePersonalDetailsOnMonitorRequestNotif = async (user: MyUser) => {
-		const requestedUsers = await FireStoreHelper.getRequestedUsers(user);
-
-		for (const reqUser of requestedUsers) {
-			await updateDoc(doc(db, "notifications", reqUser.id, NotifSubject.MonitorRequest, user.id), {
-				sender: user.toHealthWorker(),
-			});
-		}
 	};
 
 	private static _updatePersonalDetailsOnRecordCommentNotif = async (user: MyUser, comments: UserComment[]) => {

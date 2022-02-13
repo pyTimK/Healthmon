@@ -1,57 +1,111 @@
-import { FocusEventHandler, RefObject, useEffect, useState } from "react";
-import { FireStoreHelper } from "../../../classes/FireStoreHelper";
-import logError from "../../../function/logError";
-import notify from "../../../function/notify";
-import UserComment, { RecordComment } from "../../../types/RecordComment";
+import { FocusEventHandler, RefObject, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { HomeContext } from "../../../pages/home";
+import { RecordComment } from "../../../types/RecordComment";
+import Divider from "../../Divider";
+import { RecordContext } from "../Record";
 import styles from "./CommentBlock.module.css";
 import MyComment from "./MyComment";
 
 interface CommentBlockProps {
 	commentInputRef: RefObject<HTMLTextAreaElement>;
 	onFocus: FocusEventHandler<HTMLTextAreaElement>;
-	onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
-	userComment: UserComment;
+	updateCommentButtonStatus: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+	canComment: boolean;
+	recordComments: RecordComment[];
 }
 
-const CommentBlock: React.FC<CommentBlockProps> = ({ commentInputRef, onFocus, onChange, userComment }) => {
-	const [comments, setComments] = useState<RecordComment[]>([]);
-	const handleOnChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-		e.target.style.height = "1px";
-		e.target.style.height = e.target.scrollHeight + "px";
-		onChange(e);
+const CommentBlock: React.FC<CommentBlockProps> = ({
+	commentInputRef,
+	onFocus,
+	updateCommentButtonStatus,
+	canComment,
+	recordComments,
+}) => {
+	const { user } = useContext(HomeContext);
+	const { editMode, setEditMode } = useContext(RecordContext);
+	const textAreaDefaultValue = useRef<string>("");
+
+	const updateHeight = useCallback(() => {
+		const textArea = commentInputRef.current;
+		if (!textArea) return;
+
+		textArea.style.height = "1px";
+		textArea.style.height = `${textArea.scrollHeight}px`;
+	}, []);
+
+	const handleOnChangeCommentInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+		updateHeight();
+		updateCommentButtonStatus(e);
 	};
 
-	const commentsListener = () => {
-		try {
-			const unsub = FireStoreHelper.commentsListener(userComment, setComments);
-			if (unsub) return () => unsub();
-		} catch (_e) {
-			logError(_e);
-			notify("Could not get comments online");
-		}
+	const onEdit = (comment: RecordComment) => {
+		textAreaDefaultValue.current = comment.comment;
+		setEditMode(true);
 	};
-
-	useEffect(() => {
-		return commentsListener();
-	}, [userComment]);
 
 	return (
 		<div className={styles.container}>
-			{/* <Avatar photoURL={user.photoURL} letter={user.name} /> */}
 			<div className={styles.comments}>
-				{comments.map((comment, i) => (
-					<MyComment key={i} comment={comment} />
+				{recordComments.map((comment, i) => (
+					<div key={i}>
+						{i !== 0 && <Divider margin={15} opacity={0.2} />}
+						<MyComment comment={comment} canEdit={user.id === comment.sender.id} onEdit={onEdit} />
+					</div>
 				))}
 			</div>
-			<textarea
-				rows={1}
-				className={styles.textarea}
-				ref={commentInputRef}
-				placeholder='Add comment...'
-				onChange={handleOnChange}
-				onFocus={onFocus}
-			/>
+			{(canComment || editMode) && (
+				<CommentTextArea
+					defaultValue={textAreaDefaultValue.current}
+					commentInputRef={commentInputRef}
+					onChange={handleOnChangeCommentInput}
+					onFocus={onFocus}
+					updateHeight={updateHeight}
+				/>
+			)}
 		</div>
+	);
+};
+
+interface CommentTextAreaProps {
+	defaultValue: string;
+	commentInputRef: RefObject<HTMLTextAreaElement>;
+	onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+	onFocus: FocusEventHandler<HTMLTextAreaElement>;
+	updateHeight: () => void;
+}
+
+const CommentTextArea: React.FC<CommentTextAreaProps> = ({
+	defaultValue,
+	commentInputRef,
+	onChange,
+	onFocus,
+	updateHeight,
+}) => {
+	const { editMode } = useContext(RecordContext);
+	const focusOnEnd = useCallback(() => {
+		if (!commentInputRef.current) return;
+		commentInputRef.current.focus();
+		commentInputRef.current.value = "";
+		commentInputRef.current.value = defaultValue;
+	}, [commentInputRef, defaultValue]);
+
+	useEffect(() => {
+		if (editMode) {
+			focusOnEnd();
+			updateHeight();
+		}
+	}, [editMode, focusOnEnd]);
+
+	return (
+		<textarea
+			rows={1}
+			defaultValue={defaultValue}
+			className={styles.textarea}
+			ref={commentInputRef}
+			placeholder='Add comment...'
+			onChange={onChange}
+			onFocus={onFocus}
+		/>
 	);
 };
 

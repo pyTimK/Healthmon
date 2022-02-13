@@ -1,8 +1,9 @@
 import { Bell } from "akar-icons";
-import { MouseEventHandler, useEffect, useMemo, useState } from "react";
+import { MouseEventHandler, useContext, useEffect, useMemo, useState } from "react";
 import { FireStoreHelper } from "../../classes/FireStoreHelper";
-import MyUser, { Formatted, HealthWorker } from "../../classes/MyUser";
+import { Formatted, HealthWorker } from "../../classes/MyUser";
 import sortNotifs from "../../function/sortNotifs";
+import { HomeContext } from "../../pages/home";
 import { MonitorRequestNotif, RecordCommentNotif } from "../../types/Notification";
 import NotifBlock from "./NotifBlock";
 import styles from "./useNotif.module.css";
@@ -10,7 +11,8 @@ import styles from "./useNotif.module.css";
 const inSenders = (senders: Formatted<HealthWorker>, newSenderId: string) =>
 	Object.prototype.hasOwnProperty.call(senders, newSenderId);
 
-const useNotif = (user: MyUser) => {
+const useNotif = () => {
+	const { user } = useContext(HomeContext);
 	const [isNotifOpen, setIsNotifOpen] = useState(false);
 	const [monitorRequestNotifs, setMonitorRequestNotifs] = useState<MonitorRequestNotif[]>([]);
 	const [recordCommentNotifs, setRecordCommentNotifs] = useState<RecordCommentNotif[]>([]);
@@ -46,13 +48,13 @@ const useNotif = (user: MyUser) => {
 
 	const Notif: React.FC = () => (
 		<div className={styles.notifDropdown}>
-			<NotifBlock notifs={notifsList} user={user} />
+			<NotifBlock notifs={notifsList} setIsNotifOpen={setIsNotifOpen} />
 		</div>
 	);
 
 	const Overlay: React.FC = () => <div className={styles.overlay} onClick={toggleNotif} />;
 
-	return { isNotifOpen, NotifBell, Notif, Overlay };
+	return { user, isNotifOpen, NotifBell, Notif, Overlay };
 };
 
 export default useNotif;
