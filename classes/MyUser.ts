@@ -18,6 +18,14 @@ export interface RequestedUser extends BaseUser {}
 export interface Patient extends BaseUser {}
 export interface HealthWorker extends BaseUser {}
 
+export const constructEmptyBaseUser = <T extends BaseUser>(): T =>
+	({
+		name: "",
+		id: '", "',
+		number: "",
+		photoURL: "",
+	} as T);
+
 export interface Formatted<T> {
 	[key: string]: T;
 }

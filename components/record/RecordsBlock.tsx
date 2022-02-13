@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { FireStoreHelper } from "../../classes/FireStoreHelper";
-import { Patient, Role } from "../../classes/MyUser";
-import alreadyCommented from "../../function/alreadyCommented";
+import { constructEmptyBaseUser, Patient, Role } from "../../classes/MyUser";
 import { getYYYYMMDD } from "../../function/dateConversions";
 import { pulseStatus, spo2Status, tempStatus } from "../../function/healthRanges";
 import logError from "../../function/logError";
@@ -15,6 +14,7 @@ import styles from "./RecordsBlock.module.css";
 
 export const RecordBlockContext = React.createContext({
 	userCommentsOnPatient: [] as UserComment[],
+	patient: constructEmptyBaseUser<Patient>(),
 });
 
 interface RecordsBlockProps {
@@ -57,7 +57,7 @@ const RecordsBlock: React.FC<RecordsBlockProps> = ({ patient, headerHidden = fal
 	}, [patient, userConfig]);
 
 	return (
-		<RecordBlockContext.Provider value={{ userCommentsOnPatient }}>
+		<RecordBlockContext.Provider value={{ userCommentsOnPatient, patient }}>
 			<div className={styles.container}>
 				{!headerHidden && records.length > 0 && (
 					<RecordHeader patient={patient} allNormal={allNormal} isPresent={isPresent} />

@@ -20,9 +20,9 @@ import { RecordMetaData } from "./../components/record/Record";
 import { MonitorRequestNotif, RecordCommentNotif } from "./../types/Notification";
 import UserComment, {
 	date_time_healthWorkerId,
-	date_time_healthWorkerId_from_recordComment,
+	date_time_healthWorkerId_from_recordCommentNotif,
 	date_time_patientId,
-	date_time_patientId_from_recordComment,
+	date_time_patientId_from_recordCommentNotif,
 	RecordComment,
 } from "./../types/RecordComment";
 import { UserConfig, UserConfigProps } from "./../types/userConfig";
@@ -151,16 +151,7 @@ export abstract class FireStoreHelper {
 		}
 	};
 
-	static addComment = async (commenter: MyUser, comment: string, userComment: UserComment) => {
-		if (commenter.id === "") return;
-
-		//* Update list of comments by the user
-		const newUserCommentField = <{ [key: string]: UserComment }>{};
-		newUserCommentField[date_time_patientId(userComment)] = userComment;
-
-		await updateDoc(doc(db, "users", commenter.id, "comments", "comments"), newUserCommentField);
-
-		//* Add comment on record
+	private static _addCommentToRecord = async (commenter: MyUser, comment: string, recordMetaData: RecordMetaData) => {
 		const newComment: RecordComment = {
 			comment: comment,
 			sender: commenter.toHealthWorker(),
@@ -171,22 +162,39 @@ export abstract class FireStoreHelper {
 			doc(
 				db,
 				"records",
-				userComment.recordDate,
-				userComment.patientId,
-				userComment.recordTime,
+				recordMetaData.recordDate,
+				recordMetaData.patientId,
+				recordMetaData.recordTime,
 				"comments",
 				commenter.id
 			),
 			newComment
 		);
-
-		//* Send comment notif to patient
-		FireStoreHelper._sendRecordCommentNotif(commenter, userComment);
-
-		//TODO {not here} see two white unimplemented in recordcommentnotif
 	};
 
-	static editComment = async (commenter: MyUser, comment: string, userComment: UserComment) => {
+	private static _addUserComment = async (commenter: MyUser, recordMetaData: RecordMetaData) => {
+		//* Update list of comments by the user
+		const newUserCommentField = <{ [key: string]: UserComment }>{};
+		newUserCommentField[date_time_patientId(recordMetaData)] = {
+			recordDate: recordMetaData.recordDate,
+			recordTime: recordMetaData.recordTime,
+			patientId: recordMetaData.patientId,
+			hasNotif: true,
+			timestamp: serverTimestamp(),
+		};
+
+		await updateDoc(doc(db, "users", commenter.id, "comments", "comments"), newUserCommentField);
+	};
+
+	static addComment = async (commenter: MyUser, comment: string, recordMetaData: RecordMetaData) => {
+		if (commenter.id === "") return;
+
+		FireStoreHelper._addUserComment(commenter, recordMetaData);
+		FireStoreHelper._addCommentToRecord(commenter, comment, recordMetaData);
+		FireStoreHelper._sendRecordCommentNotif(commenter, recordMetaData);
+	};
+
+	static editComment = async (commenter: MyUser, comment: string, recordMetaData: RecordMetaData) => {
 		if (commenter.id === "") return;
 
 		//* Update comment on record
@@ -194,9 +202,9 @@ export abstract class FireStoreHelper {
 			doc(
 				db,
 				"records",
-				userComment.recordDate,
-				userComment.patientId,
-				userComment.recordTime,
+				recordMetaData.recordDate,
+				recordMetaData.patientId,
+				recordMetaData.recordTime,
 				"comments",
 				commenter.id
 			),
@@ -225,10 +233,20 @@ export abstract class FireStoreHelper {
 		return unsubscribe;
 	};
 
-	static commentsListener = (userComment: UserComment, setComments: Dispatch<SetStateAction<RecordComment[]>>) => {
-		if (userComment.patientId === "") return;
+	static commentsListener = (
+		recordMetaData: RecordMetaData,
+		setComments: Dispatch<SetStateAction<RecordComment[]>>
+	) => {
+		if (recordMetaData.patientId === "") return;
 		const q = query(
-			collection(db, "records", userComment.recordDate, userComment.patientId, userComment.recordTime, "comments")
+			collection(
+				db,
+				"records",
+				recordMetaData.recordDate,
+				recordMetaData.patientId,
+				recordMetaData.recordTime,
+				"comments"
+			)
 		);
 
 		const unsubscribe = onSnapshot(q, (querySnapshot) => {
@@ -249,7 +267,7 @@ export abstract class FireStoreHelper {
 
 	private static _removeHasNotif = async (user: MyUser, notif: RecordCommentNotif) => {
 		const hasNotifField = <{ [key: string]: boolean }>{};
-		const hasNotifFieldKey = `${date_time_patientId_from_recordComment(notif, user.id)}.hasNotif`;
+		const hasNotifFieldKey = `${date_time_patientId_from_recordCommentNotif(notif, user.id)}.hasNotif`;
 		hasNotifField[hasNotifFieldKey] = false;
 
 		await updateDoc(doc(db, "users", notif.sender.id, "comments", "comments"), hasNotifField);
@@ -434,11 +452,11 @@ export abstract class FireStoreHelper {
 	};
 
 	//! NOTIF - RECORD COMMENT -----------------------
-	private static _sendRecordCommentNotif = async (commenter: MyUser, userComment: UserComment) => {
+	private static _sendRecordCommentNotif = async (commenter: MyUser, recordMetaData: RecordMetaData) => {
 		const recordCommentNotif: RecordCommentNotif = {
 			sender: commenter.toHealthWorker(),
-			recordDate: userComment.recordDate,
-			recordTime: userComment.recordTime,
+			recordDate: recordMetaData.recordDate,
+			recordTime: recordMetaData.recordTime,
 			timestamp: serverTimestamp(),
 		};
 
@@ -446,9 +464,9 @@ export abstract class FireStoreHelper {
 			doc(
 				db,
 				"notifications",
-				userComment.patientId,
+				recordMetaData.patientId,
 				NotifSubject.RecordComment,
-				date_time_healthWorkerId(userComment, commenter.id)
+				date_time_healthWorkerId(recordMetaData, commenter.id)
 			),
 			recordCommentNotif
 		);
@@ -461,7 +479,7 @@ export abstract class FireStoreHelper {
 				"notifications",
 				user.id,
 				NotifSubject.RecordComment,
-				date_time_healthWorkerId_from_recordComment(notif)
+				date_time_healthWorkerId_from_recordCommentNotif(notif)
 			)
 		);
 	};

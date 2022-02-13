@@ -14,7 +14,6 @@ import React, {
 import { FireStoreHelper } from "../../classes/FireStoreHelper";
 import { Role } from "../../classes/MyUser";
 import ButtonStatus from "../../enums/ButtonStatus";
-import alreadyCommented from "../../function/alreadyCommented";
 import { getTimeFromDate } from "../../function/dateConversions";
 import { pulseStatus, spo2Status, tempStatus } from "../../function/healthRanges";
 import logError from "../../function/logError";
@@ -51,6 +50,7 @@ export interface RecordProps {
 export const RecordContext = React.createContext({
 	editMode: false,
 	setEditMode: (() => {}) as Dispatch<React.SetStateAction<boolean>>,
+	userComment: undefined as UserComment | undefined,
 });
 
 const Record: React.FC<RecordProps> = ({ record, index, showCommentButtons, setSelectedRecord, recordMetaData }) => {
@@ -60,23 +60,20 @@ const Record: React.FC<RecordProps> = ({ record, index, showCommentButtons, setS
 	const [cancelButtonStatus, setCancelButtonStatus] = useState<ButtonStatus>(ButtonStatus.Hidden);
 	const [commentButtonStatus, setCommentButtonStatus] = useState<ButtonStatus>(ButtonStatus.Hidden);
 
-	const userComment: UserComment = useMemo(() => {
-		return {
-			recordDate: recordMetaData.recordDate,
-			recordTime: recordMetaData.recordTime,
-			patientId: recordMetaData.patientId,
-			hasNotif: true,
-			timestamp: serverTimestamp(),
-		};
-	}, [recordMetaData]);
-
-	const { recordComments } = useRecordComments(userComment);
-	const { userConfig } = useContext(HomeContext);
 	const { userCommentsOnPatient } = useContext(RecordBlockContext);
-	const _alreadyCommented = alreadyCommented(userCommentsOnPatient, userConfig.date, recordMetaData.recordTime);
+
+	const userComment = userCommentsOnPatient.find(
+		(_userComment) =>
+			_userComment.recordTime === recordMetaData.recordTime &&
+			_userComment.recordDate === recordMetaData.recordDate
+	);
+
+	const { recordComments } = useRecordComments(recordMetaData);
+	const { userConfig } = useContext(HomeContext);
+
 	const [editMode, setEditMode] = useState<boolean>(false);
 
-	const canComment = userConfig.role === Role.HealthWorker && (!_alreadyCommented || editMode);
+	const canComment = userConfig.role === Role.HealthWorker && (!userComment || editMode);
 
 	const onCommentInputFocus: FocusEventHandler<HTMLTextAreaElement> = (e) => {
 		if (!canComment) return;
@@ -116,8 +113,8 @@ const Record: React.FC<RecordProps> = ({ record, index, showCommentButtons, setS
 		const comment = commentInputRef.current.value;
 
 		try {
-			if (editMode) await FireStoreHelper.editComment(user, comment, userComment);
-			else await FireStoreHelper.addComment(user, comment, userComment);
+			if (editMode) await FireStoreHelper.editComment(user, comment, recordMetaData);
+			else await FireStoreHelper.addComment(user, comment, recordMetaData);
 			setEditMode(false);
 		} catch (_e) {
 			logError(_e);
@@ -126,7 +123,7 @@ const Record: React.FC<RecordProps> = ({ record, index, showCommentButtons, setS
 	};
 
 	return (
-		<RecordContext.Provider value={{ editMode, setEditMode }}>
+		<RecordContext.Provider value={{ editMode, setEditMode, userComment }}>
 			<div className={styles.container} id={recordMetaData.recordTime}>
 				<div className={styles.left}>{getTimeFromDate(record.timestamp.toDate())}</div>
 				<div className={styles.right}>

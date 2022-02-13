@@ -1,3 +1,5 @@
+import firebase from "firebase/compat/app";
+
 export const getYYYYMMDD = (date: Date) => {
 	const offset = date.getTimezoneOffset();
 	date = new Date(date.getTime() - offset * 60 * 1000);
@@ -62,4 +64,27 @@ export const getTimeFromHHMMSS = (time: string) => {
 	hour %= 12;
 	if (hour === 0) hour = 12;
 	return `${hour}:${min} ${isMorning ? "AM" : "PM"}`;
+};
+
+export const getCommentAge = (timestamp: firebase.firestore.Timestamp | null) => {
+	//TODO ADD PER WEEK / PER MONTH / PER YEAR
+	if (!timestamp) return;
+	const commentBirth = timestamp.toDate();
+
+	const now = new Date();
+	let commentAge_ms = Math.abs(now.getTime() - commentBirth.getTime());
+
+	const days = Math.floor(commentAge_ms / 1000 / 60 / 60 / 24);
+	commentAge_ms -= days * 1000 * 60 * 60 * 24;
+	const hours = Math.floor(commentAge_ms / 1000 / 60 / 60);
+	commentAge_ms -= hours * 1000 * 60 * 60;
+	const minutes = Math.floor(commentAge_ms / 1000 / 60);
+	commentAge_ms -= minutes * 1000 * 60;
+	const seconds = Math.floor(commentAge_ms / 1000);
+	commentAge_ms -= seconds * 1000;
+
+	if (days > 0) return `${days}d ago`;
+	if (hours > 0) return `${hours}h ago`;
+	if (minutes > 0) return `${minutes}m ago`;
+	return "Just now";
 };
