@@ -151,7 +151,7 @@ export abstract class FireStoreHelper {
 		}
 	};
 
-	private static _addCommentToRecord = async (commenter: MyUser, comment: string, recordMetaData: RecordMetaData) => {
+	private static _addRecordComment = async (commenter: MyUser, comment: string, recordMetaData: RecordMetaData) => {
 		const newComment: RecordComment = {
 			comment: comment,
 			sender: commenter.toHealthWorker(),
@@ -190,8 +190,39 @@ export abstract class FireStoreHelper {
 		if (commenter.id === "") return;
 
 		FireStoreHelper._addUserComment(commenter, recordMetaData);
-		FireStoreHelper._addCommentToRecord(commenter, comment, recordMetaData);
+		FireStoreHelper._addRecordComment(commenter, comment, recordMetaData);
 		FireStoreHelper._sendRecordCommentNotif(commenter, recordMetaData);
+	};
+
+	private static _removeRecordComment = async (commenter: MyUser, userComment: UserComment) => {
+		await deleteDoc(
+			doc(
+				db,
+				"records",
+				userComment.recordDate,
+				userComment.patientId,
+				userComment.recordTime,
+				"comments",
+				commenter.id
+			)
+		);
+	};
+
+	private static _removeUserComment = async (commenter: MyUser, userComment: UserComment) => {
+		//* Update list of comments by the user
+		const newUserCommentField = <{ [key: string]: FieldValue }>{};
+		newUserCommentField[date_time_patientId(userComment)] = deleteField();
+
+		await updateDoc(doc(db, "users", commenter.id, "comments", "comments"), newUserCommentField);
+	};
+
+	static removeComment = async (commenter: MyUser, userComment: UserComment) => {
+		if (commenter.id === "") return;
+
+		await FireStoreHelper._removeUserComment(commenter, userComment);
+		await FireStoreHelper._removeRecordComment(commenter, userComment);
+		if (userComment.hasNotif)
+			await FireStoreHelper._removeRecordCommentNotifFromUserComment(commenter, userComment);
 	};
 
 	static editComment = async (commenter: MyUser, comment: string, recordMetaData: RecordMetaData) => {
@@ -469,6 +500,19 @@ export abstract class FireStoreHelper {
 				date_time_healthWorkerId(recordMetaData, commenter.id)
 			),
 			recordCommentNotif
+		);
+	};
+
+	private static _removeRecordCommentNotifFromUserComment = async (user: MyUser, userComment: UserComment) => {
+		console.log(date_time_healthWorkerId(userComment, user.id));
+		await deleteDoc(
+			doc(
+				db,
+				"notifications",
+				userComment.patientId,
+				NotifSubject.RecordComment,
+				date_time_healthWorkerId(userComment, user.id)
+			)
 		);
 	};
 

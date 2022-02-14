@@ -30,15 +30,10 @@ const MyComment: React.FC<MyCommentProps> = ({ comment, canEdit = false, onEdit 
 	};
 
 	const deleteComment = async () => {
-		if (!isMine) return;
+		if (!isMine || !userComment) return;
 
 		try {
-			//TODO CONTINUE
-			// await FireStoreHelper.
-			// const db = firebase.firestore();
-			// const recordRef = db.collection("records").doc(comment.recordId);
-			// const commentRef = recordRef.collection("comments").doc(comment.id);
-			// await commentRef.delete();
+			await FireStoreHelper.removeComment(user, userComment);
 		} catch (_e) {
 			logError(_e);
 			notify("Error deleting comment");
@@ -49,7 +44,7 @@ const MyComment: React.FC<MyCommentProps> = ({ comment, canEdit = false, onEdit 
 	return (
 		<div className={styles.container}>
 			<div className={styles.header}>
-				<Avatar photoURL={comment.sender.photoURL} letter={comment.sender.name} />
+				<Avatar nonclickable photoURL={comment.sender.photoURL} letter={comment.sender.name} />
 				<div className={styles.name}>{comment.sender.name}</div>
 
 				<div className={styles.time}>
