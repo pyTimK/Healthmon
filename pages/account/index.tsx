@@ -80,6 +80,7 @@ const Account: NextPage = () => {
 						Sign out
 					</button>
 				</div>
+				<Sizedbox height={50} />
 				<ToastContainer theme='colored' autoClose={2} />
 			</Layout>
 		</>

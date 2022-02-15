@@ -7,6 +7,7 @@ import SettingsLogo from "../icons/SettingsLogo";
 import DashboardLogo from "../icons/DashboardLogo";
 import AccountLogo from "../icons/AccountLogo";
 import { useRouter } from "next/router";
+import AboutLogo from "../icons/AboutLogo";
 
 const logoSize = 32;
 const iconSize = 24;
@@ -33,6 +34,9 @@ const Sidebar: NextComponentType = () => {
 				</Tab>
 				<Tab link='/account'>
 					<AccountLogo selected={pathname === "/account"} />
+				</Tab>
+				<Tab link='/about'>
+					<AboutLogo selected={pathname === "/about"} />
 				</Tab>
 			</div>
 		</div>

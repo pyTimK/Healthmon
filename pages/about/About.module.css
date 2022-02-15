@@ -1,0 +1,97 @@
+.container {
+    margin: 0 auto;
+    width: 70%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+}
+
+.section {
+    width: 100%;
+}
+
+.info {
+    font-size: 1.5em;
+    font-weight: 300;
+    color: whitesmoke;
+    text-align: center;
+}
+
+.pink {
+    color: var(--pink)
+}
+
+/*! ABOUT */
+.aboutInfo {
+    margin: 0 auto;
+    width: 60%;
+}
+
+/*! CAPABILITY */
+.capabilityRow {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    gap: 100px;
+    margin-bottom: 70px;
+}
+
+.capabilityItemWrapper {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+
+
+/*! THE PIONEERS */
+.pioneerContainer {
+    display: flex;
+    gap: 100px;
+}
+
+.pioneerBlob {
+    flex: 1;
+    min-width: 0;
+}
+
+.pioneerBlob img {
+    width: 100%;
+}
+
+.pioneerInfoContainer {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.pioneerHeader {
+    font-weight: 300;
+    margin: 0;
+}
+
+.pioneerBioInfo {
+    font-size: 1.3em;
+    text-align: justify;
+    font-weight: 300;
+}
+
+.pioneerFollowContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.pioneerSocialMediaWrapper {
+    display: flex;
+    gap: 20px;
+}
+
+.pioneerSocialMedia {
+    cursor: pointer;
+    color: green;
+}
