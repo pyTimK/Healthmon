@@ -18,7 +18,7 @@ const About: NextPage = () => {
 		<>
 			<Layout title='About - Healthmon' description={PageDescriptions.HOME}>
 				<div className={styles.container}>
-					<Section title='About'>
+					<Section title='About' noDashTitle>
 						<img src='/img/svg/diamonds.svg' alt='pictures of owners' />
 
 						<Sizedbox height={50} />
@@ -62,39 +62,88 @@ const About: NextPage = () => {
 						</div>
 					</Section>
 					<Section title='The Pioneers'>
-						<Pioneer
-							blobImgName='Krisha'
-							bio='Singer, rapper, and writer Krisha has made a career of bucking genres and defying
+						<div className={styles.pioneersContainer}>
+							<Pioneer
+								blobImgName='Krisha'
+								bio='Singer, rapper, and writer Krisha has made a career of bucking genres and defying
 									expectations—her résumé as a musician includes performances at Lollapalooza and
 									Glastonbury, co-compositions for 100-voice choir, performances with the Minnesota
 									Orchestra, and top-200 entries on the Billboard charts. She contributed to the #1
 									album The Hamilton Mixtape: her track, “Congratulations,” has notched over 16
 									million streams..'>
-							<FacebookIcon />
-							<InstagramIcon />
-							<TwitterIcon />
-							<LinkedInIcon />
-							<MailIcon />
-						</Pioneer>
-						<Pioneer
-							right
-							blobImgName='Sophia'
-							bio='Sophia is a writer, artist and businesswoman who is passionate about her work and her community. She is the author of the book “The Story of My Life,” which was published in 2016. Sophia is currently working in the fields of fashion and design. She is a member of the Philippine Academy of Arts and Crafts, the Philippine Academy of the Arts, and the Philippine Academy of the Humanities.'>
-							<FacebookIcon />
-							<InstagramIcon />
-							<TwitterIcon />
-							<LinkedInIcon />
-							<MailIcon />
-						</Pioneer>
-						<Pioneer
-							blobImgName='Mikee'
-							bio='Mikee is a software engineer, designer, and entrepreneur who is passionate about making the world a better place. He is the co-founder of the company “Lifeline,” which was launched in 2016. Mikee is currently working on a project for the New York City-based nonprofit, The New York Foundation for Children.'>
-							<FacebookIcon />
-							<InstagramIcon />
-							<TwitterIcon />
-							<LinkedInIcon />
-							<MailIcon />
-						</Pioneer>
+								<FacebookIcon />
+								<InstagramIcon />
+								<TwitterIcon />
+								<LinkedInIcon />
+								<MailIcon />
+							</Pioneer>
+							<Pioneer
+								right
+								blobImgName='Sophia'
+								bio='Sophia is a writer, artist and businesswoman who is passionate about her work and her community. She is the author of the book “The Story of My Life,” which was published in 2016. Sophia is currently working in the fields of fashion and design. She is a member of the Philippine Academy of Arts and Crafts, the Philippine Academy of the Arts, and the Philippine Academy of the Humanities.'>
+								<FacebookIcon />
+								<InstagramIcon />
+								<TwitterIcon />
+								<LinkedInIcon />
+								<MailIcon />
+							</Pioneer>
+							<Pioneer
+								blobImgName='Mikee'
+								bio='Mikee is a software engineer, designer, and entrepreneur who is passionate about making the world a better place. He is the co-founder of the company “Lifeline,” which was launched in 2016. Mikee is currently working on a project for the New York City-based nonprofit, The New York Foundation for Children.'>
+								<FacebookIcon />
+								<InstagramIcon />
+								<TwitterIcon />
+								<LinkedInIcon />
+								<MailIcon />
+							</Pioneer>
+						</div>
+					</Section>
+					<Section title='Contact Us'>
+						<div className={styles.contactContainer}>
+							<div className={styles.contactLeft}>
+								<div className={styles.contactItem}>
+									<h2 className={styles.contactTitle}>Email</h2>
+									<p className={styles.contactInfo}>healthmon.org@gmail.com</p>
+								</div>
+								<div className={styles.contactItem}>
+									<h2 className={styles.contactTitle}>Phone</h2>
+									<p className={styles.contactInfo}>09123456789</p>
+								</div>
+							</div>
+							<div className={styles.contactRight}>
+								<img src='/img/svg/contact_banner.svg' alt='contact_banner' />
+							</div>
+						</div>
+					</Section>
+					<Section title='Thank you for your support!' noDashTitle noBottomMargin>
+						<div className={styles.bottomContainer}>
+							<div className={styles.bottomLeft}>
+								<div className={styles.bottomHealthmon}>
+									<img
+										src='/img/icons/apple-touch-icon.png'
+										alt='healthmon_logo'
+										width={50}
+										height={50}
+									/>
+									<p className={styles.bottomTitle}>Healthmon</p>
+								</div>
+								<p className={styles.bottomInfo}>
+									This website must be used in conjunction with the Healthmon device developed through
+									the research entitled{" "}
+									<span className={styles.bottomResearchTitle}>
+										IoT-Based Health Monitoring Device with GSM Module for Home Quarantine Patients
+										using Raspberry Pi
+									</span>
+									.
+								</p>
+								<p className={styles.BottomCopyright}>
+									© 2022 Healthmon organization. All Rights Reserved.
+								</p>
+							</div>
+							<div className={styles.bottomRight}>
+								<img src='/img/logo_group.png' alt='logo_group' />
+							</div>
+						</div>
 					</Section>
 				</div>
 				<ToastContainer theme='colored' autoClose={2} />
@@ -119,7 +168,7 @@ const Pioneer: React.FC<PioneerProps> = ({ children, blobImgName, bio, right = f
 					</div>
 				)}
 				<div className={styles.pioneerInfoContainer}>
-					<h2 className={styles.pioneerHeader}>Bio</h2>
+					<h2 className={styles.pioneerName}>{blobImgName}</h2>
 					<p className={styles.pioneerBioInfo}>{bio}</p>
 					<div className={styles.pioneerFollowContainer}>
 						<h2 className={styles.pioneerHeader}>Follow {blobImgName}</h2>
@@ -134,7 +183,6 @@ const Pioneer: React.FC<PioneerProps> = ({ children, blobImgName, bio, right = f
 					</div>
 				)}
 			</div>
-			<Sizedbox height={180} />
 		</div>
 	);
 };
@@ -155,13 +203,19 @@ const CapabilityItem: React.FC<CapabilityItemProps> = ({ iconName, children, rig
 	);
 };
 
-const Section: React.FC<{ title: string }> = ({ title, children }) => {
+interface SectionProps {
+	title: string;
+	noDashTitle?: boolean;
+	noBottomMargin?: boolean;
+}
+
+const Section: React.FC<SectionProps> = ({ title, children, noDashTitle = false, noBottomMargin = false }) => {
 	return (
 		<div className={styles.section}>
-			<h1>{title}</h1>
+			<h1>{noDashTitle ? title : `- ${title} -`}</h1>
 			<Sizedbox height={30} />
 			{children}
-			<Sizedbox height={100} />
+			{!noBottomMargin && <Sizedbox height={100} />}
 		</div>
 	);
 };

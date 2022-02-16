@@ -4,6 +4,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    max-width: 1400px;
+    margin: 0 auto;
 
 }
 
@@ -48,6 +50,12 @@
 
 
 /*! THE PIONEERS */
+.pioneersContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 100px;
+}
+
 .pioneerContainer {
     display: flex;
     gap: 100px;
@@ -69,13 +77,20 @@
     align-items: flex-start;
 }
 
-.pioneerHeader {
+.pioneerName {
+    font-family: 'Rouge Script';
+    font-size: 4rem;
     font-weight: 300;
     margin: 0;
 }
 
+.pioneerHeader {
+    font-weight: 500;
+    margin: 0;
+}
+
 .pioneerBioInfo {
-    font-size: 1.3em;
+    font-size: 1.1em;
     text-align: justify;
     font-weight: 300;
 }
@@ -94,4 +109,105 @@
 .pioneerSocialMedia {
     cursor: pointer;
     color: green;
+}
+
+
+/*! CONTACT US */
+.contactContainer {
+    display: flex;
+    min-width: 0;
+}
+
+.contactLeft {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 50px;
+    justify-content: center;
+
+}
+
+.contactItem {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.contactTitle {
+    font-weight: 300;
+    color: rgb(189, 189, 189);
+    margin: 0;
+}
+
+.contactInfo {
+    font-size: 1em;
+    margin: 0;
+    text-align: justify;
+    font-weight: 300;
+}
+
+
+.contactRight {
+    flex: 2;
+    min-width: 0;
+    display: flex;
+}
+
+.contactRight img {
+    width: 100%;
+}
+
+/*! BOTTOM */
+
+.bottomContainer {
+    display: flex;
+    gap: 50px;
+
+}
+
+.bottomLeft {
+    flex: 1;
+    padding: 100px 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+.bottomHealthmon {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.bottomTitle {
+    font-size: 1.8rem;
+    /* font-weight: 300; */
+    margin: 0;
+}
+
+.bottomInfo {
+    text-align: justify;
+}
+
+.bottomResearchTitle {
+    font-style: italic;
+    font-weight: 100;
+    color: rgb(193, 193, 193);
+}
+
+.BottomCopyright {
+    text-align: left;
+    font-size: 0.9rem;
+    font-weight: 300;
+    /* color: rgb(193, 193, 193); */
+}
+
+.bottomRight {
+    flex: 1;
+    min-width: 0;
+}
+
+.bottomRight img {
+    width: 100%;
 }
