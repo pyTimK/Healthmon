@@ -33,3 +33,11 @@
     height: 13rem;
     opacity: 0.8;
 }
+
+
+/*! SMARTPHONE */
+@media screen and (max-width: 600px) {
+    .header {
+        margin: 10px 0 15px 0;
+    }
+}

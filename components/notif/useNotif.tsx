@@ -1,5 +1,6 @@
 import { Bell } from "akar-icons";
-import { MouseEventHandler, useContext, useEffect, useMemo, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import React, { MouseEventHandler, useContext, useEffect, useMemo, useState } from "react";
 import { FireStoreHelper } from "../../classes/FireStoreHelper";
 import { Formatted, HealthWorker } from "../../classes/MyUser";
 import sortNotifs from "../../function/sortNotifs";
@@ -12,7 +13,7 @@ const inSenders = (senders: Formatted<HealthWorker>, newSenderId: string) =>
 	Object.prototype.hasOwnProperty.call(senders, newSenderId);
 
 const useNotif = () => {
-	const { user } = useContext(HomeContext);
+	const { user, userConfig } = useContext(HomeContext);
 	const [isNotifOpen, setIsNotifOpen] = useState(false);
 	const [monitorRequestNotifs, setMonitorRequestNotifs] = useState<MonitorRequestNotif[]>([]);
 	const [recordCommentNotifs, setRecordCommentNotifs] = useState<RecordCommentNotif[]>([]);
@@ -39,22 +40,37 @@ const useNotif = () => {
 		setIsNotifOpen((isNotifOpen) => !isNotifOpen);
 	};
 
-	const NotifBell: React.FC = () => (
-		<div className={styles.bellWrapper}>
-			{notifsList.length > 0 && <div className={styles.redDot} />}
-			<Bell size={32} color='whitesmoke' strokeWidth={1} cursor='pointer' onClick={toggleNotif} />
-		</div>
-	);
+	const NotifBell: React.FC = () => {
+		const size = "var(--bell-size)";
+		return (
+			<div className={styles.bellWrapper}>
+				{notifsList.length > 0 && <div className={styles.redDot} />}
+				<Bell
+					style={{ width: size, height: size }}
+					color='whitesmoke'
+					strokeWidth={1}
+					cursor='pointer'
+					onClick={toggleNotif}
+				/>
+			</div>
+		);
+	};
 
-	const Notif: React.FC = () => (
-		<div className={styles.notifDropdown}>
-			<NotifBlock notifs={notifsList} setIsNotifOpen={setIsNotifOpen} />
-		</div>
-	);
+	const Notif: React.FC = () => {
+		return (
+			<motion.div
+				animate={{ height: "fit-content" }}
+				initial={{ height: 0 }}
+				exit={{ height: 0, transition: { duration: 0.2 } }}
+				className={styles.notifDropdown}>
+				<NotifBlock notifs={notifsList} setIsNotifOpen={setIsNotifOpen} />
+			</motion.div>
+		);
+	};
 
 	const Overlay: React.FC = () => <div className={styles.overlay} onClick={toggleNotif} />;
 
-	return { user, isNotifOpen, NotifBell, Notif, Overlay };
+	return { user, userConfig, isNotifOpen, NotifBell, Notif, Overlay };
 };
 
 export default useNotif;

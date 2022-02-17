@@ -1,5 +1,7 @@
 import clsx from "clsx";
 import { NextPage } from "next";
+import { CSSProperties } from "react";
+import { Blob } from "react-blob";
 import { ToastContainer } from "react-toastify";
 import { PageDescriptions } from "../../classes/Constants";
 import Avatar from "../../components/Avatar";
@@ -7,13 +9,8 @@ import Layout from "../../components/layout/Layout";
 import Sizedbox from "../../components/Sizedbox";
 import ButtonStatus from "../../enums/ButtonStatus";
 import useAccount from "../../hooks/useAccount";
+import useWindowDimensions from "../../hooks/useWindowDimensions";
 import styles from "./Account.module.css";
-import { Blob, BlobProps } from "react-blob";
-import { CSSProperties } from "react";
-
-const avatarSize = 150;
-const smallBlobAvatarSize = 180;
-const largeBlobAvatarSize = 200;
 
 const Account: NextPage = () => {
 	const {
@@ -26,6 +23,12 @@ const Account: NextPage = () => {
 		saveButtonStatus,
 		updateUser,
 	} = useAccount();
+
+	const { isSmartphone } = useWindowDimensions();
+
+	const avatarSize = isSmartphone ? 80 : 150;
+	const smallBlobAvatarSize = isSmartphone ? 100 : 180;
+	const largeBlobAvatarSize = isSmartphone ? 115 : 200;
 
 	return (
 		<>
@@ -43,10 +46,10 @@ const Account: NextPage = () => {
 								nonclickable
 							/>
 							{typeof window !== "undefined" && (
-								<BackgroundBlob size={smallBlobAvatarSize} opacity={0.5} />
+								<BackgroundBlob size={smallBlobAvatarSize} opacity={0.5} avatarSize={avatarSize} />
 							)}
 							{typeof window !== "undefined" && (
-								<BackgroundBlob size={largeBlobAvatarSize} opacity={0.3} />
+								<BackgroundBlob size={largeBlobAvatarSize} opacity={0.3} avatarSize={avatarSize} />
 							)}
 						</div>
 						<div className={styles.textDetailsOverview}>
@@ -74,7 +77,7 @@ const Account: NextPage = () => {
 						</button>
 					</div>
 				</form>
-				<Sizedbox height={50} />
+				{/* <Sizedbox height={50} /> */}
 				<div className={styles.signOutButton}>
 					<button className='black-button' onClick={logout}>
 						Sign out
@@ -89,11 +92,12 @@ const Account: NextPage = () => {
 
 interface BackgroundBlobProps {
 	style?: CSSProperties;
+	avatarSize: number;
 	size: number;
 	opacity?: number;
 }
 
-const BackgroundBlob: React.FC<BackgroundBlobProps> = ({ style, size, opacity }) => {
+const BackgroundBlob: React.FC<BackgroundBlobProps> = ({ style, size, opacity, avatarSize }) => {
 	const offset = Math.floor((size - avatarSize) / 2);
 
 	return (

@@ -23,6 +23,12 @@
     /* overflow: hidden; */
 }
 
+.titleWrapper {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
 .rowTitle {
     margin: 0;
     display: inline;
@@ -33,4 +39,17 @@
     color: gray;
     margin: 0;
     display: inline;
+}
+
+/*! SMARTPHONE */
+@media only screen and (max-width: 600px) {
+    .row {
+        width: 90vw;
+    }
+
+    .titleWrapper {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0;
+    }
 }

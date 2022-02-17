@@ -12,7 +12,9 @@
   --blue: lightskyblue;
   --calm-blue: #5865F2;
 
-  --tablet-max-width: 960px
+  --smartphone-max-width: 600px;
+  --tablet-max-width: 980px;
+  -webkit-tap-highlight-color: transparent;
 }
 
 html,
@@ -175,10 +177,20 @@ input:active {
   border: none !important;
 }
 
-/** SMALL TABLET */
+/*! SMALL TABLET */
 @media screen and (max-width: var(--tablet-max-width)) {
   .content {
     width: 100vw;
   }
 
+}
+
+
+
+
+/*! SMARTPHONE */
+@media screen and (max-width: 600px) {
+  html {
+    font-size: 16px;
+  }
 }

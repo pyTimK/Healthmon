@@ -13,3 +13,11 @@
 .flexColumn {
     flex-direction: column;
 }
+
+/*! SMARTPHONE */
+@media screen and (max-width: 600px) {
+    .container {
+        width: 90vw;
+        gap: 20px;
+    }
+}

@@ -23,8 +23,8 @@
     /* color: rgb(236, 111, 126); */
 }
 
-/** SMALL TABLET */
-@media screen and (max-width: var(--tablet-max-width)) {
+/*! TABLET */
+@media screen and (max-width: 980px) {
     .content {
         height: 50px;
         bottom: 0;

@@ -9,17 +9,19 @@ import MailIcon from "../../components/icons/social_media/MailIcon";
 import TwitterIcon from "../../components/icons/social_media/TwitterIcon";
 import Layout from "../../components/layout/Layout";
 import Sizedbox from "../../components/Sizedbox";
+import useWindowDimensions from "../../hooks/useWindowDimensions";
 import styles from "./About.module.css";
 
 const avatarSize = 150;
 
 const About: NextPage = () => {
+	const { isSmartphone } = useWindowDimensions();
 	return (
 		<>
 			<Layout title='About - Healthmon' description={PageDescriptions.HOME}>
 				<div className={styles.container}>
 					<Section title='About' noDashTitle>
-						<img src='/img/svg/diamonds.svg' alt='pictures of owners' />
+						<img className={styles.diamondImage} src='/img/svg/diamonds.svg' alt='pictures of owners' />
 
 						<Sizedbox height={50} />
 						<div className={styles.aboutInfo}>
@@ -31,19 +33,20 @@ const About: NextPage = () => {
 						</div>
 					</Section>
 					<Section title='Healthmon'>
-						<img src='/img/svg/healthmon.svg' alt='healthmon' />
+						<img className={styles.healthmonImage} src='/img/svg/healthmon.svg' alt='healthmon' />
 						<Sizedbox height={30} />
-						<p className={styles.info}>
-							<em>" The greatest breakthrough of the 21st century. "</em>
+						<p className={styles.healthmonQuote}>
+							<em>&ldquo; The greatest breakthrough of the 21st century. &rdquo;</em>
 						</p>
-						<Sizedbox height={10} />
-						<p className={styles.info}>- Sun Tzu, The Art of War</p>
+
+						<p className={styles.healthmonQuoteName}>- Sun Tzu, The Art of War</p>
 					</Section>
 					<Section title='Capability'>
 						<img src='/img/svg/heartbeat.svg' alt='heartbeat' width={75} height={75} />
 						<img src='/img/svg/thermometer.svg' alt='thermometer' width={75} height={75} />
 						<img src='/img/svg/blood.svg' alt='blood' width={75} height={75} />
 						<p className={styles.info}>3-in-1 measurements</p>
+						<Sizedbox height={30} />
 						<div className={styles.capabilityRow}>
 							<CapabilityItem iconName='echodot'>Speaks to you</CapabilityItem>
 							<CapabilityItem iconName='sms' right>
@@ -115,8 +118,13 @@ const About: NextPage = () => {
 							</div>
 						</div>
 					</Section>
-					<Section title='Thank you for your support!' noDashTitle noBottomMargin>
+					<Section title='' noDashTitle noBottomMargin>
 						<div className={styles.bottomContainer}>
+							{isSmartphone && (
+								<div className={styles.bottomRight}>
+									<img src='/img/logo_group.png' alt='logo_group' />
+								</div>
+							)}
 							<div className={styles.bottomLeft}>
 								<div className={styles.bottomHealthmon}>
 									<img
@@ -140,9 +148,11 @@ const About: NextPage = () => {
 									© 2022 Healthmon organization. All Rights Reserved.
 								</p>
 							</div>
-							<div className={styles.bottomRight}>
-								<img src='/img/logo_group.png' alt='logo_group' />
-							</div>
+							{!isSmartphone && (
+								<div className={styles.bottomRight}>
+									<img src='/img/logo_group.png' alt='logo_group' />
+								</div>
+							)}
 						</div>
 					</Section>
 				</div>
@@ -159,10 +169,13 @@ interface PioneerProps {
 }
 
 const Pioneer: React.FC<PioneerProps> = ({ children, blobImgName, bio, right = false }) => {
+	const { isSmartphone } = useWindowDimensions();
+	const isRight = right && !isSmartphone;
+
 	return (
 		<div>
 			<div className={styles.pioneerContainer}>
-				{!right && (
+				{!isRight && (
 					<div className={styles.pioneerBlob}>
 						<img src={`/img/svg/pioneers/${blobImgName}.svg`} alt={blobImgName} />
 					</div>
@@ -177,7 +190,7 @@ const Pioneer: React.FC<PioneerProps> = ({ children, blobImgName, bio, right = f
 					</div>
 				</div>
 
-				{right && (
+				{isRight && (
 					<div className={styles.pioneerBlob}>
 						<img src={`/img/svg/pioneers/${blobImgName}.svg`} alt={blobImgName} />
 					</div>
@@ -210,12 +223,14 @@ interface SectionProps {
 }
 
 const Section: React.FC<SectionProps> = ({ title, children, noDashTitle = false, noBottomMargin = false }) => {
+	const { isSmartphone } = useWindowDimensions();
+
 	return (
 		<div className={styles.section}>
 			<h1>{noDashTitle ? title : `- ${title} -`}</h1>
 			<Sizedbox height={30} />
 			{children}
-			{!noBottomMargin && <Sizedbox height={100} />}
+			{!noBottomMargin && <Sizedbox height={isSmartphone ? 50 : 200} />}
 		</div>
 	);
 };

@@ -2,13 +2,14 @@
     margin: 60px 0 20px;
     width: 100%;
     display: flex;
-    /* text-align: center; */
+    align-items: center;
     justify-content: flex-start;
 }
 
 .descriptionWrapper {
     display: flex;
     margin-left: 10px;
+    text-align: left;
 }
 
 .description {
@@ -16,5 +17,16 @@
     font-size: 1.5rem;
     line-height: 1;
     color: gray;
+}
 
+/*! SMARTPHONE */
+@media screen and (max-width: 600px) {
+    .container {
+        margin: 50px 0 20px 0;
+
+    }
+
+    .description {
+        font-size: 1.2rem;
+    }
 }

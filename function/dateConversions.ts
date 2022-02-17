@@ -88,3 +88,11 @@ export const getCommentAge = (timestamp: firebase.firestore.Timestamp | null) =>
 	if (minutes > 0) return `${minutes}m ago`;
 	return "Just now";
 };
+
+export const parseUserConfigDate = (date: string) => {
+	const splitDate = date.split("-");
+	const day = parseInt(splitDate[2]);
+	const month = parseInt(splitDate[1]);
+	const year = parseInt(splitDate[0]);
+	return { day, month, year };
+};

@@ -62,7 +62,6 @@
 .commentButtonsWrapper {
     margin-top: 20px;
     height: 30px;
-
 }
 
 .commentButtons {
@@ -70,4 +69,27 @@
     justify-content: flex-end;
     align-items: center;
     gap: 30px;
+}
+
+/*! SMARTPHONE */
+@media only screen and (max-width: 768px) {
+    .container {
+        margin-top: 10px;
+        flex-direction: column;
+    }
+
+    .left {
+        padding-top: 0px;
+    }
+
+    .commentButtonsWrapper {
+        margin-top: 10px;
+        height: 30px;
+    }
+
+    .commentButtons {
+        gap: 10px;
+    }
+
+
 }

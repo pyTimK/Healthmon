@@ -2,3 +2,10 @@
     width: 50vw;
     max-width: 500px;
 }
+
+/*! SMARTPHONE */
+@media only screen and (max-width: 600px) {
+    .container {
+        width: 90vw;
+    }
+}

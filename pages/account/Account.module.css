@@ -12,7 +12,6 @@
     /* display: flex; */
     /* align-items: center; */
     /* justify-content: center; */
-    padding-right: 30px;
 }
 
 .imgOverview img {
@@ -41,13 +40,24 @@
     align-items: center;
     justify-content: center;
     gap: 20px;
-
-
 }
 
 .signOutButton {
     display: flex;
     align-items: center;
     justify-content: center;
+
+}
+
+/*! SMARTPHONE */
+@media (min-width: 320px) and (max-width: 480px) {
+    .overview {
+        margin-top: 10px;
+        /* gap: 50px; */
+    }
+
+    .onChangeButtonWrapper {
+        padding-bottom: 20px;
+    }
 
 }

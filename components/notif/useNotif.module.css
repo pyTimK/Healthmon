@@ -14,12 +14,14 @@
     position: absolute;
     z-index: 3;
     top: calc(var(--header-margin-top) + var(--header-height) + 4px);
-    transform: translateX(calc(-1 * (var(--avatar-width) + 2 * var(--header-gap))));
+    right: 0;
+    /* transform: translateX(calc(-1 * (var(--avatar-size) + 2 * var(--header-gap)))); */
+    transform: translateY(-30px);
     width: 360px;
-    /* height: 100px; */
     background-color: var(--background-light);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 4px;
+    overflow: hidden;
 
 }
 
@@ -35,4 +37,19 @@
     background-color: var(--calm-red);
     border-radius: 50%;
     pointer-events: none;
+}
+
+
+/*! SMARTPHONE */
+@media screen and (max-width: 600px) {
+    .notifDropdown {
+        right: 0;
+        transform: translateY(-20px);
+        width: 90%;
+    }
+
+    .redDot {
+        width: 10px;
+        height: 10px;
+    }
 }

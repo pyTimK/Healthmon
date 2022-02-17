@@ -1,21 +1,25 @@
+import { AnimatePresence } from "framer-motion";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
-import React, { useContext, useEffect } from "react";
+import React, { useContext } from "react";
 import { ToastContainer } from "react-toastify";
 import { PageDescriptions } from "../../classes/Constants";
 import MyUser, { Role } from "../../classes/MyUser";
 import Avatar from "../../components/Avatar";
+import DropdownPicker from "../../components/home/myDatePicker/dropdownPicker/DropdownPicker";
 import MyDatePicker from "../../components/home/myDatePicker/MyDatePicker";
 import Layout from "../../components/layout/Layout";
 import useNotif from "../../components/notif/useNotif";
 import RecordsBlock from "../../components/record/RecordsBlock";
 import Sizedbox from "../../components/Sizedbox";
+import { parseUserConfigDate } from "../../function/dateConversions";
 import dayGreetings from "../../function/dayGreetings";
 import groupCommentsBasedOnPatient from "../../function/groupCommentsBasedOnPatient";
 import usePatients from "../../hooks/usePatients";
 import useUser from "../../hooks/useUser";
 import useUserComments from "../../hooks/useUserComments";
 import useUserConfig from "../../hooks/useUserConfig";
+import useWindowDimensions from "../../hooks/useWindowDimensions";
 import UserComment from "../../types/RecordComment";
 import { UserConfig } from "../../types/userConfig";
 import styles from "./Home.module.css";
@@ -28,26 +32,29 @@ export const HomeContext = React.createContext({
 const Home: NextPage = () => {
 	const { user } = useUser();
 	const { userConfig } = useUserConfig();
+	const { isSmartphone } = useWindowDimensions();
 
 	if (user.id === "") return <div></div>;
 
 	return (
 		<HomeContext.Provider value={{ user, userConfig }}>
-			<Layout title='HealthMon' description={PageDescriptions.HOME} header={<Header />}>
+			<Layout title='HealthMon' description={PageDescriptions.HOME}>
+				<Header />
 				<main className={styles.main}>
 					<div className={styles.title}>
 						<h1>
 							{dayGreetings()} {user?.name}
 						</h1>
 					</div>
-					<Sizedbox height={30} />
+					{/* {!isSmartphone && <Sizedbox height={30} />} */}
 					<MyDatePicker />
-					<Sizedbox height={100} />
+					{!isSmartphone && <Sizedbox height={50} />}
 
 					{userConfig.role === Role.Patient ? <PatientRecordBlock /> : <HealthWorkerRecordBlocks />}
 					<Sizedbox height={100} />
 				</main>
 			</Layout>
+			<ToastContainer theme='colored' autoClose={2} />
 		</HomeContext.Provider>
 	);
 };
@@ -84,27 +91,48 @@ const HealthWorkerRecordBlocks: React.FC<HealthWorkerRecordBlocksProps> = () => 
 	);
 };
 
-interface HeaderProps {}
-
-const Header: React.FC<HeaderProps> = () => {
-	const { user, Notif, NotifBell, Overlay, isNotifOpen } = useNotif();
+const Header: React.FC = () => {
+	const { user, userConfig, Notif, NotifBell, Overlay, isNotifOpen } = useNotif();
 	const router = useRouter();
 	const goToAccounts = () => router.push("/account");
+	const { month, year } = parseUserConfigDate(userConfig.date);
 	return (
 		<div className={styles.header}>
-			<NotifBell />
 			<Avatar
 				className={styles.avatar}
-				size={50}
+				// size={26}
 				photoURL={user.photoURL}
 				letter={user.name}
 				onClick={goToAccounts}
 			/>
-			{isNotifOpen && <Notif />}
-			{isNotifOpen && <Overlay />}
-			<ToastContainer theme='colored' autoClose={2} />
+			<DropdownPicker userConfig={userConfig} month={month} year={year} />
+			<NotifBell />
+			<AnimatePresence>{isNotifOpen && <Notif />}</AnimatePresence>
+			<AnimatePresence>{isNotifOpen && <Overlay />}</AnimatePresence>
 		</div>
 	);
 };
+
+//? OLD HEADER
+// const Header: React.FC = () => {
+// 	const { user, Notif, NotifBell, Overlay, isNotifOpen } = useNotif();
+// 	const router = useRouter();
+// 	const goToAccounts = () => router.push("/account");
+// 	return (
+// 		<div className={styles.header}>
+// 			<NotifBell />
+// 			<Avatar
+// 				className={styles.avatar}
+// 				// size={26}
+// 				photoURL={user.photoURL}
+// 				letter={user.name}
+// 				onClick={goToAccounts}
+// 			/>
+// 			{isNotifOpen && <Notif />}
+// 			{isNotifOpen && <Overlay />}
+// 			<ToastContainer theme='colored' autoClose={2} />
+// 		</div>
+// 	);
+// };
 
 export default Home;

@@ -1,9 +1,9 @@
+import clsx from "clsx";
 import { useEffect, useRef } from "react";
-import ScrollContainer, { ScrollEvent } from "react-indiana-drag-scroll";
+import ScrollContainer from "react-indiana-drag-scroll";
 import { daysInMonthArray, getDay } from "../../../../function/dateConversions";
 import { UserConfig } from "../../../../types/userConfig";
 import styles from "./RowPicker.module.css";
-import { getYYYYMMDD } from "../../../../function/dateConversions";
 import RowPickerItem from "./RowPickerItem";
 interface RowPickerProps {
 	userConfig: UserConfig;
@@ -35,7 +35,7 @@ const RowPicker: React.FC<RowPickerProps> = ({ userConfig, chosenDay, month, yea
 
 	return (
 		<ScrollContainer innerRef={myScrollContainer} className='scroll-container'>
-			<div className={styles.container}>
+			<div className={clsx(styles.container, "unselectable")}>
 				{daysInMonthArray(month, year).map((day, i) => (
 					<RowPickerItem
 						key={i}

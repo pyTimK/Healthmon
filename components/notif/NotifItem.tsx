@@ -2,7 +2,6 @@ import clsx from "clsx";
 import { useRouter } from "next/router";
 import { Dispatch, SetStateAction, useContext } from "react";
 import { FireStoreHelper } from "../../classes/FireStoreHelper";
-import MyUser from "../../classes/MyUser";
 import { getDayMonthFromYYYYMMDD, getTimeFromHHMMSS } from "../../function/dateConversions";
 import logError from "../../function/logError";
 import notify from "../../function/notify";

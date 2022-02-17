@@ -1,9 +1,8 @@
-import { useContext, useEffect, useRef } from "react";
-import ScrollContainer from "react-indiana-drag-scroll";
+import { useContext } from "react";
+import { parseUserConfigDate } from "../../../function/dateConversions";
+import useWindowDimensions from "../../../hooks/useWindowDimensions";
 import { HomeContext } from "../../../pages/home";
-import { UserConfig } from "../../../types/userConfig";
 import Sizedbox from "../../Sizedbox";
-import DropdownPicker from "./dropdownPicker/DropdownPicker";
 import styles from "./MyDatePicker.module.css";
 import RowPicker from "./rowPicker/RowPicker";
 
@@ -11,15 +10,12 @@ interface MyDatePickerProps {}
 
 const MyDatePicker: React.FC<MyDatePickerProps> = () => {
 	const { userConfig } = useContext(HomeContext);
-	const splitDate = userConfig.date.split("-");
-	const day = parseInt(splitDate[2]);
-	const month = parseInt(splitDate[1]);
-	const year = parseInt(splitDate[0]);
+	const { isSmartphone } = useWindowDimensions();
+	const { day, month, year } = parseUserConfigDate(userConfig.date);
 
 	return (
 		<div className={styles.container}>
-			<DropdownPicker userConfig={userConfig} month={month} year={year} />
-			<Sizedbox height={30} />
+			<Sizedbox height={isSmartphone ? 10 : 30} />
 			<RowPicker userConfig={userConfig} chosenDay={day} month={month} year={year} />
 		</div>
 	);

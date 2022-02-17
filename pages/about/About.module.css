@@ -30,6 +30,22 @@
     width: 60%;
 }
 
+/*! HEALTHMON */
+.healthmonQuote {
+    font-size: 1.2rem;
+    font-weight: 300;
+    color: whitesmoke;
+    text-align: center;
+}
+
+.healthmonQuoteName {
+    font-size: 0.9rem;
+    font-weight: 300;
+    color: whitesmoke;
+    text-align: center;
+}
+
+
 /*! CAPABILITY */
 .capabilityRow {
     width: 100%;
@@ -206,8 +222,68 @@
 .bottomRight {
     flex: 1;
     min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .bottomRight img {
     width: 100%;
+}
+
+/*! SMARTPHONE */
+@media screen and (max-width: 600px) {
+    .container {
+        width: 80%;
+    }
+
+    /*! ABOUT */
+    .diamondImage {
+        width: 80vw;
+    }
+
+    .aboutInfo {
+        width: 100%;
+    }
+
+    /*! HEALTHMON */
+    .healthmonImage {
+        width: 60%;
+    }
+
+    /*! CAPABILITY */
+    .capabilityRow {
+        gap: 100px;
+        margin-bottom: 30px;
+    }
+
+
+    /*! THE PIONEERS */
+    .pioneersContainer {
+        gap: 100px;
+    }
+
+    .pioneerContainer {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    /*! CONTACT US */
+    .contactContainer {
+        flex-direction: column;
+        gap: 30px;
+    }
+
+    /*! BOTTOM */
+    .bottomContainer {
+        flex-direction: column;
+        gap: 50px;
+    }
+
+    .bottomLeft {
+        padding: 0 0 20px 0;
+    }
+
+
+
 }

@@ -1,6 +1,8 @@
 import { NextPage } from "next";
 import Head from "next/head";
+import useWindowDimensions from "../../hooks/useWindowDimensions";
 import Sidebar from "../sidebar/Sidebar";
+import Sizedbox from "../Sizedbox";
 import styles from "./Layout.module.css";
 
 interface LayoutProps {
@@ -12,7 +14,7 @@ interface LayoutProps {
 
 const Layout: NextPage<LayoutProps> = ({ title, description, showSidebar = true, children, header }) => {
 	// const user = CookiesHelper.get("user", new MyUser());
-
+	const { isSmartphone } = useWindowDimensions();
 	// if (user.id === "") return <></>;
 
 	return (
@@ -28,11 +30,7 @@ const Layout: NextPage<LayoutProps> = ({ title, description, showSidebar = true,
 				<div className={styles.content}>
 					<div>{children}</div>
 				</div>
-				<footer className={styles.footer}>
-					<a href='https://healthmonmikee.web.app/' target='_blank' rel='noopener noreferrer'>
-						© 2022 Healthmon
-					</a>
-				</footer>
+				{isSmartphone ? <Sizedbox height={50} /> : <footer className={styles.footer}>© 2022 Healthmon</footer>}
 			</div>
 		</div>
 	);
