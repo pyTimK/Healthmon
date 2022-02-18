@@ -4,7 +4,7 @@ import React, { MouseEventHandler, useContext, useEffect, useMemo, useState } fr
 import { FireStoreHelper } from "../../classes/FireStoreHelper";
 import { Formatted, HealthWorker } from "../../classes/MyUser";
 import sortNotifs from "../../function/sortNotifs";
-import { HomeContext } from "../../pages/home";
+import { HomeContext } from "../../pages/index";
 import { MonitorRequestNotif, RecordCommentNotif } from "../../types/Notification";
 import NotifBlock from "./NotifBlock";
 import styles from "./useNotif.module.css";

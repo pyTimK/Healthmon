@@ -1,6 +1,7 @@
 import { NextPage } from "next";
 import Head from "next/head";
-import useWindowDimensions from "../../hooks/useWindowDimensions";
+import { useContext } from "react";
+import { AppContext } from "../../pages/_app";
 import Sidebar from "../sidebar/Sidebar";
 import Sizedbox from "../Sizedbox";
 import styles from "./Layout.module.css";
@@ -14,7 +15,7 @@ interface LayoutProps {
 
 const Layout: NextPage<LayoutProps> = ({ title, description, showSidebar = true, children, header }) => {
 	// const user = CookiesHelper.get("user", new MyUser());
-	const { isSmartphone } = useWindowDimensions();
+	const { isSmartphone } = useContext(AppContext);
 	// if (user.id === "") return <></>;
 
 	return (

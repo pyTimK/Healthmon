@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import { NextPage } from "next";
-import { CSSProperties } from "react";
+import { CSSProperties, useContext } from "react";
 import { Blob } from "react-blob";
 import { ToastContainer } from "react-toastify";
 import { PageDescriptions } from "../../classes/Constants";
@@ -9,7 +9,7 @@ import Layout from "../../components/layout/Layout";
 import Sizedbox from "../../components/Sizedbox";
 import ButtonStatus from "../../enums/ButtonStatus";
 import useAccount from "../../hooks/useAccount";
-import useWindowDimensions from "../../hooks/useWindowDimensions";
+import { AppContext } from "../_app";
 import styles from "./Account.module.css";
 
 const Account: NextPage = () => {
@@ -24,7 +24,7 @@ const Account: NextPage = () => {
 		updateUser,
 	} = useAccount();
 
-	const { isSmartphone } = useWindowDimensions();
+	const { isSmartphone } = useContext(AppContext);
 
 	const avatarSize = isSmartphone ? 80 : 150;
 	const smallBlobAvatarSize = isSmartphone ? 100 : 180;

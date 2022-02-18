@@ -16,11 +16,30 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    position: relative;
 }
 
 .tab {
     padding: 15px 0;
     /* color: rgb(236, 111, 126); */
+}
+
+.selectedBarWrapper {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    right: 0;
+    height: 60px;
+    width: 3px;
+}
+
+.selectedBar {
+    height: 80%;
+    width: 100%;
+    background-color: var(--pink);
+    border-top-left-radius: 50px;
+    border-bottom-left-radius: 50px;
 }
 
 /*! TABLET */
@@ -46,6 +65,20 @@
         flex: 1;
         display: flex;
         justify-content: center;
+    }
+
+    .selectedBarWrapper {
+        top: 0;
+        width: 90px;
+        height: 4px;
+    }
+
+    .selectedBar {
+        height: 100%;
+        width: 60%;
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 50px;
+        border-bottom-right-radius: 50px;
     }
 
 }

@@ -1,5 +1,5 @@
 import { FocusEventHandler, RefObject, useCallback, useContext, useEffect, useRef, useState } from "react";
-import { HomeContext } from "../../../pages/home";
+import { HomeContext } from "../../../pages/index";
 import { RecordComment } from "../../../types/RecordComment";
 import Divider from "../../Divider";
 import { RecordContext } from "../Record";

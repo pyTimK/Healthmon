@@ -5,7 +5,7 @@ import { FireStoreHelper } from "../../classes/FireStoreHelper";
 import { getDayMonthFromYYYYMMDD, getTimeFromHHMMSS } from "../../function/dateConversions";
 import logError from "../../function/logError";
 import notify from "../../function/notify";
-import { HomeContext } from "../../pages/home";
+import { HomeContext } from "../../pages/index";
 import { isRecordCommentNotif, MonitorRequestNotif, RecordCommentNotif } from "../../types/Notification";
 import Avatar from "../Avatar";
 import styles from "./NotifItem.module.css";

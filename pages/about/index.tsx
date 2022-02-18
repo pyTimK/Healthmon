@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import { NextPage } from "next";
+import { useContext } from "react";
 import { ToastContainer } from "react-toastify";
 import { PageDescriptions } from "../../classes/Constants";
 import FacebookIcon from "../../components/icons/social_media/FacebookIcon";
@@ -9,13 +10,13 @@ import MailIcon from "../../components/icons/social_media/MailIcon";
 import TwitterIcon from "../../components/icons/social_media/TwitterIcon";
 import Layout from "../../components/layout/Layout";
 import Sizedbox from "../../components/Sizedbox";
-import useWindowDimensions from "../../hooks/useWindowDimensions";
+import { AppContext } from "../_app";
 import styles from "./About.module.css";
 
 const avatarSize = 150;
 
 const About: NextPage = () => {
-	const { isSmartphone } = useWindowDimensions();
+	const { isSmartphone } = useContext(AppContext);
 	return (
 		<>
 			<Layout title='About - Healthmon' description={PageDescriptions.HOME}>
@@ -169,7 +170,7 @@ interface PioneerProps {
 }
 
 const Pioneer: React.FC<PioneerProps> = ({ children, blobImgName, bio, right = false }) => {
-	const { isSmartphone } = useWindowDimensions();
+	const { isSmartphone } = useContext(AppContext);
 	const isRight = right && !isSmartphone;
 
 	return (
@@ -223,7 +224,7 @@ interface SectionProps {
 }
 
 const Section: React.FC<SectionProps> = ({ title, children, noDashTitle = false, noBottomMargin = false }) => {
-	const { isSmartphone } = useWindowDimensions();
+	const { isSmartphone } = useContext(AppContext);
 
 	return (
 		<div className={styles.section}>
