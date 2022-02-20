@@ -16,7 +16,6 @@ const useUserComments: useUserCommentsType = (user) => {
 		try {
 			const unsub = FireStoreHelper.userCommentsListener(user, setUserComments);
 			return () => {
-				console.log("successfully unsubscribed to user comments");
 				unsub();
 			};
 		} catch (_e) {

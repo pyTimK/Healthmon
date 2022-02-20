@@ -8,12 +8,21 @@ function getWindowDimensions() {
 	};
 }
 
-export default function useIsSmartphone() {
-	const [isSmartphone, setIsSmartphone] = useState(true);
+export const enum DeviceType {
+	Smartphone,
+	Tablet,
+	Desktop,
+}
+
+export default function useDevice() {
+	const [device, setDevice] = useState(DeviceType.Smartphone);
 
 	useEffect(() => {
 		function handleResize() {
-			setIsSmartphone(getWindowDimensions().width < 600);
+			let newDevice = DeviceType.Smartphone;
+			if (getWindowDimensions().width > 600) newDevice = DeviceType.Tablet;
+			if (getWindowDimensions().width > 980) newDevice = DeviceType.Desktop;
+			setDevice(newDevice);
 		}
 		handleResize();
 
@@ -21,5 +30,5 @@ export default function useIsSmartphone() {
 		return () => window.removeEventListener("resize", handleResize);
 	}, []);
 
-	return { isSmartphone };
+	return { device };
 }

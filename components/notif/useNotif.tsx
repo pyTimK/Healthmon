@@ -1,39 +1,23 @@
 import { Bell } from "akar-icons";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import React, { MouseEventHandler, useContext, useEffect, useMemo, useState } from "react";
 import { FireStoreHelper } from "../../classes/FireStoreHelper";
 import { Formatted, HealthWorker } from "../../classes/MyUser";
 import sortNotifs from "../../function/sortNotifs";
-import { HomeContext } from "../../pages/index";
+import useNotifListeners from "../../hooks/useNotifListeners";
+import { AppContext } from "../../pages/_app";
 import { MonitorRequestNotif, RecordCommentNotif } from "../../types/Notification";
 import NotifBlock from "./NotifBlock";
 import styles from "./useNotif.module.css";
 
-const inSenders = (senders: Formatted<HealthWorker>, newSenderId: string) =>
-	Object.prototype.hasOwnProperty.call(senders, newSenderId);
-
 const useNotif = () => {
-	const { user, userConfig } = useContext(HomeContext);
+	const { user, userConfig, monitorRequestNotifs, recordCommentNotifs } = useContext(AppContext);
 	const [isNotifOpen, setIsNotifOpen] = useState(false);
-	const [monitorRequestNotifs, setMonitorRequestNotifs] = useState<MonitorRequestNotif[]>([]);
-	const [recordCommentNotifs, setRecordCommentNotifs] = useState<RecordCommentNotif[]>([]);
 
 	const notifsList: (MonitorRequestNotif | RecordCommentNotif)[] = useMemo(
 		() => sortNotifs(monitorRequestNotifs, recordCommentNotifs),
 		[monitorRequestNotifs, recordCommentNotifs]
 	);
-
-	useEffect(() => {
-		if (user.id.length === 0) return;
-
-		const unsubMonitorRequestNotif = FireStoreHelper.monitorRequestNotifListener(user.id, setMonitorRequestNotifs);
-		const unsubRecordCommentNotif = FireStoreHelper.recordCommentNotifListener(user.id, setRecordCommentNotifs);
-
-		return () => {
-			unsubMonitorRequestNotif();
-			unsubRecordCommentNotif();
-		};
-	}, [user]);
 
 	const toggleNotif: MouseEventHandler = (e) => {
 		e.preventDefault();

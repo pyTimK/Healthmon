@@ -10,13 +10,14 @@ import MailIcon from "../../components/icons/social_media/MailIcon";
 import TwitterIcon from "../../components/icons/social_media/TwitterIcon";
 import Layout from "../../components/layout/Layout";
 import Sizedbox from "../../components/Sizedbox";
+import { DeviceType } from "../../hooks/useIsSmartphone";
 import { AppContext } from "../_app";
 import styles from "./About.module.css";
 
 const avatarSize = 150;
 
 const About: NextPage = () => {
-	const { isSmartphone } = useContext(AppContext);
+	const { device } = useContext(AppContext);
 	return (
 		<>
 			<Layout title='About - Healthmon' description={PageDescriptions.HOME}>
@@ -121,7 +122,7 @@ const About: NextPage = () => {
 					</Section>
 					<Section title='' noDashTitle noBottomMargin>
 						<div className={styles.bottomContainer}>
-							{isSmartphone && (
+							{device === DeviceType.Smartphone && (
 								<div className={styles.bottomRight}>
 									<img src='/img/logo_group.png' alt='logo_group' />
 								</div>
@@ -149,7 +150,7 @@ const About: NextPage = () => {
 									© 2022 Healthmon organization. All Rights Reserved.
 								</p>
 							</div>
-							{!isSmartphone && (
+							{device !== DeviceType.Smartphone && (
 								<div className={styles.bottomRight}>
 									<img src='/img/logo_group.png' alt='logo_group' />
 								</div>
@@ -170,8 +171,8 @@ interface PioneerProps {
 }
 
 const Pioneer: React.FC<PioneerProps> = ({ children, blobImgName, bio, right = false }) => {
-	const { isSmartphone } = useContext(AppContext);
-	const isRight = right && !isSmartphone;
+	const { device } = useContext(AppContext);
+	const isRight = right && device !== DeviceType.Smartphone;
 
 	return (
 		<div>
@@ -224,14 +225,14 @@ interface SectionProps {
 }
 
 const Section: React.FC<SectionProps> = ({ title, children, noDashTitle = false, noBottomMargin = false }) => {
-	const { isSmartphone } = useContext(AppContext);
+	const { device } = useContext(AppContext);
 
 	return (
 		<div className={styles.section}>
 			<h1>{noDashTitle ? title : `- ${title} -`}</h1>
 			<Sizedbox height={30} />
 			{children}
-			{!noBottomMargin && <Sizedbox height={isSmartphone ? 50 : 200} />}
+			{!noBottomMargin && <Sizedbox height={device === DeviceType.Smartphone ? 50 : 200} />}
 		</div>
 	);
 };

@@ -1,14 +1,15 @@
 import { motion } from "framer-motion";
 import styles from "./Overlay.module.css";
 interface OverlayProps {
+	opacity?: number;
 	onClick: () => void;
 }
 
-const Overlay: React.FC<OverlayProps> = ({ onClick }) => {
+const Overlay: React.FC<OverlayProps> = ({ onClick, opacity = 0.5 }) => {
 	return (
 		<motion.div
 			key='overlay'
-			animate={{ opacity: 0.5 }}
+			animate={{ opacity: opacity }}
 			initial={{ opacity: 0 }}
 			exit={{ opacity: 0 }}
 			transition={{ duration: 0.1 }}

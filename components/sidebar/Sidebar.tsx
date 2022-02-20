@@ -11,6 +11,7 @@ import AboutLogo from "../icons/AboutLogo";
 import { motion } from "framer-motion";
 import React, { useContext, useEffect, useState } from "react";
 import { AppContext } from "../../pages/_app";
+import { DeviceType } from "../../hooks/useIsSmartphone";
 
 const logoSize = 32;
 const iconSize = 24;
@@ -21,15 +22,7 @@ export const tabOrdering = ["/", "/settings", "/account", "/about"];
 const Sidebar: NextComponentType = () => {
 	const router = useRouter();
 	const pathname = router.pathname;
-	const { pastTwoTabIndices, isSmartphone } = useContext(AppContext);
-	// const [tabIndex, setTabIndex] = useState(pastTwoTabIndices[0]);
-	// console.log(pastTwoTabIndices);
-
-	// useEffect(() => {
-	// 	console.log("pastTwoTabIndices changed: ", pastTwoTabIndices);
-	// }, [pastTwoTabIndices]);
-
-	console.log(pastTwoTabIndices);
+	const { pastTwoTabIndices, device } = useContext(AppContext);
 
 	return (
 		<div className={styles.content}>
@@ -44,15 +37,15 @@ const Sidebar: NextComponentType = () => {
 				<motion.div
 					key={pastTwoTabIndices[1]}
 					animate={
-						isSmartphone
-							? { top: 0, left: 90 * pastTwoTabIndices[0] }
+						device === DeviceType.Smartphone || device === DeviceType.Tablet
+							? { top: 0, left: `calc(25vw * ${pastTwoTabIndices[0]})` }
 							: { left: "auto", top: 60 * pastTwoTabIndices[0] }
 					}
 					initial={
 						pastTwoTabIndices[1] === -1
 							? undefined
-							: isSmartphone
-							? { top: 0, left: Math.max(0, 90 * pastTwoTabIndices[1]) }
+							: device === DeviceType.Smartphone || device === DeviceType.Tablet
+							? { top: 0, left: pastTwoTabIndices[1] < 0 ? 0 : `calc(25vw * ${pastTwoTabIndices[1]})` }
 							: { left: "auto", top: Math.max(0, 60 * pastTwoTabIndices[1]) }
 					}
 					// transition={{ delay: 1000 }}

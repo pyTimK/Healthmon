@@ -6,7 +6,7 @@ import { Role } from "../../../classes/MyUser";
 import { getCommentAge } from "../../../function/dateConversions";
 import logError from "../../../function/logError";
 import notify from "../../../function/notify";
-import { HomeContext } from "../../../pages/index";
+import { AppContext } from "../../../pages/_app";
 import { RecordComment } from "../../../types/RecordComment";
 import Avatar from "../../Avatar";
 import { RecordContext } from "../Record";
@@ -19,7 +19,7 @@ interface MyCommentProps {
 }
 
 const MyComment: React.FC<MyCommentProps> = ({ comment, canEdit = false, onEdit }) => {
-	const { user, userConfig } = useContext(HomeContext);
+	const { user, userConfig } = useContext(AppContext);
 	const { editMode, userComment } = useContext(RecordContext);
 	const isMine = userConfig.role === Role.HealthWorker && comment.sender.id === user.id;
 	const isHidden = editMode && isMine;

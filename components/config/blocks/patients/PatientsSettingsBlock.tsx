@@ -1,10 +1,10 @@
+import { useContext } from "react";
 import { useRef } from "react";
 import { FireStoreHelper } from "../../../../classes/FireStoreHelper";
 import MyUser, { Patient } from "../../../../classes/MyUser";
 import logError from "../../../../function/logError";
 import notify from "../../../../function/notify";
-import usePatients from "../../../../hooks/usePatients";
-import useRequestedUsers from "../../../../hooks/useRequestedUsers";
+import { AppContext } from "../../../../pages/_app";
 import useConfirmModal from "../../../myModal/useConfirmModal/useConfirmModal";
 import SettingsBlock from "../../settingsBlock/SettingsBlock";
 import SettingsRow from "../../settingsRow/SettingsRow";
@@ -14,8 +14,7 @@ interface PatientsSettingsBlockProps {
 	user: MyUser;
 }
 const PatientsSettingsBlock: React.FC<PatientsSettingsBlockProps> = ({ user }) => {
-	const { patients } = usePatients(user);
-	const { requestedUsers } = useRequestedUsers(user);
+	const { patients, requestedUsers } = useContext(AppContext);
 	const selectedPatient = useRef<Patient | null>(null);
 	const { PatientSearchModal, openPatientSearchModal, setSearchResult } = usePatientSearchModal(
 		user,

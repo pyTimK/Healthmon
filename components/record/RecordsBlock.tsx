@@ -5,7 +5,8 @@ import { getYYYYMMDD } from "../../function/dateConversions";
 import { pulseStatus, spo2Status, tempStatus } from "../../function/healthRanges";
 import logError from "../../function/logError";
 import notify from "../../function/notify";
-import { HealthWorkerRecodBlocksContext, HomeContext } from "../../pages/index";
+import { HealthWorkerRecodBlocksContext } from "../../pages/index";
+import { AppContext } from "../../pages/_app";
 import HealthStatus from "../../types/HealthStatus";
 import UserComment from "../../types/RecordComment";
 import Record, { RecordData, RecordMetaData } from "./Record";
@@ -23,7 +24,7 @@ interface RecordsBlockProps {
 }
 
 const RecordsBlock: React.FC<RecordsBlockProps> = ({ patient, headerHidden = false }) => {
-	const { userConfig } = useContext(HomeContext);
+	const { userConfig } = useContext(AppContext);
 	let userCommentsOnPatient: UserComment[] = [];
 
 	if (userConfig.role === Role.HealthWorker) {

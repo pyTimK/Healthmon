@@ -1,17 +1,15 @@
 import { getAuth } from "firebase/auth";
 import { useRouter } from "next/router";
-import { FormEventHandler, useState } from "react";
+import { FormEventHandler, useContext, useState } from "react";
 import usePersonalDetailsSettingsBlock from "../components/config/blocks/personalDetails/usePersonalDetailsSettingsBlock";
 import ButtonStatus from "../enums/ButtonStatus";
 import { auth } from "../firebase/initFirebase";
 import logError from "../function/logError";
 import notify from "../function/notify";
-import useUser from "./useUser";
-import useUserConfig from "./useUserConfig";
+import { AppContext } from "../pages/_app";
 
 const useAccount = () => {
-	const { user } = useUser();
-	const { userConfig } = useUserConfig();
+	const { user, userConfig, device } = useContext(AppContext);
 	const router = useRouter();
 	const authUser = getAuth().currentUser;
 
@@ -61,6 +59,7 @@ const useAccount = () => {
 		updateUser,
 		editing,
 		saveButtonStatus,
+		device,
 	};
 };
 

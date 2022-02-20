@@ -15,7 +15,6 @@ const usePatients: usePatientsType = (user) => {
 		try {
 			const unsub = FireStoreHelper.patientsListener(user, setPatients);
 			return () => {
-				console.log("successfully unsubscribed");
 				unsub();
 			};
 		} catch (_e) {

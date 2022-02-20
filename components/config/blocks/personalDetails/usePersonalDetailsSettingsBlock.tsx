@@ -1,5 +1,5 @@
-import React, { ChangeEventHandler, useEffect, useMemo, useRef, useState } from "react";
-import ReactDropdown from "react-dropdown";
+import clsx from "clsx";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import MyUser, { Role } from "../../../../classes/MyUser";
 import { UserConfig } from "../../../../types/userConfig";
 import InputOption from "../../options/inputOption/InputOption";
@@ -50,18 +50,38 @@ const usePersonalDetailsSettingsBlock = (user: MyUser, userConfig: UserConfig, h
 								</SettingsRow>
 								<SettingsRow title='Role'>
 									{editing ? (
-										<ReactDropdown
-											className={styles.dropdown}
-											menuClassName={styles.dropdownMenu}
-											placeholderClassName={styles.dropdownPlaceHolder}
-											arrowClassName={styles.dropdownArrow}
-											options={[Role.Patient, Role.HealthWorker]}
-											onChange={(arg) => {
-												setRole(arg.value as Role);
-											}}
-											// placeholder='Select Year Level'
-											value={role}
-										/>
+										// <ReactDropdown
+										// 	className={styles.dropdown}
+										// 	menuClassName={styles.dropdownMenu}
+										// 	placeholderClassName={styles.dropdownPlaceHolder}
+										// 	arrowClassName={styles.dropdownArrow}
+										// 	options={[Role.Patient, Role.HealthWorker]}
+										// 	onChange={(arg) => {
+										// 		setRole(arg.value as Role);
+										// 	}}
+										// 	// placeholder='Select Year Level'
+										// 	value={role}
+										// />
+										<div className={clsx(styles.roleWrapper, "unselectable")}>
+											<div
+												className={clsx(
+													styles.roleItem,
+													role === Role.Patient && styles.roleLeftSelected
+												)}
+												onClick={() => setRole(Role.Patient)}>
+												<img src='/img/svg/patient.svg' alt='doctor' height={35} />
+												<p className={styles.settingsRowValue}>Patient</p>
+											</div>
+											<div
+												className={clsx(
+													styles.roleItem,
+													role === Role.HealthWorker && styles.roleRightSelected
+												)}
+												onClick={() => setRole(Role.HealthWorker)}>
+												<img src='/img/svg/doctor.svg' alt='doctor' height={35} />
+												<p className={styles.settingsRowValue}>Health Worker</p>
+											</div>
+										</div>
 									) : (
 										<p className={styles.settingsRowValue}>{userConfig.role}</p>
 									)}
@@ -71,7 +91,7 @@ const usePersonalDetailsSettingsBlock = (user: MyUser, userConfig: UserConfig, h
 					</>
 				);
 			},
-		[editing, user]
+		[editing, user, role]
 	);
 	// PersonalDetailsSettingsBlock.displayName = "PersonalDetailsSettingsBlock";
 

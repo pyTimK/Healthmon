@@ -16,11 +16,22 @@
 
 }
 
+@keyframes fromLeft {
+    from {
+        width: 0;
+    }
+
+    to {
+        width: 100%;
+    }
+}
+
 .inputOption:focus {
     outline: none;
+    caret-color: var(--pink);
+    border-bottom: 1px solid var(--pink);
 }
 
 .inputOption:active {
-    border-bottom: 2px solid var(--background-dark);
-
+    /* border-bottom: 2px solid var(--pink); */
 }

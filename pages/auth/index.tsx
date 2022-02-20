@@ -1,19 +1,18 @@
-import { NextPage } from "next";
-import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
-import styles from "./Auth.module.css";
-import "firebase/compat/auth";
-import Sizedbox from "../../components/Sizedbox";
 import { User } from "firebase/auth";
 import firebase from "firebase/compat/app";
-import { auth, db } from "../../firebase/initFirebase";
-import { FireStoreHelper } from "../../classes/FireStoreHelper";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
+import "firebase/compat/auth";
 import { doc, getDoc } from "firebase/firestore";
-import MyUser from "../../classes/MyUser";
+import { NextPage } from "next";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
 import { ToastContainer } from "react-toastify";
 import { CookiesHelper } from "../../classes/CookiesHelper";
-import { UserConfig } from "../../types/userConfig";
+import { FireStoreHelper } from "../../classes/FireStoreHelper";
+import MyUser from "../../classes/MyUser";
+import Sizedbox from "../../components/Sizedbox";
+import { auth, db } from "../../firebase/initFirebase";
+import styles from "./Auth.module.css";
 
 const SignInScreen: NextPage = () => {
 	const [authUser, setAuthUser] = useState<User | null>(null);
@@ -28,6 +27,7 @@ const SignInScreen: NextPage = () => {
 		} else {
 			//* Go to registration if first time logging in
 			const myUser = MyUser.fromFirebaseUser(authUser);
+			//TODO must not block for 2 seconds in auth page -> register page
 			await FireStoreHelper.setUser(myUser);
 			await FireStoreHelper.createUserConfig(authUser.uid);
 			router.replace("/register");

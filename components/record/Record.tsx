@@ -1,16 +1,6 @@
 import clsx from "clsx";
 import firebase from "firebase/compat/app";
-import { serverTimestamp } from "firebase/firestore";
-import React, {
-	Dispatch,
-	FocusEventHandler,
-	ReactElement,
-	SetStateAction,
-	useContext,
-	useMemo,
-	useRef,
-	useState,
-} from "react";
+import React, { Dispatch, FocusEventHandler, ReactElement, SetStateAction, useContext, useRef, useState } from "react";
 import { FireStoreHelper } from "../../classes/FireStoreHelper";
 import { Role } from "../../classes/MyUser";
 import ButtonStatus from "../../enums/ButtonStatus";
@@ -19,7 +9,7 @@ import { pulseStatus, spo2Status, tempStatus } from "../../function/healthRanges
 import logError from "../../function/logError";
 import notify from "../../function/notify";
 import useRecordComments from "../../hooks/useRecordComments";
-import { HomeContext } from "../../pages/index";
+import { AppContext } from "../../pages/_app";
 import HealthStatus from "../../types/HealthStatus";
 import UserComment from "../../types/RecordComment";
 import CommentBlock from "./comment/CommentBlock";
@@ -54,7 +44,7 @@ export const RecordContext = React.createContext({
 });
 
 const Record: React.FC<RecordProps> = ({ record, index, showCommentButtons, setSelectedRecord, recordMetaData }) => {
-	const { user } = useContext(HomeContext);
+	const { user, userConfig } = useContext(AppContext);
 
 	const commentInputRef = useRef<HTMLTextAreaElement>(null);
 	const [cancelButtonStatus, setCancelButtonStatus] = useState<ButtonStatus>(ButtonStatus.Hidden);
@@ -69,7 +59,6 @@ const Record: React.FC<RecordProps> = ({ record, index, showCommentButtons, setS
 	);
 
 	const { recordComments } = useRecordComments(recordMetaData);
-	const { userConfig } = useContext(HomeContext);
 
 	const [editMode, setEditMode] = useState<boolean>(false);
 

@@ -154,6 +154,10 @@ input:active {
 .sdp {
   --theme-color: var(--pink) !important;
   --selected-date-color: #eeeeee !important;
+
+  background-color: var(--background-light) !important;
+  border: none;
+  outline: none;
 }
 
 
@@ -167,6 +171,16 @@ input:active {
   border: none !important;
 }
 
+.sdp--text {
+  color: whitesmoke !important;
+  font-weight: 200 !important;
+}
+
+.sdp--square-btn {
+  background-color: var(--background-light) !important;
+  color: whitesmoke !important;
+}
+
 .sdp--month-name:focus {
   outline: none !important;
   border: none !important;
@@ -175,6 +189,15 @@ input:active {
 .sdp--month-name:active {
   outline: none !important;
   border: none !important;
+}
+
+.sdp--text__inactive {
+  color: gray ! important;
+}
+
+.sdp--date-btn__selected {
+  background-color: var(--pink) !important;
+
 }
 
 /*! SMALL TABLET */

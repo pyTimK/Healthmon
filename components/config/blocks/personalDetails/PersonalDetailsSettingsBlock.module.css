@@ -4,6 +4,42 @@
     /* overflow: hidden; */
 }
 
+
+.roleWrapper {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-end;
+    /* gap: 20px; */
+    /* border: 1px solid var(--pink); */
+    background-color: #15141662;
+    border-radius: 10px;
+}
+
+.roleItem {
+    border: 1px solid transparent;
+    padding: 6px;
+    display: flex;
+    /* flex-direction: column; */
+    align-items: center;
+    justify-content: flex-start;
+    text-align: center;
+    cursor: pointer;
+}
+
+.roleLeftSelected {
+    border: 1px solid var(--pink);
+    color: #faafb7;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+.roleRightSelected {
+    border: 1px solid var(--pink);
+    color: #faafb7;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
 .dropdown {
     box-shadow: 0 0 1px rgb(81, 81, 81);
     border: 1px solid rgba(245, 245, 245, 0.174);
@@ -12,18 +48,27 @@
     flex: 2;
     color: whitesmoke;
     border-radius: 5px;
-    padding: 20;
+    position: relative;
+    /* padding: 20px; */
     cursor: pointer;
 }
 
+
+
 .dropdownMenu {
-    background-color: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+    background-color: var(--background-dark);
+    border: 1px solid rgba(245, 245, 245, 0.174);
 }
 
 .dropdownMenu {
     border-top: 1px solid rgba(245, 245, 245, 0.174);
     font-size: 0.8rem;
 }
+
+
 
 .dropdownMenu div.is-selected {
     color: red;

@@ -1,9 +1,9 @@
-import { useRef } from "react";
+import { useContext, useRef } from "react";
 import { FireStoreHelper } from "../../../../classes/FireStoreHelper";
 import MyUser, { HealthWorker } from "../../../../classes/MyUser";
 import logError from "../../../../function/logError";
 import notify from "../../../../function/notify";
-import useHealthWorkers from "../../../../hooks/useHealthWorkers";
+import { AppContext } from "../../../../pages/_app";
 import useConfirmModal from "../../../myModal/useConfirmModal/useConfirmModal";
 import SettingsBlock from "../../settingsBlock/SettingsBlock";
 import SettingsRow from "../../settingsRow/SettingsRow";
@@ -13,7 +13,7 @@ interface HealthWorkersSettingsBlockProps {
 }
 
 const HealthWorkersSettingsBlock: React.FC<HealthWorkersSettingsBlockProps> = ({ user }) => {
-	const { healthWorkers } = useHealthWorkers(user);
+	const { healthWorkers } = useContext(AppContext);
 	const selectedHealthWorker = useRef<HealthWorker | null>(null);
 
 	const { ConfirmModal, openConfirmModal, closeConfirmModal } = useConfirmModal();

@@ -5,7 +5,7 @@ import { FireStoreHelper } from "../../classes/FireStoreHelper";
 import { getDayMonthFromYYYYMMDD, getTimeFromHHMMSS } from "../../function/dateConversions";
 import logError from "../../function/logError";
 import notify from "../../function/notify";
-import { HomeContext } from "../../pages/index";
+import { AppContext } from "../../pages/_app";
 import { isRecordCommentNotif, MonitorRequestNotif, RecordCommentNotif } from "../../types/Notification";
 import Avatar from "../Avatar";
 import styles from "./NotifItem.module.css";
@@ -16,7 +16,7 @@ interface NotifItemProp {
 }
 
 const NotifItem: React.FC<NotifItemProp> = ({ notif, setIsNotifOpen }) => {
-	const { user, userConfig } = useContext(HomeContext);
+	const { user, userConfig } = useContext(AppContext);
 	const sender = notif.sender;
 	const router = useRouter();
 

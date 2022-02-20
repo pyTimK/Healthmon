@@ -1,12 +1,14 @@
 import { ChevronDown } from "akar-icons";
 import clsx from "clsx";
 import { AnimatePresence, motion } from "framer-motion";
+import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import DatePicker from "sassy-datepicker";
 import { getMonthYearFromStr } from "../../../../function/dateConversions";
 import { UserConfig } from "../../../../types/userConfig";
 import Overlay from "../../../Overlay/Overlay";
 import styles from "./DropdownPicker.module.css";
+// const AnimatePresence = dynamic(() => import("framer-motion/types").then((mod)=>mod.AnimatePresence), { ssr: false });
 
 interface DropdownPickerProps {
 	userConfig: UserConfig;
@@ -25,10 +27,6 @@ const DropdownPicker: React.FC<DropdownPickerProps> = ({ userConfig, month, year
 		setIsPickingDate((prevIsPickingDate) => !prevIsPickingDate);
 	};
 
-	useEffect(() => {
-		console.log("blah");
-	}, []);
-
 	return (
 		<motion.div className={styles.container}>
 			<div className={styles.monthYearButtonContainer} onClick={toggleIsPickingDate}>
@@ -37,16 +35,18 @@ const DropdownPicker: React.FC<DropdownPickerProps> = ({ userConfig, month, year
 			</div>
 			<AnimatePresence>
 				{isPickingDate && (
-					<div>
+					<div className={styles.datePickerContainer}>
 						<motion.div
 							key='datePicker'
-							animate={{ height: "fit-content" }}
+							animate={{
+								height: "fit-content",
+							}}
 							initial={{ height: 0 }}
 							exit={{ height: 0, transition: { duration: 0.1 } }}
 							className={clsx(styles.datePickerWrapper, "unselectable")}>
 							<DatePicker selected={new Date(userConfig.date)} onChange={changeDate} />
 						</motion.div>
-						<Overlay onClick={toggleIsPickingDate} />
+						<Overlay opacity={0.6} onClick={toggleIsPickingDate} />
 					</div>
 				)}
 			</AnimatePresence>

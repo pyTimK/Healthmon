@@ -1,5 +1,5 @@
-import { FocusEventHandler, RefObject, useCallback, useContext, useEffect, useRef, useState } from "react";
-import { HomeContext } from "../../../pages/index";
+import { FocusEventHandler, RefObject, useCallback, useContext, useEffect, useRef } from "react";
+import { AppContext } from "../../../pages/_app";
 import { RecordComment } from "../../../types/RecordComment";
 import Divider from "../../Divider";
 import { RecordContext } from "../Record";
@@ -21,7 +21,7 @@ const CommentBlock: React.FC<CommentBlockProps> = ({
 	canComment,
 	recordComments,
 }) => {
-	const { user } = useContext(HomeContext);
+	const { user } = useContext(AppContext);
 	const { editMode, setEditMode } = useContext(RecordContext);
 	const textAreaDefaultValue = useRef<string>("");
 

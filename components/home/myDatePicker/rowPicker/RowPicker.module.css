@@ -2,8 +2,21 @@
     display: flex;
     align-items: center;
     gap: 45px;
-    cursor: pointer;
+    cursor: grab;
+    overflow-x: scroll;
+
+    /* Hide scrollbar for IE, Edge and Firefox */
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
 }
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.container::-webkit-scrollbar {
+    display: none;
+}
+
 
 /*! SMARTPHONE */
 @media screen and (max-width: 600px) {

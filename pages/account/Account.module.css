@@ -37,6 +37,7 @@
 
 .onChangeButtonWrapper {
     display: flex;
+    padding-bottom: 20px;
     align-items: center;
     justify-content: center;
     gap: 20px;
@@ -57,7 +58,7 @@
     }
 
     .onChangeButtonWrapper {
-        padding-bottom: 20px;
+        /* padding-bottom: 20px; */
     }
 
 }

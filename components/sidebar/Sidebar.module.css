@@ -69,7 +69,7 @@
 
     .selectedBarWrapper {
         top: 0;
-        width: 90px;
+        width: 25vw;
         height: 4px;
     }
 
@@ -80,5 +80,6 @@
         border-bottom-left-radius: 50px;
         border-bottom-right-radius: 50px;
     }
+
 
 }

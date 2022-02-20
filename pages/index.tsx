@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import React, { useContext } from "react";
 import { ToastContainer } from "react-toastify";
 import { PageDescriptions } from "../classes/Constants";
-import MyUser, { Role } from "../classes/MyUser";
+import { Role } from "../classes/MyUser";
 import Avatar from "../components/Avatar";
 import DropdownPicker from "../components/home/myDatePicker/dropdownPicker/DropdownPicker";
 import MyDatePicker from "../components/home/myDatePicker/MyDatePicker";
@@ -15,43 +15,33 @@ import Sizedbox from "../components/Sizedbox";
 import { parseUserConfigDate } from "../function/dateConversions";
 import dayGreetings from "../function/dayGreetings";
 import groupCommentsBasedOnPatient from "../function/groupCommentsBasedOnPatient";
-import usePatients from "../hooks/usePatients";
-import useUser from "../hooks/useUser";
+import { DeviceType } from "../hooks/useIsSmartphone";
 import useUserComments from "../hooks/useUserComments";
-import useUserConfig from "../hooks/useUserConfig";
-import UserComment from "../types/RecordComment";
-import { UserConfig } from "../types/userConfig";
 import styles from "../styles/Home.module.css";
+import UserComment from "../types/RecordComment";
 import { AppContext } from "./_app";
 
-export const HomeContext = React.createContext({
-	user: new MyUser(),
-	userConfig: UserConfig.constructEmpty(),
-});
-
 const Home: NextPage = () => {
-	const { user } = useUser();
-	const { userConfig } = useUserConfig();
-	const { isSmartphone } = useContext(AppContext);
+	const { device, user, userConfig } = useContext(AppContext);
 
 	return (
 		<Layout title='HealthMon' description={PageDescriptions.HOME}>
-			<HomeContext.Provider value={{ user, userConfig }}>
-				<Header />
-				<main className={styles.main}>
+			<Header />
+			<main className={styles.main}>
+				{user.id !== "" && (
 					<div className={styles.title}>
 						<h1>
 							{dayGreetings()} {user?.name}
 						</h1>
 					</div>
-					<MyDatePicker />
-					{!isSmartphone && <Sizedbox height={50} />}
+				)}
+				{user.id !== "" && userConfig.id !== "" && <MyDatePicker />}
+				{device !== DeviceType.Smartphone && <Sizedbox height={50} />}
 
-					{userConfig.role === Role.Patient ? <PatientRecordBlock /> : <HealthWorkerRecordBlocks />}
-					<Sizedbox height={100} />
-				</main>
-				<ToastContainer theme='colored' autoClose={2} />
-			</HomeContext.Provider>
+				{userConfig.role === Role.Patient ? <PatientRecordBlock /> : <HealthWorkerRecordBlocks />}
+				<Sizedbox height={100} />
+			</main>
+			<ToastContainer theme='colored' autoClose={2} />
 		</Layout>
 	);
 };
@@ -59,7 +49,7 @@ const Home: NextPage = () => {
 interface PatientRecordBlockProps {}
 
 const PatientRecordBlock: React.FC<PatientRecordBlockProps> = () => {
-	const { user } = useContext(HomeContext);
+	const { user } = useContext(AppContext);
 	return <RecordsBlock headerHidden patient={user.toPatient()} />;
 };
 
@@ -72,8 +62,7 @@ export const HealthWorkerRecodBlocksContext = React.createContext({
 interface HealthWorkerRecordBlocksProps {}
 
 const HealthWorkerRecordBlocks: React.FC<HealthWorkerRecordBlocksProps> = () => {
-	const { user } = useContext(HomeContext);
-	const { patients } = usePatients(user);
+	const { user, patients } = useContext(AppContext);
 	const { userComments } = useUserComments(user);
 	const groupedCommentsBasedOnPatient = groupCommentsBasedOnPatient(userComments);
 

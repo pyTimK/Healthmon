@@ -23,7 +23,7 @@ const useUser = () => {
 	// TODO: move to serverside
 	useEffect(() => {
 		const id = CookiesHelper.get<string>("id", "");
-		if (id.length === 0) {
+		if (id.length === 0 && router.pathname !== "/auth") {
 			router.replace("/auth");
 			return;
 		}
