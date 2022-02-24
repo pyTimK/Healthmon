@@ -92,11 +92,11 @@ class MyUser {
 		};
 	};
 
-	async updatePersonalDetails(newName: string, newNumber: string) {
+	async updatePersonalDetails(newName: string, newNumber: string, fireStoreHelper: FireStoreHelper) {
 		if (this.name === newName && this.number === newNumber) return;
 		this.name = newName;
 		this.number = newNumber;
-		await FireStoreHelper.updatePersonalDetails(this);
+		await fireStoreHelper.updatePersonalDetails(this);
 	}
 }
 

@@ -1,11 +1,9 @@
 import React, { useContext, useEffect, useState } from "react";
-import { FireStoreHelper } from "../../classes/FireStoreHelper";
 import { constructEmptyBaseUser, Patient, Role } from "../../classes/MyUser";
 import { getYYYYMMDD } from "../../function/dateConversions";
 import { pulseStatus, spo2Status, tempStatus } from "../../function/healthRanges";
 import logError from "../../function/logError";
 import notify from "../../function/notify";
-import { HealthWorkerRecodBlocksContext } from "../../pages/index";
 import { AppContext } from "../../pages/_app";
 import HealthStatus from "../../types/HealthStatus";
 import UserComment from "../../types/RecordComment";
@@ -21,14 +19,20 @@ export const RecordBlockContext = React.createContext({
 interface RecordsBlockProps {
 	patient: Patient;
 	headerHidden?: boolean;
+	groupedCommentsBasedOnPatient?: {
+		[key: string]: UserComment[];
+	};
 }
 
-const RecordsBlock: React.FC<RecordsBlockProps> = ({ patient, headerHidden = false }) => {
-	const { userConfig } = useContext(AppContext);
+const RecordsBlock: React.FC<RecordsBlockProps> = ({
+	patient,
+	headerHidden = false,
+	groupedCommentsBasedOnPatient,
+}) => {
+	const { userConfig, fireStoreHelper } = useContext(AppContext);
 	let userCommentsOnPatient: UserComment[] = [];
 
-	if (userConfig.role === Role.HealthWorker) {
-		const { groupedCommentsBasedOnPatient } = useContext(HealthWorkerRecodBlocksContext);
+	if (userConfig.role === Role.HealthWorker && groupedCommentsBasedOnPatient) {
 		userCommentsOnPatient = groupedCommentsBasedOnPatient[patient.id] ?? [];
 	}
 
@@ -44,8 +48,10 @@ const RecordsBlock: React.FC<RecordsBlockProps> = ({ patient, headerHidden = fal
 	);
 
 	const getRecordListener = (id: string) => {
+		if (!fireStoreHelper) return;
+
 		try {
-			const unsub = FireStoreHelper.recordDataListener(id, userConfig.date, setRecords, setRecordsMetaData);
+			const unsub = fireStoreHelper.recordDataListener(id, userConfig.date, setRecords, setRecordsMetaData);
 			if (unsub) return () => unsub();
 		} catch (_e) {
 			logError(_e);

@@ -1,13 +1,13 @@
 import clsx from "clsx";
 import { useRouter } from "next/router";
-import { Dispatch, SetStateAction, useContext } from "react";
-import { FireStoreHelper } from "../../classes/FireStoreHelper";
+import { Dispatch, SetStateAction, useContext, useState } from "react";
+import ButtonStatus from "../../enums/ButtonStatus";
 import { getDayMonthFromYYYYMMDD, getTimeFromHHMMSS } from "../../function/dateConversions";
 import logError from "../../function/logError";
 import notify from "../../function/notify";
 import { AppContext } from "../../pages/_app";
 import { isRecordCommentNotif, MonitorRequestNotif, RecordCommentNotif } from "../../types/Notification";
-import Avatar from "../Avatar";
+import MyAvatar from "../Avatar";
 import styles from "./NotifItem.module.css";
 
 interface NotifItemProp {
@@ -16,13 +16,16 @@ interface NotifItemProp {
 }
 
 const NotifItem: React.FC<NotifItemProp> = ({ notif, setIsNotifOpen }) => {
-	const { user, userConfig } = useContext(AppContext);
+	const { user, userConfig, fireStoreHelper } = useContext(AppContext);
 	const sender = notif.sender;
 	const router = useRouter();
+	const [acceptDeclineButtonStatus, setAcceptDeclineButtonStatus] = useState<ButtonStatus>(ButtonStatus.Enabled);
 
 	const onDeclineMonitorRequest = async () => {
+		if (!fireStoreHelper) return;
+
 		try {
-			await FireStoreHelper.removeMonitorRequest(user.toPatient(), sender);
+			await fireStoreHelper.removeMonitorRequest(user.toPatient(), sender);
 		} catch (_e) {
 			logError(_e);
 			notify("Can't decline request right now");
@@ -30,19 +33,25 @@ const NotifItem: React.FC<NotifItemProp> = ({ notif, setIsNotifOpen }) => {
 	};
 
 	const onAcceptMonitorRequest = async () => {
+		if (!fireStoreHelper) return;
+
+		setAcceptDeclineButtonStatus(ButtonStatus.Disabled);
 		try {
-			await FireStoreHelper.add_patient_healthWorker_relationship(user.toPatient(), sender);
-			await FireStoreHelper.removeMonitorRequest(user.toPatient(), sender);
+			await fireStoreHelper.removeMonitorRequest(user.toPatient(), sender);
+			await fireStoreHelper.add_patient_healthWorker_relationship(user.toPatient(), sender);
 		} catch (_e) {
 			logError(_e);
 			notify("Can't accept request right now");
 		}
+		setAcceptDeclineButtonStatus(ButtonStatus.Enabled);
 	};
 
 	const deleteCommentNotif = async () => {
+		if (!fireStoreHelper) return;
+
 		if (!isRecordCommentNotif(notif)) return;
 		try {
-			await FireStoreHelper.removeRecordCommentNotif(user, notif);
+			await fireStoreHelper.removeRecordCommentNotif(user, notif);
 		} catch (_e) {
 			logError(_e);
 			notify("Can't remove notification right now");
@@ -50,9 +59,11 @@ const NotifItem: React.FC<NotifItemProp> = ({ notif, setIsNotifOpen }) => {
 	};
 
 	const viewComment = async () => {
+		if (!fireStoreHelper) return;
+
 		//TODO: view comment
 		if (!isRecordCommentNotif(notif)) return;
-		await userConfig.updateDate(notif.recordDate);
+		await userConfig.updateDate(notif.recordDate, fireStoreHelper);
 		router.replace(`/#${notif.recordTime}`);
 		setIsNotifOpen(false);
 	};
@@ -61,7 +72,7 @@ const NotifItem: React.FC<NotifItemProp> = ({ notif, setIsNotifOpen }) => {
 		<div className={styles.container}>
 			<div className={styles.main}>
 				<div className={styles.avatarWrapper}>
-					<Avatar size={45} letter={sender.name} nonclickable photoURL={sender.photoURL} />
+					<MyAvatar size={45} letter={sender.name} nonclickable photoURL={sender.photoURL} />
 				</div>
 				<p className={styles.description}>
 					<b className={styles.name}>{sender.name}</b>
@@ -90,12 +101,16 @@ const NotifItem: React.FC<NotifItemProp> = ({ notif, setIsNotifOpen }) => {
 			) : (
 				<div className={styles.options}>
 					<button
+						disabled={acceptDeclineButtonStatus === ButtonStatus.Disabled}
 						className={clsx(styles.notifButton, styles.declineButton)}
 						onClick={onDeclineMonitorRequest}>
 						{/* <Cross size={16} /> */}
 						Decline
 					</button>
-					<button className={clsx(styles.notifButton, styles.acceptButton)} onClick={onAcceptMonitorRequest}>
+					<button
+						disabled={acceptDeclineButtonStatus === ButtonStatus.Disabled}
+						className={clsx(styles.notifButton, styles.acceptButton)}
+						onClick={onAcceptMonitorRequest}>
 						{/* <Check size={16} />  */}
 						Accept
 					</button>

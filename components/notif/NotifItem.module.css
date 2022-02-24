@@ -61,6 +61,11 @@
     align-items: center;
 }
 
+.notifButton:disabled {
+    opacity: 0.3;
+    cursor: default;
+}
+
 .discardButton {
     /* color: var(--pink);
     background-color: transparent;

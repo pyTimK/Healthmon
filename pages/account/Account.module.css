@@ -9,9 +9,9 @@
 .imgOverview {
     flex: 1;
     position: relative;
-    /* display: flex; */
-    /* align-items: center; */
-    /* justify-content: center; */
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
 }
 
 .imgOverview img {

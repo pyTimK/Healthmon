@@ -36,7 +36,7 @@ const usePersonalDetailsSettingsBlock = (user: MyUser, userConfig: UserConfig, h
 								editing={editing}>
 								<SettingsRow title='Name'>
 									{editing ? (
-										<InputOption inputRef={nameInputRef} value={user.name} maxLength={15} />
+										<InputOption inputRef={nameInputRef} value={user.name} maxLength={20} />
 									) : (
 										<p className={styles.settingsRowValue}>{user.name}</p>
 									)}
@@ -50,18 +50,6 @@ const usePersonalDetailsSettingsBlock = (user: MyUser, userConfig: UserConfig, h
 								</SettingsRow>
 								<SettingsRow title='Role'>
 									{editing ? (
-										// <ReactDropdown
-										// 	className={styles.dropdown}
-										// 	menuClassName={styles.dropdownMenu}
-										// 	placeholderClassName={styles.dropdownPlaceHolder}
-										// 	arrowClassName={styles.dropdownArrow}
-										// 	options={[Role.Patient, Role.HealthWorker]}
-										// 	onChange={(arg) => {
-										// 		setRole(arg.value as Role);
-										// 	}}
-										// 	// placeholder='Select Year Level'
-										// 	value={role}
-										// />
 										<div className={clsx(styles.roleWrapper, "unselectable")}>
 											<div
 												className={clsx(

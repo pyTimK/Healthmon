@@ -23,7 +23,7 @@ const Settings: NextPage = () => {
 				) : (
 					<PatientsSettingsBlock user={user} />
 				)}
-				<ToastContainer theme='colored' autoClose={2} />
+				<ToastContainer theme='colored' autoClose={200} closeButton={false} />
 			</div>
 		</Layout>
 	);

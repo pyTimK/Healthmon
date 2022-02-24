@@ -8,11 +8,13 @@
     "lint": "next lint",
     "export": "next export",
     "postinstall": "patch-package",
-    "deploy": "next build && next export && firebase deploy"
+    "deploy": "next build && next export && firebase deploy",
+    "deploytest": "next build && next export && firebase hosting:channel:deploy trial-and-error-69"
   },
   "dependencies": {
     "@types/cookie": "^0.4.1",
     "@types/qrcode": "^1.4.2",
+    "@types/react-custom-scroll": "^4.3.2",
     "@types/react-qr-reader": "^2.1.4",
     "akar-icons": "^1.9.6",
     "clsx": "^1.1.1",
@@ -28,10 +30,13 @@
     "next-optimized-images": "^2.6.2",
     "next-pwa": "^5.4.4",
     "patch-package": "^6.4.7",
+    "prop-types": "^15.8.1",
     "qr-scanner": "^1.3.0",
     "react": "17.0.2",
+    "react-avatar": "^4.0.0",
     "react-blob": "^2.1.0",
     "react-code-input": "^3.10.1",
+    "react-custom-scroll": "^4.4.0",
     "react-dom": "17.0.2",
     "react-dropdown": "^1.9.2",
     "react-firebase-hooks": "^4.0.2",

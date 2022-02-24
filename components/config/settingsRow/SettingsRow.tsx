@@ -1,4 +1,4 @@
-import Avatar from "../../Avatar";
+import MyAvatar from "../../Avatar";
 import styles from "./SettingsRow.module.css";
 
 interface SettingsRowProps {
@@ -11,7 +11,7 @@ const SettingsRow: React.FC<SettingsRowProps> = ({ title, subtitle, photoURL, ch
 	return (
 		<div className={styles.row}>
 			<div className={styles.rowLeft}>
-				{photoURL && <Avatar photoURL={photoURL} letter={title} nonclickable />}
+				{photoURL && <MyAvatar photoURL={photoURL} letter={title} nonclickable />}
 				<div className={styles.titleWrapper}>
 					<h3 className={styles.rowTitle}>{title}</h3>
 					{subtitle && <p className={styles.rowSubTitle}>{subtitle}</p>}

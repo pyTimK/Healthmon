@@ -1,18 +1,18 @@
-import { UserConfig } from "./../types/userConfig";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { CookiesHelper } from "../classes/CookiesHelper";
-import { FireStoreHelper } from "../classes/FireStoreHelper";
+import { CookieKeys, CookiesHelper } from "../classes/CookiesHelper";
 import logError from "../function/logError";
 import notify from "../function/notify";
+import { FirebaseData } from "./../pages/_app";
+import { UserConfig } from "./../types/userConfig";
 
-const useUserConfig = () => {
+const useUserConfig = (data?: FirebaseData) => {
 	const [userConfig, setUserConfig] = useState(UserConfig.constructEmpty());
 	const router = useRouter();
 
-	const userConfigListener = (id: string) => {
+	const userConfigListener = (data: FirebaseData, id: string) => {
 		try {
-			const unsub = FireStoreHelper.userConfigListener(id, setUserConfig);
+			const unsub = data.fireStoreHelper.userConfigListener(id, setUserConfig);
 			return () => unsub();
 		} catch (_e) {
 			logError(_e);
@@ -23,14 +23,12 @@ const useUserConfig = () => {
 
 	// TODO: move to serverside
 	useEffect(() => {
-		const id = CookiesHelper.get<string>("id", "");
-		if (id.length === 0 && router.pathname !== "/auth") {
-			router.replace("/auth");
-			return;
-		}
+		if (!data) return;
+		const id = CookiesHelper.get<string>(CookieKeys.id, "");
+		if (id === "") return;
 
-		return userConfigListener(id);
-	}, []);
+		return userConfigListener(data, id);
+	}, [data]);
 
 	return { userConfig };
 };

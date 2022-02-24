@@ -1,4 +1,4 @@
-import Avatar from "../Avatar";
+import MyAvatar from "../Avatar";
 import styles from "./UseOverview.module.css";
 interface UserOverviewProps {
 	name: string;
@@ -10,7 +10,7 @@ const UserOverview: React.FC<UserOverviewProps> = ({ name, number, photoURL }) =
 	return (
 		<div className={styles.container}>
 			<div>
-				<Avatar size={48} photoURL={photoURL} letter={name} nonclickable />
+				<MyAvatar size={48} photoURL={photoURL} letter={name} nonclickable />
 			</div>
 			<div className={styles.right}>
 				<h3 className={styles.name}>{name}</h3>

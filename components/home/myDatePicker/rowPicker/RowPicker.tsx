@@ -1,8 +1,9 @@
 import clsx from "clsx";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import useDraggableScroll from "use-draggable-scroll";
 import { daysInMonthArray, getDay } from "../../../../function/dateConversions";
 import useIsMounted from "../../../../hooks/useIsMounted";
+import { AppContext } from "../../../../pages/_app";
 import { UserConfig } from "../../../../types/userConfig";
 import styles from "./RowPicker.module.css";
 import RowPickerItem from "./RowPickerItem";
@@ -14,6 +15,7 @@ interface RowPickerProps {
 }
 
 const RowPicker: React.FC<RowPickerProps> = ({ userConfig, chosenDay, month, year }) => {
+	const { fireStoreHelper } = useContext(AppContext);
 	const myScrollContainer = useRef<HTMLDivElement>(null);
 	const selectedDayRef = useRef<HTMLDivElement>(null);
 	const [isClickingDate, setIsClickingDate] = useState(true);
@@ -43,9 +45,9 @@ const RowPicker: React.FC<RowPickerProps> = ({ userConfig, chosenDay, month, yea
 	}, [userConfig]);
 
 	const changeDate = (day: number) => {
-		if (!isClickingDate) return;
+		if (!isClickingDate || !fireStoreHelper) return;
 		const date = new Date(year, month - 1, day);
-		userConfig.updateDate(date);
+		userConfig.updateDate(date, fireStoreHelper);
 	};
 
 	return (

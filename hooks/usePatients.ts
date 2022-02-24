@@ -1,19 +1,18 @@
-import { Unsubscribe } from "firebase/firestore";
-import MyUser, { Patient } from "../classes/MyUser";
 import { useEffect, useState } from "react";
-import { FireStoreHelper } from "../classes/FireStoreHelper";
+import MyUser, { Patient } from "../classes/MyUser";
 import logError from "../function/logError";
 import notify from "../function/notify";
+import { FirebaseData } from "../pages/_app";
 
-type usePatientsType = (user: MyUser) => { patients: Patient[] };
+type usePatientsType = (user: MyUser, data?: FirebaseData) => { patients: Patient[] };
 
-const usePatients: usePatientsType = (user) => {
+const usePatients: usePatientsType = (user, data) => {
 	const [patients, setPatients] = useState<Patient[]>([]);
 
 	//* Does not require reload on page to get updated data
-	const getPatientsListener = () => {
+	const getPatientsListener = (data: FirebaseData) => {
 		try {
-			const unsub = FireStoreHelper.patientsListener(user, setPatients);
+			const unsub = data.fireStoreHelper.patientsListener(user, setPatients);
 			return () => {
 				unsub();
 			};
@@ -26,10 +25,10 @@ const usePatients: usePatientsType = (user) => {
 
 	// TODO: move to serverside
 	useEffect(() => {
-		if (user.id === "") return;
+		if (!data || user.id === "") return;
 		console.log("usePatients accessed");
-		return getPatientsListener();
-	}, [user]);
+		return getPatientsListener(data);
+	}, [user, data]);
 
 	return { patients: patients };
 };

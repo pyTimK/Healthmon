@@ -1,10 +1,7 @@
 import { Bell } from "akar-icons";
 import { motion } from "framer-motion";
-import React, { MouseEventHandler, useContext, useEffect, useMemo, useState } from "react";
-import { FireStoreHelper } from "../../classes/FireStoreHelper";
-import { Formatted, HealthWorker } from "../../classes/MyUser";
+import React, { MouseEventHandler, useContext, useMemo, useState } from "react";
 import sortNotifs from "../../function/sortNotifs";
-import useNotifListeners from "../../hooks/useNotifListeners";
 import { AppContext } from "../../pages/_app";
 import { MonitorRequestNotif, RecordCommentNotif } from "../../types/Notification";
 import NotifBlock from "./NotifBlock";

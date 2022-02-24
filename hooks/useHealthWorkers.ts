@@ -1,19 +1,18 @@
-import { Unsubscribe } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { FireStoreHelper } from "../classes/FireStoreHelper";
 import MyUser, { HealthWorker } from "../classes/MyUser";
 import logError from "../function/logError";
 import notify from "../function/notify";
+import { FirebaseData } from "./../pages/_app";
 
-type useHealthWorkersType = (user: MyUser) => { healthWorkers: HealthWorker[] };
+type useHealthWorkersType = (user: MyUser, data?: FirebaseData) => { healthWorkers: HealthWorker[] };
 
-const useHealthWorkers: useHealthWorkersType = (user) => {
+const useHealthWorkers: useHealthWorkersType = (user, data) => {
 	const [healthWorkers, setHealthWorkers] = useState<HealthWorker[]>([]);
 
 	//* Does not require reload on page to get updated data
-	const getHealthWorkersListener = () => {
+	const getHealthWorkersListener = (data: FirebaseData) => {
 		try {
-			const unsub = FireStoreHelper.healthWorkersListener(user, setHealthWorkers);
+			const unsub = data.fireStoreHelper.healthWorkersListener(user, setHealthWorkers);
 			return () => unsub();
 		} catch (_e) {
 			logError(_e);
@@ -24,10 +23,10 @@ const useHealthWorkers: useHealthWorkersType = (user) => {
 
 	// TODO: move to serverside
 	useEffect(() => {
-		if (user.id === "") return;
+		if (!data || user.id === "") return;
 		console.log("useHealthWorkers accessed");
-		return getHealthWorkersListener();
-	}, [user]);
+		return getHealthWorkersListener(data);
+	}, [user, data]);
 
 	return { healthWorkers: healthWorkers };
 };

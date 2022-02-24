@@ -1,7 +1,7 @@
 import { SettingsHorizontal } from "akar-icons";
 import clsx from "clsx";
 import { useRouter } from "next/router";
-import { Dispatch, SetStateAction } from "react";
+import React, { Dispatch, SetStateAction } from "react";
 import { MonitorRequestNotif, RecordCommentNotif } from "../../types/Notification";
 import Divider from "../Divider";
 import Sizedbox from "../Sizedbox";

@@ -2,9 +2,10 @@ import { ChevronDown } from "akar-icons";
 import clsx from "clsx";
 import { AnimatePresence, motion } from "framer-motion";
 import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import DatePicker from "sassy-datepicker";
 import { getMonthYearFromStr } from "../../../../function/dateConversions";
+import { AppContext } from "../../../../pages/_app";
 import { UserConfig } from "../../../../types/userConfig";
 import Overlay from "../../../Overlay/Overlay";
 import styles from "./DropdownPicker.module.css";
@@ -17,10 +18,13 @@ interface DropdownPickerProps {
 }
 
 const DropdownPicker: React.FC<DropdownPickerProps> = ({ userConfig, month, year }) => {
+	const { fireStoreHelper } = useContext(AppContext);
 	const [isPickingDate, setIsPickingDate] = useState(false);
 
 	const changeDate = (date: Date) => {
-		userConfig.updateDate(date);
+		if (!fireStoreHelper) return;
+
+		userConfig.updateDate(date, fireStoreHelper);
 	};
 
 	const toggleIsPickingDate = () => {

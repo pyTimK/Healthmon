@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { Patient } from "../../classes/MyUser";
 import generateRecordDescrip from "../../function/generateRecordDescrip";
-import Avatar from "../Avatar";
+import MyAvatar from "../Avatar";
 import styles from "./RecordHeader.module.css";
 
 interface RecordHeadingProps {
@@ -14,7 +14,7 @@ const RecordHeader: React.FC<RecordHeadingProps> = ({ patient, isPresent, allNor
 	const generatedRecordDescrip = useMemo(() => generateRecordDescrip(isPresent, allNormal), [isPresent, allNormal]);
 	return (
 		<div className={styles.container}>
-			<Avatar letter={patient.name} nonclickable photoURL={patient.photoURL} />
+			<MyAvatar letter={patient.name} nonclickable photoURL={patient.photoURL} />
 			<div className={styles.descriptionWrapper}>
 				<p className={styles.description}>
 					{patient.name} {generatedRecordDescrip}

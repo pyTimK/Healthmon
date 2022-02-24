@@ -5,7 +5,7 @@ import React, { useContext } from "react";
 import { ToastContainer } from "react-toastify";
 import { PageDescriptions } from "../classes/Constants";
 import { Role } from "../classes/MyUser";
-import Avatar from "../components/Avatar";
+import MyAvatar from "../components/Avatar";
 import DropdownPicker from "../components/home/myDatePicker/dropdownPicker/DropdownPicker";
 import MyDatePicker from "../components/home/myDatePicker/MyDatePicker";
 import Layout from "../components/layout/Layout";
@@ -31,7 +31,7 @@ const Home: NextPage = () => {
 				{user.id !== "" && (
 					<div className={styles.title}>
 						<h1>
-							{dayGreetings()} {user?.name}
+							{dayGreetings()} <span className={styles.nameHome}>{user?.name}</span>
 						</h1>
 					</div>
 				)}
@@ -41,7 +41,7 @@ const Home: NextPage = () => {
 				{userConfig.role === Role.Patient ? <PatientRecordBlock /> : <HealthWorkerRecordBlocks />}
 				<Sizedbox height={100} />
 			</main>
-			<ToastContainer theme='colored' autoClose={2} />
+			<ToastContainer theme='colored' autoClose={2} closeButton={false} />
 		</Layout>
 	);
 };
@@ -53,12 +53,6 @@ const PatientRecordBlock: React.FC<PatientRecordBlockProps> = () => {
 	return <RecordsBlock headerHidden patient={user.toPatient()} />;
 };
 
-export const HealthWorkerRecodBlocksContext = React.createContext({
-	groupedCommentsBasedOnPatient: {} as {
-		[key: string]: UserComment[];
-	},
-});
-
 interface HealthWorkerRecordBlocksProps {}
 
 const HealthWorkerRecordBlocks: React.FC<HealthWorkerRecordBlocksProps> = () => {
@@ -67,13 +61,11 @@ const HealthWorkerRecordBlocks: React.FC<HealthWorkerRecordBlocksProps> = () => 
 	const groupedCommentsBasedOnPatient = groupCommentsBasedOnPatient(userComments);
 
 	return (
-		<HealthWorkerRecodBlocksContext.Provider value={{ groupedCommentsBasedOnPatient }}>
-			<div className={styles.recordsWrapper}>
-				{patients.map((patient, i) => (
-					<RecordsBlock key={i} patient={patient} />
-				))}
-			</div>
-		</HealthWorkerRecodBlocksContext.Provider>
+		<div className={styles.recordsWrapper}>
+			{patients.map((patient, i) => (
+				<RecordsBlock key={i} patient={patient} groupedCommentsBasedOnPatient={groupedCommentsBasedOnPatient} />
+			))}
+		</div>
 	);
 };
 
@@ -84,7 +76,7 @@ const Header: React.FC = () => {
 	const { month, year } = parseUserConfigDate(userConfig.date);
 	return (
 		<div className={styles.header}>
-			<Avatar
+			<MyAvatar
 				className={styles.avatar}
 				// size={26}
 				photoURL={user.photoURL}

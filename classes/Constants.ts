@@ -21,16 +21,16 @@ export const recordHeaderDescriptions = {
 
 	past: {
 		good: [
-			" felt well on this day.",
-			" felt good on this day.",
-			" couldn’t be better on this day.",
-			" felt fine on this day.",
+			" felt well on that day.",
+			" felt good on that day.",
+			" couldn’t be better on that day.",
+			" felt fine on that day.",
 		],
 		bad: [
-			" felt under the weather on this day.",
-			" did not feel good on this day.",
-			" was unwell on this day.",
-			" was feeling low on this day.",
+			" felt under the weather on that day.",
+			" did not feel good on that day.",
+			" was unwell on that day.",
+			" was feeling low on that day.",
 		],
 	},
 };

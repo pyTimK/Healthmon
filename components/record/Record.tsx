@@ -1,7 +1,6 @@
 import clsx from "clsx";
 import firebase from "firebase/compat/app";
 import React, { Dispatch, FocusEventHandler, ReactElement, SetStateAction, useContext, useRef, useState } from "react";
-import { FireStoreHelper } from "../../classes/FireStoreHelper";
 import { Role } from "../../classes/MyUser";
 import ButtonStatus from "../../enums/ButtonStatus";
 import { getTimeFromDate } from "../../function/dateConversions";
@@ -44,7 +43,7 @@ export const RecordContext = React.createContext({
 });
 
 const Record: React.FC<RecordProps> = ({ record, index, showCommentButtons, setSelectedRecord, recordMetaData }) => {
-	const { user, userConfig } = useContext(AppContext);
+	const { user, userConfig, fireStoreHelper } = useContext(AppContext);
 
 	const commentInputRef = useRef<HTMLTextAreaElement>(null);
 	const [cancelButtonStatus, setCancelButtonStatus] = useState<ButtonStatus>(ButtonStatus.Hidden);
@@ -98,12 +97,13 @@ const Record: React.FC<RecordProps> = ({ record, index, showCommentButtons, setS
 
 	const submitComment = async () => {
 		if (!canComment || !commentInputRef.current) return;
+		if (!fireStoreHelper) return;
 
 		const comment = commentInputRef.current.value;
 
 		try {
-			if (editMode) await FireStoreHelper.editComment(user, comment, recordMetaData);
-			else await FireStoreHelper.addComment(user, comment, recordMetaData);
+			if (editMode) await fireStoreHelper.editComment(user, comment, recordMetaData);
+			else await fireStoreHelper.addComment(user, comment, recordMetaData);
 			setEditMode(false);
 		} catch (_e) {
 			logError(_e);

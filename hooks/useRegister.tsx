@@ -7,7 +7,7 @@ import notify from "../function/notify";
 import { AppContext } from "../pages/_app";
 
 const useRegister = () => {
-	const { user, userConfig } = useContext(AppContext);
+	const { user, userConfig, fireStoreHelper } = useContext(AppContext);
 
 	const [proceedButtonStatus, setProceedButtonStatus] = useState(ButtonStatus.Enabled);
 	const { PersonalDetailsSettingsBlock, nameInputRef, numberInputRef, role } = usePersonalDetailsSettingsBlock(
@@ -17,12 +17,16 @@ const useRegister = () => {
 	const route = useRouter();
 
 	const updateUser: FormEventHandler<HTMLFormElement> = async (e) => {
+		if (!fireStoreHelper) return;
 		e.preventDefault();
 		setProceedButtonStatus(ButtonStatus.Disabled);
 		try {
-			await user.updatePersonalDetails(nameInputRef.current!.value, numberInputRef.current!.value);
-			console.log(userConfig);
-			await userConfig.updateRole(role);
+			await user.updatePersonalDetails(
+				nameInputRef.current!.value,
+				numberInputRef.current!.value,
+				fireStoreHelper
+			);
+			await userConfig.updateRole(role, fireStoreHelper);
 		} catch (_e) {
 			notify("Updating user details failed");
 			logError(_e);

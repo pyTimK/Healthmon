@@ -1,5 +1,4 @@
 import { useContext, useRef } from "react";
-import { FireStoreHelper } from "../../../../classes/FireStoreHelper";
 import MyUser, { HealthWorker } from "../../../../classes/MyUser";
 import logError from "../../../../function/logError";
 import notify from "../../../../function/notify";
@@ -13,16 +12,16 @@ interface HealthWorkersSettingsBlockProps {
 }
 
 const HealthWorkersSettingsBlock: React.FC<HealthWorkersSettingsBlockProps> = ({ user }) => {
-	const { healthWorkers } = useContext(AppContext);
+	const { healthWorkers, fireStoreHelper } = useContext(AppContext);
 	const selectedHealthWorker = useRef<HealthWorker | null>(null);
 
 	const { ConfirmModal, openConfirmModal, closeConfirmModal } = useConfirmModal();
 
 	const unpairHealthWorker = async () => {
-		if (!selectedHealthWorker.current) return;
+		if (!selectedHealthWorker.current || !fireStoreHelper) return;
 
 		try {
-			FireStoreHelper.remove_patient_healthWorker_relationship(user.toPatient(), selectedHealthWorker.current);
+			fireStoreHelper.remove_patient_healthWorker_relationship(user.toPatient(), selectedHealthWorker.current);
 			notify("HealthWorker unpaired", { type: "success" });
 		} catch (_e) {
 			logError(_e);

@@ -35,7 +35,7 @@ const RegisterScreen: NextPage = () => {
 			</form>
 
 			{/* TOAST */}
-			<ToastContainer theme='colored' autoClose={2} />
+			<ToastContainer theme='colored' autoClose={2} closeButton={false} />
 		</Layout>
 	);
 };

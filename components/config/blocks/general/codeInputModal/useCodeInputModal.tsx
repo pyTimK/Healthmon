@@ -1,11 +1,10 @@
 import { doc, getDoc } from "firebase/firestore";
 import dynamic from "next/dynamic";
-import { Dispatch, SetStateAction } from "react";
-import { FireStoreHelper } from "../../../../../classes/FireStoreHelper";
+import { Dispatch, SetStateAction, useContext } from "react";
 import MyUser from "../../../../../classes/MyUser";
-import { db } from "../../../../../firebase/initFirebase";
 import logError from "../../../../../function/logError";
 import notify from "../../../../../function/notify";
+import { AppContext } from "../../../../../pages/_app";
 import AuthenticateData from "../../../../../types/AuthenticateData";
 import useMyModal from "../../../../myModal/useMyModal";
 import Sizedbox from "../../../../Sizedbox";
@@ -22,10 +21,11 @@ type UseCodeInputModal = (
 
 //* Responsible for pairing up user to device
 const useCodeInputModal: UseCodeInputModal = (user, parsedQR, setParsedQR) => {
+	const { db, fireStoreHelper } = useContext(AppContext);
 	const [MyModal, openCodeInputModal, closeCodeInputModal, isCodeInputModalOpen] = useMyModal();
 
 	const submitCode = async (inputCode: string) => {
-		if (!parsedQR) return;
+		if (!parsedQR || !db || !fireStoreHelper) return;
 
 		const authenticateDoc = await getDoc(doc(db, "authenticate", parsedQR));
 		const deviceData = authenticateDoc.data() as AuthenticateData;
@@ -40,7 +40,7 @@ const useCodeInputModal: UseCodeInputModal = (user, parsedQR, setParsedQR) => {
 
 		//* Pair in Firestore
 		try {
-			await FireStoreHelper.pairDevice(user, parsedQR);
+			await fireStoreHelper.pairDevice(user, parsedQR);
 			user.device = parsedQR;
 			notify("Successfully linked device", { type: "success" });
 		} catch (_e) {

@@ -1,18 +1,17 @@
-import { Unsubscribe } from "firebase/firestore";
-import MyUser, { RequestedUser } from "../classes/MyUser";
 import { useEffect, useState } from "react";
-import { FireStoreHelper } from "../classes/FireStoreHelper";
+import MyUser, { RequestedUser } from "../classes/MyUser";
 import logError from "../function/logError";
 import notify from "../function/notify";
+import { FirebaseData } from "../pages/_app";
 
-type useRequestedUsersType = (user: MyUser) => { requestedUsers: RequestedUser[] };
+type useRequestedUsersType = (user: MyUser, data?: FirebaseData) => { requestedUsers: RequestedUser[] };
 
-const useRequestedUsers: useRequestedUsersType = (user) => {
+const useRequestedUsers: useRequestedUsersType = (user, data) => {
 	const [requestedUsers, setRequestedUsers] = useState<RequestedUser[]>([]);
 
-	const getRequestedUsersListener = () => {
+	const getRequestedUsersListener = (data: FirebaseData) => {
 		try {
-			const unsub = FireStoreHelper.requestedUsersListener(user, setRequestedUsers);
+			const unsub = data.fireStoreHelper.requestedUsersListener(user, setRequestedUsers);
 			return () => unsub();
 		} catch (_e) {
 			logError(_e);
@@ -23,10 +22,10 @@ const useRequestedUsers: useRequestedUsersType = (user) => {
 
 	// TODO: move to serverside
 	useEffect(() => {
-		if (user.id === "") return;
+		if (!data || user.id === "") return;
 		console.log("useRequestedUsers accessed");
-		return getRequestedUsersListener();
-	}, [user]);
+		return getRequestedUsersListener(data);
+	}, [user, data]);
 
 	return { requestedUsers: requestedUsers };
 };

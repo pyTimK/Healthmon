@@ -2,7 +2,11 @@ import { IncomingMessage } from "http";
 import cookies from "js-cookie";
 import cookie from "cookie";
 
-const allCookies: string[] = [];
+export const enum CookieKeys {
+	id = "id",
+}
+
+const allCookies: string[] = ["id"];
 export abstract class CookiesHelper {
 	static get<T>(key: string, fallBackValue: T): T {
 		try {
@@ -35,9 +39,13 @@ export abstract class CookiesHelper {
 		CookiesHelper.set(key, { ...prev, ...fields });
 	}
 
-	static clear() {
-		allCookies.forEach((ck) => {
-			cookies.remove(ck);
-		});
+	// static clear() {
+	// 	allCookies.forEach((ck) => {
+	// 		cookies.remove(ck);
+	// 	});
+	// }
+
+	static remove(key: CookieKeys) {
+		cookies.remove(key);
 	}
 }

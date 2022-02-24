@@ -1,6 +1,4 @@
-import { useContext } from "react";
-import { useRef } from "react";
-import { FireStoreHelper } from "../../../../classes/FireStoreHelper";
+import { useContext, useRef } from "react";
 import MyUser, { Patient } from "../../../../classes/MyUser";
 import logError from "../../../../function/logError";
 import notify from "../../../../function/notify";
@@ -14,7 +12,7 @@ interface PatientsSettingsBlockProps {
 	user: MyUser;
 }
 const PatientsSettingsBlock: React.FC<PatientsSettingsBlockProps> = ({ user }) => {
-	const { patients, requestedUsers } = useContext(AppContext);
+	const { patients, requestedUsers, fireStoreHelper } = useContext(AppContext);
 	const selectedPatient = useRef<Patient | null>(null);
 	const { PatientSearchModal, openPatientSearchModal, setSearchResult } = usePatientSearchModal(
 		user,
@@ -29,9 +27,9 @@ const PatientsSettingsBlock: React.FC<PatientsSettingsBlockProps> = ({ user }) =
 	};
 
 	const unpairPatient = async () => {
-		if (!selectedPatient.current) return;
+		if (!selectedPatient.current || !fireStoreHelper) return;
 		try {
-			FireStoreHelper.remove_patient_healthWorker_relationship(selectedPatient.current, user.toHealthWorker());
+			fireStoreHelper.remove_patient_healthWorker_relationship(selectedPatient.current, user.toHealthWorker());
 			notify("Patient unpaired", { type: "success" });
 		} catch (_e) {
 			logError(_e);

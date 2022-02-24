@@ -42,6 +42,12 @@
     cursor: pointer;
 }
 
+.resultsWrapper {
+    width: 100%;
+    /* height: 300px; */
+    /* overflow-y: scroll; */
+}
+
 .resultRow {
     display: flex;
     justify-content: space-between;
@@ -49,9 +55,10 @@
     width: 70%;
     padding: 8px 12px;
     border-radius: 5px;
+    max-height: 50vh;
 
     gap: 30px;
-    margin: 12px 0;
+    margin: 12px auto;
 }
 
 .resultRowButton {
@@ -68,7 +75,7 @@
 /*! SMARTPHONE */
 @media screen and (max-width: 600px) {
     .resultRow {
-        width: 90%;
+        width: 100%;
         flex-direction: column;
         gap: 5px;
     }

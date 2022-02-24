@@ -1,18 +1,18 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { CookiesHelper } from "../classes/CookiesHelper";
-import { FireStoreHelper } from "../classes/FireStoreHelper";
+import { CookieKeys, CookiesHelper } from "../classes/CookiesHelper";
 import MyUser from "../classes/MyUser";
 import logError from "../function/logError";
 import notify from "../function/notify";
+import { FirebaseData } from "../pages/_app";
 
-const useUser = () => {
+const useUser = (data?: FirebaseData) => {
 	const [user, setUser] = useState<MyUser>(new MyUser());
 	const router = useRouter();
 
-	const getUserData = async (id: string) => {
+	const getUserData = async (data: FirebaseData, id: string) => {
 		try {
-			const fetchedUser = await FireStoreHelper.getUser(id);
+			const fetchedUser = await data.fireStoreHelper.getUser(id);
 			setUser(fetchedUser);
 		} catch (_e) {
 			logError(_e);
@@ -22,13 +22,12 @@ const useUser = () => {
 
 	// TODO: move to serverside
 	useEffect(() => {
-		const id = CookiesHelper.get<string>("id", "");
-		if (id.length === 0 && router.pathname !== "/auth") {
-			router.replace("/auth");
-			return;
-		}
-		getUserData(id);
-	}, []);
+		if (!data) return;
+		const id = CookiesHelper.get<string>(CookieKeys.id, "");
+		if (id === "") return;
+
+		getUserData(data, id);
+	}, [data]);
 
 	return { user };
 };

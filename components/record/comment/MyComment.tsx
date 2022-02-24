@@ -1,14 +1,13 @@
 import { Pencil, TrashCan } from "akar-icons";
 import firebase from "firebase/compat/app";
 import { useContext } from "react";
-import { FireStoreHelper } from "../../../classes/FireStoreHelper";
 import { Role } from "../../../classes/MyUser";
 import { getCommentAge } from "../../../function/dateConversions";
 import logError from "../../../function/logError";
 import notify from "../../../function/notify";
 import { AppContext } from "../../../pages/_app";
 import { RecordComment } from "../../../types/RecordComment";
-import Avatar from "../../Avatar";
+import MyAvatar from "../../Avatar";
 import { RecordContext } from "../Record";
 import styles from "./MyComment.module.css";
 
@@ -19,7 +18,7 @@ interface MyCommentProps {
 }
 
 const MyComment: React.FC<MyCommentProps> = ({ comment, canEdit = false, onEdit }) => {
-	const { user, userConfig } = useContext(AppContext);
+	const { user, userConfig, fireStoreHelper } = useContext(AppContext);
 	const { editMode, userComment } = useContext(RecordContext);
 	const isMine = userConfig.role === Role.HealthWorker && comment.sender.id === user.id;
 	const isHidden = editMode && isMine;
@@ -30,10 +29,10 @@ const MyComment: React.FC<MyCommentProps> = ({ comment, canEdit = false, onEdit 
 	};
 
 	const deleteComment = async () => {
-		if (!isMine || !userComment) return;
+		if (!isMine || !userComment || !fireStoreHelper) return;
 
 		try {
-			await FireStoreHelper.removeComment(user, userComment);
+			await fireStoreHelper.removeComment(user, userComment);
 		} catch (_e) {
 			logError(_e);
 			notify("Error deleting comment");
@@ -44,7 +43,7 @@ const MyComment: React.FC<MyCommentProps> = ({ comment, canEdit = false, onEdit 
 	return (
 		<div className={styles.container}>
 			<div className={styles.header}>
-				<Avatar nonclickable photoURL={comment.sender.photoURL} letter={comment.sender.name} />
+				<MyAvatar nonclickable photoURL={comment.sender.photoURL} letter={comment.sender.name} />
 				<div className={styles.name}>{comment.sender.name}</div>
 
 				<div className={styles.time}>

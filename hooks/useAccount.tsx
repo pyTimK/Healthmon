@@ -1,17 +1,17 @@
 import { getAuth } from "firebase/auth";
 import { useRouter } from "next/router";
 import { FormEventHandler, useContext, useState } from "react";
+import { CookieKeys, CookiesHelper } from "../classes/CookiesHelper";
 import usePersonalDetailsSettingsBlock from "../components/config/blocks/personalDetails/usePersonalDetailsSettingsBlock";
 import ButtonStatus from "../enums/ButtonStatus";
-import { auth } from "../firebase/initFirebase";
 import logError from "../function/logError";
 import notify from "../function/notify";
 import { AppContext } from "../pages/_app";
 
 const useAccount = () => {
-	const { user, userConfig, device } = useContext(AppContext);
+	const { user, userConfig, fireStoreHelper, auth } = useContext(AppContext);
 	const router = useRouter();
-	const authUser = getAuth().currentUser;
+	const authUser = auth?.currentUser;
 
 	const { PersonalDetailsSettingsBlock, nameInputRef, numberInputRef, role, editing, setEditing } =
 		usePersonalDetailsSettingsBlock(user, userConfig, true);
@@ -19,11 +19,18 @@ const useAccount = () => {
 
 	const updateUser: FormEventHandler<HTMLFormElement> = async (e) => {
 		e.preventDefault();
+		if (!fireStoreHelper || !numberInputRef.current || !nameInputRef.current) return;
+
+		if (numberInputRef.current.value.length < 10) {
+			notify("Number must be at least 10 digits long");
+			return;
+		}
+
 		setSaveButtonStatus(ButtonStatus.Disabled);
 		try {
-			await user.updatePersonalDetails(nameInputRef.current!.value, numberInputRef.current!.value);
-			await userConfig.updateRole(role);
-			await notify("Successfully updated details", { type: "success" });
+			await user.updatePersonalDetails(nameInputRef.current.value, numberInputRef.current.value, fireStoreHelper);
+			await userConfig.updateRole(role, fireStoreHelper);
+			notify("Successfully updated details", { type: "success" });
 			setEditing(false);
 		} catch (_e) {
 			notify("Updating user details failed");
@@ -41,6 +48,9 @@ const useAccount = () => {
 	};
 
 	const logout = async () => {
+		if (!auth) return;
+		CookiesHelper.remove(CookieKeys.id);
+
 		try {
 			await auth.signOut();
 			router.replace("/auth");
@@ -59,7 +69,6 @@ const useAccount = () => {
 		updateUser,
 		editing,
 		saveButtonStatus,
-		device,
 	};
 };
 
