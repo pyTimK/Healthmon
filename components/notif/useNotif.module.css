@@ -13,10 +13,11 @@
 .notifDropdown {
     position: absolute;
     z-index: 3;
-    top: calc(var(--header-margin-top) + var(--header-height) + 4px);
+    top: calc(var(--header-margin-top) + var(--header-height) + 4px - 30px);
     right: 0;
     /* transform: translateX(calc(-1 * (var(--avatar-size) + 2 * var(--header-gap)))); */
-    transform: translateY(-30px);
+    /* transform: translateY(-30px); */
+    /* transform: scaleY(1) !important; */
     width: 360px;
     background-color: var(--background-light);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -44,9 +45,10 @@
 @media screen and (max-width: 600px) {
     .notifDropdown {
         right: 0;
-        transform: translateY(-20px);
+        top: calc(var(--header-margin-top) + var(--header-height) + 4px - 30px);
         width: 90%;
     }
+
 
     .redDot {
         width: 10px;

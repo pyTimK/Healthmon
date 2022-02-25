@@ -1,3 +1,4 @@
+import { AnimateSharedLayout } from "framer-motion";
 import React, { useContext, useEffect, useState } from "react";
 import { constructEmptyBaseUser, Patient, Role } from "../../classes/MyUser";
 import { getYYYYMMDD } from "../../function/dateConversions";
@@ -69,19 +70,21 @@ const RecordsBlock: React.FC<RecordsBlockProps> = ({
 				{!headerHidden && records.length > 0 && (
 					<RecordHeader patient={patient} allNormal={allNormal} isPresent={isPresent} />
 				)}
-				{records.length === recordsMetaData.length &&
-					records.map((record, i) => {
-						return (
-							<Record
-								key={i}
-								record={record}
-								index={i}
-								showCommentButtons={selectedRecord === i}
-								setSelectedRecord={setSelectedRecord}
-								recordMetaData={recordsMetaData[i]}
-							/>
-						);
-					})}
+				<AnimateSharedLayout>
+					{records.length === recordsMetaData.length &&
+						records.map((record, i) => {
+							return (
+								<Record
+									key={i}
+									record={record}
+									index={i}
+									showCommentButtons={selectedRecord === i}
+									setSelectedRecord={setSelectedRecord}
+									recordMetaData={recordsMetaData[i]}
+								/>
+							);
+						})}
+				</AnimateSharedLayout>
 			</div>
 		</RecordBlockContext.Provider>
 	);

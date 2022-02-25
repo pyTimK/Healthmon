@@ -1,6 +1,16 @@
 import clsx from "clsx";
 import firebase from "firebase/compat/app";
-import React, { Dispatch, FocusEventHandler, ReactElement, SetStateAction, useContext, useRef, useState } from "react";
+import { motion } from "framer-motion";
+import React, {
+	Dispatch,
+	FocusEventHandler,
+	ReactElement,
+	SetStateAction,
+	useContext,
+	useEffect,
+	useRef,
+	useState,
+} from "react";
 import { Role } from "../../classes/MyUser";
 import ButtonStatus from "../../enums/ButtonStatus";
 import { getTimeFromDate } from "../../function/dateConversions";
@@ -44,6 +54,7 @@ export const RecordContext = React.createContext({
 
 const Record: React.FC<RecordProps> = ({ record, index, showCommentButtons, setSelectedRecord, recordMetaData }) => {
 	const { user, userConfig, fireStoreHelper } = useContext(AppContext);
+	const [justOpened, setJustOpened] = useState(true);
 
 	const commentInputRef = useRef<HTMLTextAreaElement>(null);
 	const [cancelButtonStatus, setCancelButtonStatus] = useState<ButtonStatus>(ButtonStatus.Hidden);
@@ -74,6 +85,10 @@ const Record: React.FC<RecordProps> = ({ record, index, showCommentButtons, setS
 				: ButtonStatus.Disabled
 		);
 	};
+
+	useEffect(() => {
+		setJustOpened(false);
+	}, []);
 
 	const cancelEdit = () => {
 		if (!canComment) return;
@@ -111,57 +126,76 @@ const Record: React.FC<RecordProps> = ({ record, index, showCommentButtons, setS
 		}
 	};
 
+	const now = new Date();
+
 	return (
-		<RecordContext.Provider value={{ editMode, setEditMode, userComment }}>
-			<div className={styles.container} id={recordMetaData.recordTime}>
-				<div className={styles.left}>{getTimeFromDate(record.timestamp.toDate())}</div>
-				<div className={styles.right}>
-					<div className={clsx(styles.data, !canComment && !recordComments.length && styles.dataRoundBorder)}>
-						<Data
-							measurement={record.temp.toFixed(1)}
-							units=' °C'
-							name='Temp'
-							imgName='thermometer'
-							status={tempStatus(record.temp)}
-						/>
-						<Data
-							measurement={Math.floor(record.pulse).toString()}
-							units='BPM'
-							name='PR'
-							imgName='heartbeat'
-							status={pulseStatus(record.pulse)}
-						/>
-						<Data
-							measurement={Math.floor(record.spo2).toString()}
-							units='%'
-							name={
-								<>
-									SpO<sub>2</sub>
-								</>
-							}
-							imgName='blood'
-							status={spo2Status(record.spo2)}
+		<motion.div
+			layout={!justOpened}
+			initial={!justOpened && { height: 0 }}
+			animate={{ height: "fit-content", overflow: "hidden" }}
+			transition={{ duration: 3 }}>
+			<RecordContext.Provider value={{ editMode, setEditMode, userComment }}>
+				<div className={styles.container} id={recordMetaData.recordTime}>
+					<div className={styles.left}>
+						<div className={styles.leftTime}>{getTimeFromDate(record.timestamp.toDate())}</div>
+						{console.log(record.timestamp.toDate())}
+						{console.log(now.getTime() - (record.timestamp.toMillis() - 28800000))}
+						{now.getTime() - (record.timestamp.toMillis() - 28800000) < 300000 && (
+							<div className={styles.leftNew}>- RECENT -</div>
+						)}
+					</div>
+					<div className={styles.right}>
+						<div
+							className={clsx(
+								styles.data,
+								!canComment && !recordComments.length && styles.dataRoundBorder
+							)}>
+							<Data
+								measurement={record.temp.toFixed(1)}
+								units=' °C'
+								name='Temp'
+								imgName='thermometer'
+								status={tempStatus(record.temp)}
+							/>
+							<Data
+								measurement={Math.floor(record.pulse).toString()}
+								units='BPM'
+								name='PR'
+								imgName='heartbeat'
+								status={pulseStatus(record.pulse)}
+							/>
+							<Data
+								measurement={Math.floor(record.spo2).toString()}
+								units='%'
+								name={
+									<>
+										SpO<sub>2</sub>
+									</>
+								}
+								imgName='blood'
+								status={spo2Status(record.spo2)}
+							/>
+						</div>
+						<CommentBlock
+							commentInputRef={commentInputRef}
+							onFocus={onCommentInputFocus}
+							updateCommentButtonStatus={updateCommentButtonStatus}
+							canComment={canComment}
+							recordComments={recordComments}
 						/>
 					</div>
-					<CommentBlock
-						commentInputRef={commentInputRef}
-						onFocus={onCommentInputFocus}
-						updateCommentButtonStatus={updateCommentButtonStatus}
-						canComment={canComment}
-						recordComments={recordComments}
-					/>
 				</div>
-			</div>
-			{canComment && (
-				<CommentButtons
-					showCommentButtons={showCommentButtons}
-					cancelButtonStatus={cancelButtonStatus}
-					commentButtonStatus={commentButtonStatus}
-					onCancel={cancelEdit}
-					onComment={submitComment}
-				/>
-			)}
-		</RecordContext.Provider>
+				{canComment && (
+					<CommentButtons
+						showCommentButtons={showCommentButtons}
+						cancelButtonStatus={cancelButtonStatus}
+						commentButtonStatus={commentButtonStatus}
+						onCancel={cancelEdit}
+						onComment={submitComment}
+					/>
+				)}
+			</RecordContext.Provider>
+		</motion.div>
 	);
 };
 

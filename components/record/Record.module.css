@@ -6,9 +6,26 @@
 .left {
     flex: 1;
     display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    /* padding-right: 20px; */
     font-size: 1.5rem;
     font-weight: 200;
+}
+
+.leftTime {
+    display: flex;
     padding-top: 20px;
+
+}
+
+.leftNew {
+    font-size: 0.8rem;
+    font-weight: 100;
+    color: orange;
+    /* display: flex; */
+    /* align-items: center; */
+    /* justify-content: center; */
 }
 
 .right {
@@ -79,7 +96,18 @@
     }
 
     .left {
-        padding-top: 0px;
+        padding-top: 20px;
+        flex-direction: row;
+
+        align-items: center;
+    }
+
+    .leftTime {
+        padding-top: 0;
+    }
+
+    .leftNew {
+        padding-left: 10px;
     }
 
     .commentButtonsWrapper {

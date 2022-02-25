@@ -1,6 +1,15 @@
 import { Bell } from "akar-icons";
-import { motion } from "framer-motion";
-import React, { MouseEventHandler, useContext, useMemo, useState } from "react";
+import { AnimateSharedLayout, motion } from "framer-motion";
+import React, {
+	Dispatch,
+	memo,
+	MouseEventHandler,
+	SetStateAction,
+	useContext,
+	useEffect,
+	useMemo,
+	useState,
+} from "react";
 import sortNotifs from "../../function/sortNotifs";
 import { AppContext } from "../../pages/_app";
 import { MonitorRequestNotif, RecordCommentNotif } from "../../types/Notification";
@@ -37,21 +46,35 @@ const useNotif = () => {
 		);
 	};
 
-	const Notif: React.FC = () => {
-		return (
-			<motion.div
-				animate={{ height: "fit-content" }}
-				initial={{ height: 0 }}
-				exit={{ height: 0, transition: { duration: 0.2 } }}
-				className={styles.notifDropdown}>
-				<NotifBlock notifs={notifsList} setIsNotifOpen={setIsNotifOpen} />
-			</motion.div>
-		);
-	};
-
 	const Overlay: React.FC = () => <div className={styles.overlay} onClick={toggleNotif} />;
 
-	return { user, userConfig, isNotifOpen, NotifBell, Notif, Overlay };
+	return { user, userConfig, isNotifOpen, NotifBell, Overlay, notifsList, setIsNotifOpen };
 };
 
 export default useNotif;
+
+interface NotifProps {
+	notifsList: (MonitorRequestNotif | RecordCommentNotif)[];
+	setIsNotifOpen: Dispatch<SetStateAction<boolean>>;
+}
+
+export const Notif: React.FC<NotifProps> = ({ notifsList, setIsNotifOpen }) => {
+	const [justOpened, setJustOpened] = useState(true);
+	useEffect(() => {
+		setJustOpened(false);
+		// setTimeout(() => setJustOpened(false), 800);
+	}, []);
+	return (
+		<AnimateSharedLayout>
+			<motion.div
+				// layout
+				animate={{ height: "fit-content" }}
+				initial={{ height: 0 }}
+				exit={{ height: 0, transition: { duration: 0.2 } }}
+				// transition={{ duration: 5 }}
+				className={styles.notifDropdown}>
+				<NotifBlock notifs={notifsList} setIsNotifOpen={setIsNotifOpen} />
+			</motion.div>
+		</AnimateSharedLayout>
+	);
+};

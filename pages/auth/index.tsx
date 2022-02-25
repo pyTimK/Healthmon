@@ -1,11 +1,14 @@
+import clsx from "clsx";
 import { User } from "firebase/auth";
 import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
 import { doc, getDoc } from "firebase/firestore";
+import { AnimatePresence, motion } from "framer-motion";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useContext, useEffect, useState } from "react";
 import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
+import { CircleLoader, PuffLoader, RingLoader } from "react-spinners";
 import { ToastContainer } from "react-toastify";
 import { CookiesHelper } from "../../classes/CookiesHelper";
 import MyUser from "../../classes/MyUser";
@@ -19,9 +22,12 @@ const SignInScreen: NextPage = () => {
 	const [authUser, setAuthUser] = useState<User | null>(null);
 	const router = useRouter();
 	const avatarSize = device === DeviceType.Smartphone ? 80 : 150;
+	const [loading, setLoading] = useState(false);
 
 	const firestoreUserRecordChecker = async (authUser: User) => {
 		if (!db || !fireStoreHelper) return;
+
+		setLoading(true);
 
 		const snapshot = await getDoc(doc(db, "users", authUser.uid));
 		CookiesHelper.set("id", authUser.uid);
@@ -74,20 +80,29 @@ const SignInScreen: NextPage = () => {
 	};
 
 	return (
-		<div className={styles.container}>
-			<div className={styles.logo}>
-				<div style={{ width: avatarSize, height: avatarSize }}>
-					<img src='/img/icons/apple-touch-icon.png' alt='logo' width={avatarSize} />
+		<AnimatePresence exitBeforeEnter>
+			<motion.div className={styles.container} exit={{ opacity: 0 }} transition={{ duration: 3 }}>
+				<div className={styles.logo}>
+					<div style={{ width: avatarSize, height: avatarSize }}>
+						<img src='/img/icons/apple-touch-icon.png' alt='logo' width={avatarSize} />
+					</div>
+					<BackgroundBlob avatarSize={avatarSize} />
 				</div>
-				<BackgroundBlob avatarSize={avatarSize} />
-			</div>
-			<h1>Welcome</h1>
-			<p className={styles.p1}>Please sign-in using one of the following methods</p>
-			<StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={auth} />
-			<ToastContainer theme='colored' autoClose={2} closeButton={false} />
-			<img src='/img/svg/balls/pinkball.svg' alt='pink ball' className={styles.pinkball} />
-			<img src='/img/svg/balls/blackball.svg' alt='black ball' className={styles.blackball} />
-		</div>
+				<h1>{loading ? "Loading" : "Welcome"}</h1>
+				<p className={styles.p1}>{loading ? "" : "Please sign-in using one of the following methods"}</p>
+				{loading ? (
+					<div className={styles.loading}>
+						<RingLoader color='var(--pink)' loading={loading} size={150} />
+					</div>
+				) : (
+					<StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={auth} />
+				)}
+				<ToastContainer theme='colored' autoClose={2} closeButton={false} />
+				<img src='/img/svg/balls/pinkball.svg' alt='pink ball' className={styles.pinkball} />
+				<img src='/img/svg/balls/blackball.svg' alt='black ball' className={styles.blackball} />
+				<img src='/img/svg/balls/lines.svg' alt='black ball' className={clsx(styles.lines, "unselectable")} />
+			</motion.div>
+		</AnimatePresence>
 	);
 };
 

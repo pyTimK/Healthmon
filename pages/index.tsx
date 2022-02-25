@@ -9,7 +9,7 @@ import MyAvatar from "../components/Avatar";
 import DropdownPicker from "../components/home/myDatePicker/dropdownPicker/DropdownPicker";
 import MyDatePicker from "../components/home/myDatePicker/MyDatePicker";
 import Layout from "../components/layout/Layout";
-import useNotif from "../components/notif/useNotif";
+import useNotif, { Notif } from "../components/notif/useNotif";
 import RecordsBlock from "../components/record/RecordsBlock";
 import Sizedbox from "../components/Sizedbox";
 import { parseUserConfigDate } from "../function/dateConversions";
@@ -70,7 +70,7 @@ const HealthWorkerRecordBlocks: React.FC<HealthWorkerRecordBlocksProps> = () => 
 };
 
 const Header: React.FC = () => {
-	const { user, userConfig, Notif, NotifBell, Overlay, isNotifOpen } = useNotif();
+	const { user, userConfig, NotifBell, Overlay, isNotifOpen, notifsList, setIsNotifOpen } = useNotif();
 	const router = useRouter();
 	const goToAccounts = () => router.push("/account");
 	const { month, year } = parseUserConfigDate(userConfig.date);
@@ -85,7 +85,9 @@ const Header: React.FC = () => {
 			/>
 			<DropdownPicker userConfig={userConfig} month={month} year={year} />
 			<NotifBell />
-			<AnimatePresence>{isNotifOpen && <Notif />}</AnimatePresence>
+			<AnimatePresence>
+				{isNotifOpen && <Notif notifsList={notifsList} setIsNotifOpen={setIsNotifOpen} />}
+			</AnimatePresence>
 			<AnimatePresence>{isNotifOpen && <Overlay />}</AnimatePresence>
 		</div>
 	);

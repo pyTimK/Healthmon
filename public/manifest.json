@@ -46,7 +46,7 @@
   "scope": "/",
   "start_url": "/",
   "description": "Healthmon is a web application that is used together with the IoT-Based Health Monitoring Device <Device Name>. It monitors the collected health data of patients and stores the result in a cloud storage for later access.",
-  "display": "standalone",
+  "display": "fullscreen",
   "theme_color": "#17171B",
   "background_color": "#FFFFFF"
 }
